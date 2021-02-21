@@ -29,7 +29,8 @@ class GymList {
         _listSubject.add([]);
         return;
       }
-      final list = List<Map>.from(res.body).map((e) => Gym.fromMap(e)).toList();
+      final list =
+          List<Map>.from(res.body).map((e) => Gym.fromJson(e)).toList();
       if (list.isEmpty) {
         _listSubject.add([]);
         return;
@@ -73,6 +74,7 @@ class GymList {
   }
 }
 
+@JsonSerializable()
 class Gym {
   final String id;
   final String name;
@@ -80,17 +82,16 @@ class Gym {
   final List<Equipments> equipments;
   final List<BusinessHours> businessHours;
   final Price hourlyRate;
-  Gym.fromMap(Map map)
-      : id = map['id'],
-        name = map['name'],
-        address = map['address'],
-        hourlyRate = Price.fromJson(map['hourlyRate']),
-        equipments = List<Map>.from(map['equipments'])
-            .map((e) => Equipments.fromJson(e))
-            .toList(),
-        businessHours = List<Map>.from(map['businessHours'])
-            .map((e) => BusinessHours.fromJson(e))
-            .toList();
+  Gym(
+      {this.id,
+      this.name,
+      this.address,
+      this.equipments,
+      this.businessHours,
+      this.hourlyRate});
+
+  Map<String, dynamic> toJson() => _$GymToJson(this);
+  factory Gym.fromJson(Map<String, dynamic> json) => _$GymFromJson(json);
 }
 
 @JsonSerializable()

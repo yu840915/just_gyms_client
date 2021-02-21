@@ -6,6 +6,35 @@ part of 'gym_list.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
+Gym _$GymFromJson(Map<String, dynamic> json) {
+  return Gym(
+    id: json['id'] as String,
+    name: json['name'] as String,
+    address: json['address'] as String,
+    equipments: (json['equipments'] as List)
+        ?.map((e) =>
+            e == null ? null : Equipments.fromJson(e as Map<String, dynamic>))
+        ?.toList(),
+    businessHours: (json['businessHours'] as List)
+        ?.map((e) => e == null
+            ? null
+            : BusinessHours.fromJson(e as Map<String, dynamic>))
+        ?.toList(),
+    hourlyRate: json['hourlyRate'] == null
+        ? null
+        : Price.fromJson(json['hourlyRate'] as Map<String, dynamic>),
+  );
+}
+
+Map<String, dynamic> _$GymToJson(Gym instance) => <String, dynamic>{
+      'id': instance.id,
+      'name': instance.name,
+      'address': instance.address,
+      'equipments': instance.equipments,
+      'businessHours': instance.businessHours,
+      'hourlyRate': instance.hourlyRate,
+    };
+
 Equipments _$EquipmentsFromJson(Map<String, dynamic> json) {
   return Equipments(
     typeId: json['typeId'] as int,
