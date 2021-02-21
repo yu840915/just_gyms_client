@@ -48,6 +48,7 @@ class _MapViewPageState extends State<MapViewPage> {
         target: LatLng(position.latitude, position.longitude),
         zoom: 14,
       ),
+      minMaxZoomPreference: MinMaxZoomPreference(10, 20),
       myLocationEnabled: true,
       onMapCreated: (GoogleMapController controller) {
         _controller.complete(controller);
