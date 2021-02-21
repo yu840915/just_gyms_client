@@ -1,7 +1,12 @@
+import 'package:geolocator/geolocator.dart';
+import 'package:json_annotation/json_annotation.dart';
 import 'package:rxdart/subjects.dart';
 import 'package:where_gym/api_services/api_services.dart';
+part 'gym_list.g.dart';
 
 class GymList {
+  final _myLocationSubject = BehaviorSubject<Position>();
+  Stream<Position> get myLocationStream => _myLocationSubject;
   final _listSubject = BehaviorSubject<List<Gym>>();
   Stream<List<Gym>> get listStream => _listSubject;
   Future _task;
@@ -11,8 +16,13 @@ class GymList {
       return _task;
     }
     try {
-      final task =
-          APIServices.instances.get('/gyms?lat=25.131204&lon=121.498629');
+      final findLocation = _determinePosition();
+      _task = findLocation;
+      final pos = await findLocation;
+      print(pos.latitude);
+      print(pos.longitude);
+      final task = APIServices.instances
+          .get('/gyms?lat=${pos.latitude}&lon=${pos.longitude}');
       _task = task;
       final res = await task;
       if (res.body == null) {
@@ -28,6 +38,34 @@ class GymList {
     } finally {
       _task = null;
     }
+  }
+
+  Future<Position> _determinePosition() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      return Future.error('Location services are disabled.');
+    }
+
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.deniedForever) {
+      return Future.error(
+          'Location permissions are permantly denied, we cannot request permissions.');
+    }
+
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission != LocationPermission.whileInUse &&
+          permission != LocationPermission.always) {
+        return Future.error(
+            'Location permissions are denied (actual value: $permission).');
+      }
+    }
+    final pos = await Geolocator.getCurrentPosition();
+    _myLocationSubject.add(pos);
+    return pos;
   }
 
   void dispose() {
@@ -46,38 +84,46 @@ class Gym {
       : id = map['id'],
         name = map['name'],
         address = map['address'],
-        hourlyRate = Price.fromMap(map['hourlyRate']),
+        hourlyRate = Price.fromJson(map['hourlyRate']),
         equipments = List<Map>.from(map['equipments'])
-            .map((e) => Equipments.fromMap(e))
+            .map((e) => Equipments.fromJson(e))
             .toList(),
         businessHours = List<Map>.from(map['businessHours'])
-            .map((e) => BusinessHours.fromMap(e))
+            .map((e) => BusinessHours.fromJson(e))
             .toList();
 }
 
+@JsonSerializable()
 class Equipments {
   final int typeId;
   final String name;
   final int number;
 
-  Equipments.fromMap(Map map)
-      : typeId = map['typeId'],
-        name = map['name'],
-        number = map['number'];
+  Equipments({this.typeId, this.name, this.number});
+  factory Equipments.fromJson(Map<String, dynamic> json) =>
+      _$EquipmentsFromJson(json);
+
+  Map<String, dynamic> toJson() => _$EquipmentsToJson(this);
 }
 
+@JsonSerializable()
 class Price {
   final int amount;
   final String currency;
-  Price.fromMap(Map map)
-      : amount = map['amount'],
-        currency = map['currency'];
+  Price({this.amount, this.currency});
+
+  Map<String, dynamic> toJson() => _$PriceToJson(this);
+
+  factory Price.fromJson(Map<String, dynamic> json) => _$PriceFromJson(json);
 }
 
+@JsonSerializable()
 class BusinessHours {
   final int start;
   final int end;
-  BusinessHours.fromMap(Map map)
-      : start = map['start'],
-        end = map['end'];
+  BusinessHours({this.start, this.end});
+
+  Map<String, dynamic> toJson() => _$BusinessHoursToJson(this);
+  factory BusinessHours.fromJson(Map<String, dynamic> json) =>
+      _$BusinessHoursFromJson(json);
 }

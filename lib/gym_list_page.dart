@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:where_gym/gym_list.dart';
+import 'package:where_gym/map_view_page.dart';
 
 class GymListPage extends StatefulWidget {
   @override
@@ -22,11 +23,28 @@ class _GymListPageState extends State<GymListPage> {
     super.dispose();
   }
 
+  void _showMapView(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => MapViewPage(_gymList),
+        fullscreenDialog: true,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(leading: _buildMapButton(context)),
       body: _buildBody(context),
+    );
+  }
+
+  Widget _buildMapButton(BuildContext context) {
+    return FlatButton(
+      onPressed: () => _showMapView(context),
+      child: Text('地圖'),
     );
   }
 
