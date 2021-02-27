@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:geolocator/geolocator.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:rxdart/subjects.dart';
@@ -29,8 +31,9 @@ class GymList {
         _listSubject.add([]);
         return;
       }
-      final list =
-          List<Map>.from(res.body).map((e) => Gym.fromJson(e)).toList();
+      final list = List<Map>.from(jsonDecode(res.body))
+          .map((e) => Gym.fromJson(e))
+          .toList();
       if (list.isEmpty) {
         _listSubject.add([]);
         return;
