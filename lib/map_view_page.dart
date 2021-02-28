@@ -18,6 +18,7 @@ class _MapViewPageState extends State<MapViewPage> {
   Completer<GoogleMapController> _controller = Completer();
   GymList get gymList => widget.gymList;
   GymMarkerList markerList;
+  List<GymMarker> _markers = [];
 
   @override
   void initState() {
@@ -48,17 +49,27 @@ class _MapViewPageState extends State<MapViewPage> {
       mapType: MapType.normal,
       initialCameraPosition: CameraPosition(
         target: LatLng(position.latitude, position.longitude),
-        zoom: 14,
+        zoom: 15,
       ),
       minMaxZoomPreference: MinMaxZoomPreference(10, 20),
       myLocationEnabled: true,
+      markers: _markers.map((e) => e.toMarker()).toSet(),
+      onCameraIdle: () {
+        markerList.updateMarkerIfNeeded();
+      },
       onMapCreated: (GoogleMapController controller) {
         _controller.complete(controller);
-        markerList = GymMarkerList(controller);
-        markerList.fetchMarkersForRegion(
-          MapDataRegion(center: LatLng(25.131204, 121.498629), radiusInM: 3000),
-        );
+        _prepareMarkerList(controller);
       },
     );
+  }
+
+  void _prepareMarkerList(GoogleMapController controller) {
+    markerList = GymMarkerList(controller);
+    markerList.markerStream.listen((event) {
+      setState(() {
+        _markers = event ?? [];
+      });
+    });
   }
 }
