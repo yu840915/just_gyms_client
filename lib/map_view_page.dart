@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:where_gym/gym_list.dart';
+import 'package:where_gym/gym_marker_list.dart';
 
 class MapViewPage extends StatefulWidget {
   final GymList gymList;
@@ -16,6 +17,7 @@ class MapViewPage extends StatefulWidget {
 class _MapViewPageState extends State<MapViewPage> {
   Completer<GoogleMapController> _controller = Completer();
   GymList get gymList => widget.gymList;
+  GymMarkerList markerList;
 
   @override
   void initState() {
@@ -52,6 +54,10 @@ class _MapViewPageState extends State<MapViewPage> {
       myLocationEnabled: true,
       onMapCreated: (GoogleMapController controller) {
         _controller.complete(controller);
+        markerList = GymMarkerList(controller);
+        markerList.fetchMarkersForRegion(
+          MapDataRegion(center: LatLng(25.131204, 121.498629), radiusInM: 3000),
+        );
       },
     );
   }
