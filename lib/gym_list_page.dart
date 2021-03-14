@@ -77,7 +77,8 @@ class _Row extends StatelessWidget {
         children: [
           Text(gym.name),
           Text(gym.address),
-          Text(gym.hourlyRate.currency + ' ${gym.hourlyRate.amount}'),
+          if (gym.hourlyRate != null)
+            Text(gym.hourlyRate.currency + ' ${gym.hourlyRate.amount}'),
           _buildEquipments()
         ],
       ),

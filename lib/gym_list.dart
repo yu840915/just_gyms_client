@@ -123,8 +123,8 @@ class Price {
 
 @JsonSerializable()
 class BusinessHours {
-  final int start;
-  final int end;
+  final String start;
+  final String end;
   BusinessHours({this.start, this.end});
 
   Map<String, dynamic> toJson() => _$BusinessHoursToJson(this);

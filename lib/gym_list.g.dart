@@ -64,8 +64,8 @@ Map<String, dynamic> _$PriceToJson(Price instance) => <String, dynamic>{
 
 BusinessHours _$BusinessHoursFromJson(Map<String, dynamic> json) {
   return BusinessHours(
-    start: json['start'] as int,
-    end: json['end'] as int,
+    start: json['start'] as String,
+    end: json['end'] as String,
   );
 }
 
