@@ -12,7 +12,11 @@ import 'package:where_gym/gym_list.dart';
 class GymMarkerList {
   final GoogleMap.GoogleMapController mapController;
   final _markersSubject = BehaviorSubject<List<GymMarker>>();
+  final _displayableMarkersSubject =
+      BehaviorSubject<List<DisplayableGymMarker>>();
   Stream<List<GymMarker>> get markerStream => _markersSubject;
+  Stream<List<DisplayableGymMarker>> get displayableMarkersStream =>
+      _displayableMarkersSubject;
   MapDataRegion _currentRegion;
   int _zoomLevel;
 
@@ -54,7 +58,21 @@ class GymMarkerList {
     );
     _currentRegion = region;
     _markersSubject.add(markers);
-    print(markers);
+    _displayableMarkersSubject.add([]);
+  }
+
+  void insertDisplayableMarker(DisplayableGymMarker marker) {
+    final missing = _markersSubject.value.indexWhere(
+          (element) => element.id == marker.id,
+        ) ==
+        -1;
+    if (missing) {
+      return;
+    }
+    final list =
+        List<DisplayableGymMarker>.from(_displayableMarkersSubject.value ?? []);
+    list.add(marker);
+    _displayableMarkersSubject.add(list);
   }
 }
 
@@ -62,7 +80,9 @@ class GymMarker {
   final String id;
   final GoogleMap.LatLng latLng;
   final List<Gym> gyms;
-  GymMarker({@required this.latLng, @required this.gyms}) : id = gyms.first.id;
+
+  GymMarker({@required this.latLng, @required this.gyms})
+      : id = gyms.first.id + '-${gyms.length}';
 
   static Future<GymMarker> fromMarkerFeature(
       GeoJsonFeature<GeoJsonPoint> feature) async {
@@ -90,6 +110,30 @@ class GymMarker {
       markerId: GoogleMap.MarkerId(id),
       position: latLng,
       infoWindow: infoWindow,
+    );
+  }
+}
+
+class DisplayableGymMarker {
+  GymMarker _gymMarker;
+
+  String get id => _gymMarker.id;
+
+  List<Gym> get gyms => _gymMarker.gyms;
+
+  GoogleMap.LatLng get latLng => _gymMarker.latLng;
+  final GoogleMap.BitmapDescriptor icon;
+
+  DisplayableGymMarker({this.icon, GymMarker marker}) : _gymMarker = marker;
+
+  GoogleMap.Marker toMarker() {
+    final marker = _gymMarker.toMarker();
+
+    return GoogleMap.Marker(
+      markerId: marker.markerId,
+      position: marker.position,
+      infoWindow: marker.infoWindow,
+      icon: icon,
     );
   }
 }

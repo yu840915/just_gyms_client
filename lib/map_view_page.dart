@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:where_gym/gym_list.dart';
+import 'package:where_gym/gym_marker_image_maker.dart';
 import 'package:where_gym/gym_marker_list.dart';
 
 class MapViewPage extends StatefulWidget {
@@ -18,7 +19,7 @@ class _MapViewPageState extends State<MapViewPage> {
   Completer<GoogleMapController> _controller = Completer();
   GymList get gymList => widget.gymList;
   GymMarkerList markerList;
-  List<GymMarker> _markers = [];
+  List<DisplayableGymMarker> _markers = [];
 
   @override
   void initState() {
@@ -27,17 +28,23 @@ class _MapViewPageState extends State<MapViewPage> {
 
   @override
   Widget build(BuildContext context) {
-    return new Scaffold(
-      appBar: AppBar(),
-      body: StreamBuilder<Position>(
-        stream: gymList.myLocationStream.take(1),
-        builder: (context, snapshot) => _buildMapView(context, snapshot.data),
-      ),
-      // floatingActionButton: FloatingActionButton.extended(
-      //   onPressed: _goToTheLake,
-      //   label: Text('To the lake!'),
-      //   icon: Icon(Icons.directions_boat),
-      // ),
+    return Stack(
+      children: [
+        if (markerList != null) GymMarkerImageMakerContainers(markerList),
+        new Scaffold(
+          appBar: AppBar(),
+          body: StreamBuilder<Position>(
+            stream: gymList.myLocationStream.take(1),
+            builder: (context, snapshot) =>
+                _buildMapView(context, snapshot.data),
+          ),
+          // floatingActionButton: FloatingActionButton.extended(
+          //   onPressed: _goToTheLake,
+          //   label: Text('To the lake!'),
+          //   icon: Icon(Icons.directions_boat),
+          // ),
+        ),
+      ],
     );
   }
 
@@ -66,7 +73,7 @@ class _MapViewPageState extends State<MapViewPage> {
 
   void _prepareMarkerList(GoogleMapController controller) {
     markerList = GymMarkerList(controller);
-    markerList.markerStream.listen((event) {
+    markerList.displayableMarkersStream.listen((event) {
       setState(() {
         _markers = event ?? [];
       });
