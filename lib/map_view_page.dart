@@ -37,12 +37,7 @@ class _MapViewPageState extends State<MapViewPage> {
             stream: gymList.myLocationStream.take(1),
             builder: (context, snapshot) =>
                 _buildMapView(context, snapshot.data),
-          ),
-          // floatingActionButton: FloatingActionButton.extended(
-          //   onPressed: _goToTheLake,
-          //   label: Text('To the lake!'),
-          //   icon: Icon(Icons.directions_boat),
-          // ),
+          ),          
         ),
       ],
     );

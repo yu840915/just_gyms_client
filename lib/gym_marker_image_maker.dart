@@ -4,7 +4,9 @@ import 'package:after_layout/after_layout.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:where_gym/gym_list.dart';
 import 'package:where_gym/gym_marker_list.dart';
+import 'package:where_gym/shared_appearances.dart';
 
 class GymMarkerImageMakerContainers extends StatelessWidget {
   final GymMarkerList gymMarkerList;
@@ -12,11 +14,13 @@ class GymMarkerImageMakerContainers extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<List<GymMarker>>(
-      stream: gymMarkerList.markerStream,
-      builder: (context, snapshot) {
-        return _buildMarkerMakers(context, snapshot.data);
-      },
+    return Material(
+      child: StreamBuilder<List<GymMarker>>(
+        stream: gymMarkerList.markerStream,
+        builder: (context, snapshot) {
+          return _buildMarkerMakers(context, snapshot.data);
+        },
+      ),
     );
   }
 
@@ -24,8 +28,7 @@ class GymMarkerImageMakerContainers extends StatelessWidget {
     if (list == null) {
       return Container();
     }
-    return GridView.count(
-      crossAxisCount: 10,
+    return Stack(
       children: list
           .map((e) =>
               GymMarkerImageMaker(gymMarker: e, gymMarkerList: gymMarkerList))
@@ -47,6 +50,8 @@ class GymMarkerImageMaker extends StatefulWidget {
 class _GymMarkerImageMakerState extends State<GymMarkerImageMaker>
     with AfterLayoutMixin<GymMarkerImageMaker> {
   final GlobalKey iconKey = GlobalKey();
+  GymMarker get gymMarker => widget.gymMarker;
+
   @override
   void afterFirstLayout(BuildContext context) async {
     RenderRepaintBoundary boundary = iconKey.currentContext.findRenderObject();
@@ -71,9 +76,44 @@ class _GymMarkerImageMakerState extends State<GymMarkerImageMaker>
 
   Widget _buildMarkerContent() {
     return Container(
-      height: 30,
-      width: 30,
-      color: Colors.red,
+      child: gymMarker.gyms.length == 1
+          ? _buildMarkerContentForGym(gymMarker.gyms.first)
+          : _buildMarkerContentForCollection(gymMarker.gyms),
+      padding: EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+      decoration: BoxDecoration(
+        color: AppColors.theme,
+        border: Border.all(color: Colors.green.shade900),
+        borderRadius: BorderRadius.circular(8),
+      ),
+    );
+  }
+
+  Widget _buildMarkerContentForCollection(List<Gym> list) {
+    return Text(
+      '${list.length} 項結果',
+      style: TextStyle(
+        color: Colors.green.shade900,
+        fontSize: 12,
+      ),
+    );
+  }
+
+  Widget _buildMarkerContentForGym(Gym gym) {
+    if (gym.hourlyRate == null) {
+      return Text(
+        '1 項結果',
+        style: TextStyle(
+          color: Colors.green.shade900,
+          fontSize: 12,
+        ),
+      );
+    }
+    return Text(
+      '${gym.hourlyRate.currency} ${gym.hourlyRate.amount}',
+      style: TextStyle(
+        color: Colors.green.shade900,
+        fontSize: 12,
+      ),
     );
   }
 }
