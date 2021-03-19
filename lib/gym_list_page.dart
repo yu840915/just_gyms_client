@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:where_gym/gym_list.dart';
-import 'package:where_gym/map_view_page.dart';
+import 'package:where_gym/map_view/map_view_page.dart';
 
 class GymListPage extends StatefulWidget {
   @override
@@ -42,7 +42,7 @@ class _GymListPageState extends State<GymListPage> {
   }
 
   Widget _buildMapButton(BuildContext context) {
-    return FlatButton(
+    return TextButton(
       onPressed: () => _showMapView(context),
       child: Text('地圖'),
     );

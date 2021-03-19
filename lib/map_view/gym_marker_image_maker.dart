@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:where_gym/gym_list.dart';
-import 'package:where_gym/gym_marker_list.dart';
+import 'package:where_gym/map_view/gym_marker_list.dart';
 import 'package:where_gym/shared_appearances.dart';
 
 class GymMarkerImageMakerContainers extends StatelessWidget {

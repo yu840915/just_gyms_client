@@ -13,7 +13,10 @@ class GymMarkerList {
   final GoogleMap.GoogleMapController mapController;
   final _markersSubject = BehaviorSubject<List<GymMarker>>();
   final _displayableMarkersSubject =
-      BehaviorSubject<List<DisplayableGymMarker>>();
+      BehaviorSubject<List<DisplayableGymMarker>>()..add([]);
+  final _selectedMarkerIdSubject = BehaviorSubject<String>();
+  Stream<String> get selectedMarkerIdStream => _selectedMarkerIdSubject;
+  String get selectedMarkerId => _selectedMarkerIdSubject.value;
   Stream<List<GymMarker>> get markerStream => _markersSubject;
   Stream<List<DisplayableGymMarker>> get displayableMarkersStream =>
       _displayableMarkersSubject;
@@ -24,6 +27,7 @@ class GymMarkerList {
 
   void dispose() {
     _markersSubject.close();
+    _selectedMarkerIdSubject.close();
   }
 
   Future<void> updateMarkerIfNeeded() async {
@@ -59,6 +63,14 @@ class GymMarkerList {
     _currentRegion = region;
     _markersSubject.add(markers);
     _displayableMarkersSubject.add([]);
+    if (_selectedMarkerIdSubject.value != null) {
+      final missing = markers.indexWhere(
+              (element) => element.id == _selectedMarkerIdSubject.value) ==
+          -1;
+      if (missing) {
+        _selectedMarkerIdSubject.add(null);
+      }
+    }
   }
 
   void insertDisplayableMarker(DisplayableGymMarker marker) {
@@ -73,6 +85,14 @@ class GymMarkerList {
         List<DisplayableGymMarker>.from(_displayableMarkersSubject.value ?? []);
     list.add(marker);
     _displayableMarkersSubject.add(list);
+  }
+
+  void selectedMarker(DisplayableGymMarker marker) {
+    if (marker == null) {
+      _selectedMarkerIdSubject.add(null);
+    } else if (_displayableMarkersSubject.value.contains(marker)) {
+      _selectedMarkerIdSubject.add(marker.id);
+    }
   }
 }
 
@@ -95,21 +115,9 @@ class GymMarker {
   }
 
   GoogleMap.Marker toMarker() {
-    GoogleMap.InfoWindow infoWindow;
-    if (gyms.length == 1) {
-      infoWindow = GoogleMap.InfoWindow(
-        title: gyms.first.name,
-        snippet: gyms.first.address,
-      );
-    } else {
-      infoWindow = GoogleMap.InfoWindow(
-        title: '${gyms.length} 項結果',
-      );
-    }
     return GoogleMap.Marker(
       markerId: GoogleMap.MarkerId(id),
       position: latLng,
-      infoWindow: infoWindow,
     );
   }
 }
@@ -126,14 +134,14 @@ class DisplayableGymMarker {
 
   DisplayableGymMarker({this.icon, GymMarker marker}) : _gymMarker = marker;
 
-  GoogleMap.Marker toMarker() {
+  GoogleMap.Marker toMarker({Function onTap}) {
     final marker = _gymMarker.toMarker();
 
     return GoogleMap.Marker(
       markerId: marker.markerId,
       position: marker.position,
-      infoWindow: marker.infoWindow,
       icon: icon,
+      onTap: onTap,
     );
   }
 }

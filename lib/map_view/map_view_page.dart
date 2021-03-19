@@ -4,8 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:where_gym/gym_list.dart';
-import 'package:where_gym/gym_marker_image_maker.dart';
-import 'package:where_gym/gym_marker_list.dart';
+import 'package:where_gym/map_view/gym_marker_image_maker.dart';
+import 'package:where_gym/map_view/gym_marker_info_page_view.dart';
+import 'package:where_gym/map_view/gym_marker_list.dart';
 
 class MapViewPage extends StatefulWidget {
   final GymList gymList;
@@ -37,8 +38,13 @@ class _MapViewPageState extends State<MapViewPage> {
             stream: gymList.myLocationStream.take(1),
             builder: (context, snapshot) =>
                 _buildMapView(context, snapshot.data),
-          ),          
+          ),
         ),
+        if (markerList != null)
+          Container(
+            child: Material(child: GymMarkerInfoPageView(markerList)),
+            height: 100,
+          ),
       ],
     );
   }
@@ -55,23 +61,32 @@ class _MapViewPageState extends State<MapViewPage> {
       ),
       minMaxZoomPreference: MinMaxZoomPreference(10, 20),
       myLocationEnabled: true,
-      markers: _markers.map((e) => e.toMarker()).toSet(),
+      markers:
+          _markers.map((e) => e.toMarker(onTap: () => _onMarkerTap(e))).toSet(),
       onCameraIdle: () {
         markerList.updateMarkerIfNeeded();
       },
       onMapCreated: (GoogleMapController controller) {
-        _controller.complete(controller);
+        if (!_controller.isCompleted) {
+          _controller.complete(controller);
+        }
         _prepareMarkerList(controller);
       },
     );
   }
 
   void _prepareMarkerList(GoogleMapController controller) {
-    markerList = GymMarkerList(controller);
+    setState(() {
+      markerList = GymMarkerList(controller);
+    });
     markerList.displayableMarkersStream.listen((event) {
       setState(() {
         _markers = event ?? [];
       });
     });
+  }
+
+  void _onMarkerTap(DisplayableGymMarker marker) {
+    markerList.selectedMarker(marker);
   }
 }
