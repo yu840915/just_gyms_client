@@ -48,6 +48,7 @@ class GymInfoCardView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      color: Colors.white70,
       child: Column(
         children: [
           Text(card.gym.name),

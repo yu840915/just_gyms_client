@@ -41,9 +41,18 @@ class _MapViewPageState extends State<MapViewPage> {
           ),
         ),
         if (markerList != null)
-          Container(
-            child: Material(child: GymMarkerInfoPageView(markerList)),
-            height: 100,
+          SafeArea(
+            top: false,
+            child: Align(
+              alignment: Alignment.bottomCenter,
+              child: Container(
+                child: Material(
+                  child: GymMarkerInfoPageView(markerList),
+                  color: Colors.transparent,
+                ),
+                height: 100,
+              ),
+            ),
           ),
       ],
     );
