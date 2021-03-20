@@ -26,7 +26,7 @@ dependencies:
   rxdart: ^0.26.0
   geolocator: ^7.0.1
   google_maps_flutter: ^2.0.1
-  json_annotation: ^3.1.1
+  json_annotation: ^4.0.1
   http: ^0.13.1
   geojson: ^0.10.0
   latlong: ^0.6.1
