@@ -16,7 +16,7 @@ class GymMarkerList {
       BehaviorSubject<List<DisplayableGymMarker>>()..add([]);
   final _selectedMarkerIdSubject = BehaviorSubject<String>();
   Stream<String> get selectedMarkerIdStream => _selectedMarkerIdSubject;
-  String get selectedMarkerId => _selectedMarkerIdSubject.value;
+  String get selectedMarkerId => _selectedMarkerIdSubject.valueWrapper.value;
   Stream<List<GymMarker>> get markerStream => _markersSubject;
   Stream<List<DisplayableGymMarker>> get displayableMarkersStream =>
       _displayableMarkersSubject;
@@ -63,9 +63,9 @@ class GymMarkerList {
     _currentRegion = region;
     _markersSubject.add(markers);
     _displayableMarkersSubject.add([]);
-    if (_selectedMarkerIdSubject.value != null) {
-      final missing = markers.indexWhere(
-              (element) => element.id == _selectedMarkerIdSubject.value) ==
+    if (_selectedMarkerIdSubject.valueWrapper.value != null) {
+      final missing = markers.indexWhere((element) =>
+              element.id == _selectedMarkerIdSubject.valueWrapper.value) ==
           -1;
       if (missing) {
         _selectedMarkerIdSubject.add(null);
@@ -74,15 +74,15 @@ class GymMarkerList {
   }
 
   void insertDisplayableMarker(DisplayableGymMarker marker) {
-    final missing = _markersSubject.value.indexWhere(
+    final missing = _markersSubject.valueWrapper.value.indexWhere(
           (element) => element.id == marker.id,
         ) ==
         -1;
     if (missing) {
       return;
     }
-    final list =
-        List<DisplayableGymMarker>.from(_displayableMarkersSubject.value ?? []);
+    final list = List<DisplayableGymMarker>.from(
+        _displayableMarkersSubject.valueWrapper.value ?? []);
     list.add(marker);
     _displayableMarkersSubject.add(list);
   }
@@ -90,7 +90,7 @@ class GymMarkerList {
   void selectedMarker(DisplayableGymMarker marker) {
     if (marker == null) {
       _selectedMarkerIdSubject.add(null);
-    } else if (_displayableMarkersSubject.value.contains(marker)) {
+    } else if (_displayableMarkersSubject.valueWrapper.value.contains(marker)) {
       _selectedMarkerIdSubject.add(marker.id);
     }
   }
