@@ -16,6 +16,18 @@ class GymMarkerList {
       BehaviorSubject<List<DisplayableGymMarker>>()..add([]);
   final _selectedMarkerIdSubject = BehaviorSubject<String>();
   Stream<String> get selectedMarkerIdStream => _selectedMarkerIdSubject;
+  DisplayableGymMarker get selectedMarker {
+    final selectedId = _selectedMarkerIdSubject.valueWrapper?.value;
+    if (_displayableMarkersSubject.valueWrapper.value.isEmpty ||
+        selectedId == null) {
+      return null;
+    }
+    return _displayableMarkersSubject.valueWrapper.value.firstWhere(
+      (element) => element.id == selectedId,
+      orElse: () => null,
+    );
+  }
+
   String get selectedMarkerId => _selectedMarkerIdSubject.valueWrapper.value;
   Stream<List<GymMarker>> get markerStream => _markersSubject;
   Stream<List<DisplayableGymMarker>> get displayableMarkersStream =>
@@ -87,7 +99,7 @@ class GymMarkerList {
     _displayableMarkersSubject.add(list);
   }
 
-  void selectedMarker(DisplayableGymMarker marker) {
+  void selecteMarker(DisplayableGymMarker marker) {
     if (marker == null) {
       _selectedMarkerIdSubject.add(null);
     } else if (_displayableMarkersSubject.valueWrapper.value.contains(marker)) {

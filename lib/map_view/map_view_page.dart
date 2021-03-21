@@ -20,7 +20,32 @@ class _MapViewPageState extends State<MapViewPage> {
   Completer<GoogleMapController> _controller = Completer();
   GymList get gymList => widget.gymList;
   GymMarkerList markerList;
+  PersistentBottomSheetController bottomSheetController;
   List<DisplayableGymMarker> _markers = [];
+
+  void _handleMarkerSelection(BuildContext context, String selection) async {
+    if (selection == null) {
+      bottomSheetController?.close();
+      return;
+    }
+    if (bottomSheetController != null) {
+      return;
+    }
+    bottomSheetController = Scaffold.of(context).showBottomSheet(
+      (context) => SafeArea(
+        top: false,
+        child: Container(
+          padding: EdgeInsets.symmetric(vertical: 20),
+          child: GymMarkerInfoPageView(markerList),
+          height: 200,
+          clipBehavior: Clip.none,
+        ),
+      ),
+      backgroundColor: Colors.transparent,
+    );
+    await bottomSheetController.closed;
+    bottomSheetController = null;
+  }
 
   @override
   void initState() {
@@ -40,22 +65,6 @@ class _MapViewPageState extends State<MapViewPage> {
                 _buildMapView(context, snapshot.data),
           ),
         ),
-        if (markerList != null)
-          SafeArea(
-            top: false,
-            child: Align(
-              alignment: Alignment.bottomCenter,
-              child: Container(
-                padding: EdgeInsets.symmetric(vertical: 20),
-                child: Material(
-                  child: GymMarkerInfoPageView(markerList),
-                  color: Colors.transparent,
-                ),
-                height: 180,
-                clipBehavior: Clip.none,
-              ),
-            ),
-          ),
       ],
     );
   }
@@ -81,14 +90,19 @@ class _MapViewPageState extends State<MapViewPage> {
         if (!_controller.isCompleted) {
           _controller.complete(controller);
         }
-        _prepareMarkerList(controller);
+        _prepareMarkerList(context, controller);
       },
     );
   }
 
-  void _prepareMarkerList(GoogleMapController controller) {
+  void _prepareMarkerList(
+      BuildContext context, GoogleMapController controller) {
+    final list = GymMarkerList(controller);
+    list.selectedMarkerIdStream.listen((event) {
+      _handleMarkerSelection(context, event);
+    });
     setState(() {
-      markerList = GymMarkerList(controller);
+      markerList = list;
     });
     markerList.displayableMarkersStream.listen((event) {
       setState(() {
@@ -98,6 +112,6 @@ class _MapViewPageState extends State<MapViewPage> {
   }
 
   void _onMarkerTap(DisplayableGymMarker marker) {
-    markerList.selectedMarker(marker);
+    markerList.selecteMarker(marker);
   }
 }
