@@ -23,6 +23,7 @@ Gym _$GymFromJson(Map<String, dynamic> json) {
     hourlyRate: json['hourlyRate'] == null
         ? null
         : Price.fromJson(json['hourlyRate'] as Map<String, dynamic>),
+    phones: (json['phones'] as List)?.map((e) => e as String)?.toList(),
   );
 }
 
@@ -33,6 +34,7 @@ Map<String, dynamic> _$GymToJson(Gym instance) => <String, dynamic>{
       'equipments': instance.equipments,
       'businessHours': instance.businessHours,
       'hourlyRate': instance.hourlyRate,
+      'phones': instance.phones,
     };
 
 Equipments _$EquipmentsFromJson(Map<String, dynamic> json) {

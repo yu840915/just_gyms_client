@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:where_gym/gym_list.dart';
 import 'package:where_gym/map_view/gym_marker_list.dart';
+import 'package:where_gym/shared_appearances.dart';
 
 class GymMarkerInfoPageView extends StatefulWidget {
   final GymMarkerList gymMarkerList;
@@ -37,36 +39,70 @@ class _GymMarkerInfoPageViewState extends State<GymMarkerInfoPageView> {
       return Container();
     }
     return PageView.builder(
-        itemBuilder: (context, idx) =>
-            GymInfoCardView(cards[idx % cards.length]));
+      controller: pageController,
+      itemBuilder: (context, idx) => GymInfoCardView(cards[idx % cards.length]),
+    );
   }
 }
 
 class GymInfoCardView extends StatelessWidget {
   final GymInfoCard card;
   GymInfoCardView(this.card);
+
+  void _callGym(String phone) {
+    launch('tel://$phone');
+  }
+
+  void _showDetail(BuildContext context) {}
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Colors.white70,
-      child: Column(
-        children: [
-          Text(card.gym.name),
-          Text(card.gym.address),
-          if (card.gym.hourlyRate != null)
-            Text(card.gym.hourlyRate.currency +
-                ' ${card.gym.hourlyRate.amount}'),
-          _buildEquipments()
-        ],
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 10),      
+      child: ElevatedButton(
+        clipBehavior: Clip.none,
+        style: ButtonStyle(
+          padding: MaterialStateProperty.all(EdgeInsets.all(10)),
+          backgroundColor: MaterialStateProperty.all(Colors.white),
+          overlayColor: MaterialStateProperty.all(Colors.grey.shade200),
+          shape: MaterialStateProperty.all(
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          ),
+        ),
+        onPressed: () => _showDetail(context),
+        child: Column(
+          children: [
+            Text(card.gym.name,
+                style: TextStyles.title.copyWith(color: Colors.black)),
+            Text(card.gym.address,
+                style: TextStyles.detail.copyWith(color: Colors.black)),
+            if (card.gym.hourlyRate != null)
+              Text(
+                  card.gym.hourlyRate.currency +
+                      ' ${card.gym.hourlyRate.amount}',
+                  style: TextStyles.detail.copyWith(color: Colors.black)),
+            Spacer(),
+            if (card.gym.phone != null) _buildContactButton(card.gym.phone)
+          ],
+          crossAxisAlignment: CrossAxisAlignment.start,
+        ),
       ),
     );
   }
 
-  Widget _buildEquipments() {
-    return Text(card.gym.equipments
-        .map((e) => e.name + 'x' + '${e.number}')
-        .toList()
-        .join(", "));
+  Widget _buildContactButton(String phone) {
+    return ElevatedButton(
+      onPressed: () => _callGym(phone),
+      child: Text(
+        '立即預約',
+      ),
+      style: ButtonStyle(
+        shape: MaterialStateProperty.all(StadiumBorder()),
+        textStyle: MaterialStateProperty.all(TextStyles.actionSmall),
+        minimumSize: MaterialStateProperty.all(Size(60, 30)),
+        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      ),
+    );
   }
 }
 

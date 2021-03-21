@@ -85,13 +85,16 @@ class Gym {
   final List<Equipments> equipments;
   final List<BusinessHours> businessHours;
   final Price hourlyRate;
+  final List<String> phones;
+  String get phone => phones != null && phones.isNotEmpty ? phones.first : null;
   Gym(
       {this.id,
       this.name,
       this.address,
       this.equipments,
       this.businessHours,
-      this.hourlyRate});
+      this.hourlyRate,
+      this.phones});
 
   Map<String, dynamic> toJson() => _$GymToJson(this);
   factory Gym.fromJson(Map<String, dynamic> json) => _$GymFromJson(json);

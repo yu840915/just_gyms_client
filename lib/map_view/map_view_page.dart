@@ -46,11 +46,13 @@ class _MapViewPageState extends State<MapViewPage> {
             child: Align(
               alignment: Alignment.bottomCenter,
               child: Container(
+                padding: EdgeInsets.symmetric(vertical: 20),
                 child: Material(
                   child: GymMarkerInfoPageView(markerList),
                   color: Colors.transparent,
                 ),
-                height: 100,
+                height: 180,
+                clipBehavior: Clip.none,
               ),
             ),
           ),

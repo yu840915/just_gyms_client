@@ -63,7 +63,7 @@ class GymMarkerList {
     _currentRegion = region;
     _markersSubject.add(markers);
     _displayableMarkersSubject.add([]);
-    if (_selectedMarkerIdSubject.valueWrapper.value != null) {
+    if (_selectedMarkerIdSubject.valueWrapper?.value != null) {
       final missing = markers.indexWhere((element) =>
               element.id == _selectedMarkerIdSubject.valueWrapper.value) ==
           -1;
