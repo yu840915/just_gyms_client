@@ -13,21 +13,25 @@ class GymMarkerInfoPageView extends StatefulWidget {
 }
 
 class _GymMarkerInfoPageViewState extends State<GymMarkerInfoPageView> {
+  GymMarkerList get gymMarkerList => widget.gymMarkerList;
   PageController pageController;
-  Stream<List<GymInfoCard>> markersStream;
+  List<DisplayableGymMarker> markers;
 
   @override
   void initState() {
     super.initState();
-    pageController = PageController(initialPage: 999, viewportFraction: 0.8);
-    markersStream = widget.gymMarkerList.displayableMarkersStream
-        .map((e) => GymInfoCard.convertMarkersToCards(e));
+    gymMarkerList.displayableMarkersStream.listen((event) {
+      markers = event;
+    });
+    gymMarkerList.selectedMarkerIdStream.listen((event) {
+      _handleSelectionChanged(gymMarkerList.selectedMarker);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<List<DisplayableGymMarker>>(
-        stream: widget.gymMarkerList.displayableMarkersStream,
+        stream: gymMarkerList.displayableMarkersStream,
         builder: (context, snapshot) {
           return _buildCardViews(
               context, GymInfoCard.convertMarkersToCards(snapshot.data));
@@ -38,10 +42,48 @@ class _GymMarkerInfoPageViewState extends State<GymMarkerInfoPageView> {
     if (cards == null) {
       return Container();
     }
+    if (cards.length == 1) {
+      return GymInfoCardView(cards.first);
+    }
     return PageView.builder(
       controller: pageController,
       itemBuilder: (context, idx) => GymInfoCardView(cards[idx % cards.length]),
+      onPageChanged: (idx) => {_handlePageChanged(cards[idx % cards.length])},
     );
+  }
+
+  void _handlePageChanged(GymInfoCard card) {
+    gymMarkerList.selecteMarker(card.assosiatedMarker);
+  }
+
+  void _handleSelectionChanged(DisplayableGymMarker marker) {
+    if (marker == null) {
+      return;
+    }
+    if (markers == null) {
+      return;
+    }
+    if (pageController == null) {
+      _initPageControllerWithSelection(marker);
+      return;
+    }
+    final currentIdx = pageController.page.toInt() % markers.length;
+    final padding = pageController.page.toInt() - currentIdx;
+    if (markers[currentIdx].id == marker.id) {
+      return;
+    }
+    final newIdx = markers.indexWhere((element) => element.id == marker.id);
+    pageController.animateToPage(
+      newIdx + padding,
+      duration: Duration(microseconds: 150),
+      curve: Curves.linear,
+    );
+  }
+
+  void _initPageControllerWithSelection(DisplayableGymMarker marker) {
+    final idx = markers.indexWhere((element) => element.id == marker.id);
+    pageController =
+        PageController(initialPage: 1000 + idx, viewportFraction: 0.8);
   }
 }
 
@@ -58,7 +100,7 @@ class GymInfoCardView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10),      
+      padding: const EdgeInsets.symmetric(horizontal: 10),
       child: ElevatedButton(
         clipBehavior: Clip.none,
         style: ButtonStyle(
