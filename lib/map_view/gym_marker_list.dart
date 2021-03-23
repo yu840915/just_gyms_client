@@ -15,6 +15,7 @@ class GymMarkerList {
   final _displayableMarkersSubject =
       BehaviorSubject<List<DisplayableGymMarker>>()..add([]);
   final _selectedMarkerIdSubject = BehaviorSubject<String>();
+  final _dirtySubject = BehaviorSubject<bool>();
   Stream<String> get selectedMarkerIdStream => _selectedMarkerIdSubject;
   DisplayableGymMarker get selectedMarker {
     final selectedId = _selectedMarkerIdSubject.valueWrapper?.value;
@@ -29,20 +30,28 @@ class GymMarkerList {
   }
 
   String get selectedMarkerId => _selectedMarkerIdSubject.valueWrapper.value;
-  Stream<List<GymMarker>> get markerStream => _markersSubject;
-  Stream<List<DisplayableGymMarker>> get displayableMarkersStream =>
+  Stream<List<GymMarker>> get onMarkersChange => _markersSubject;
+  Stream<List<DisplayableGymMarker>> get onDisplayableMarkersChange =>
       _displayableMarkersSubject;
+  Stream<bool> get onIsDirty => _dirtySubject;
   MapDataRegion _currentRegion;
   int _zoomLevel;
 
-  GymMarkerList(this.mapController);
+  GymMarkerList(this.mapController) {
+    _dirtySubject.add(true);
+  }
 
   void dispose() {
     _markersSubject.close();
     _selectedMarkerIdSubject.close();
+    _dirtySubject.close();
   }
 
-  Future<void> updateMarkerIfNeeded() async {
+  void markAsDirtyIfNeeded() async {
+    if (_currentRegion == null) {
+      _dirtySubject.add(true);
+      return;
+    }
     final bounds = await mapController.getVisibleRegion();
     final zoom = (await mapController.getZoomLevel()).toInt();
     final lat = 0.5 * (bounds.northeast.latitude + bounds.southwest.latitude);
@@ -53,13 +62,31 @@ class GymMarkerList {
         _currentRegion.includesRegion(MapDataRegion(
             center: GoogleMap.LatLng(lat, lon),
             radiusInM: (0.25 * dia).toInt()))) {
+      _dirtySubject.add(false);
+    } else {
+      _dirtySubject.add(true);
+    }
+  }
+
+  Future<void> updateMarkerIfNeeded() async {
+    if (!_dirtySubject.valueWrapper.value) {
       return;
     }
-    await fetchMarkersForRegion(
-      MapDataRegion(
-          center: GoogleMap.LatLng(lat, lon), radiusInM: (0.5 * dia).toInt()),
-    );
-    _zoomLevel = zoom;
+    _dirtySubject.add(false);
+    final bounds = await mapController.getVisibleRegion();
+    final zoom = (await mapController.getZoomLevel()).toInt();
+    final lat = 0.5 * (bounds.northeast.latitude + bounds.southwest.latitude);
+    final lon = 0.5 * (bounds.northeast.longitude + bounds.southwest.longitude);
+    final dia = distanceGMap(bounds.northeast, bounds.southwest);
+    try {
+      await fetchMarkersForRegion(
+        MapDataRegion(
+            center: GoogleMap.LatLng(lat, lon), radiusInM: (0.5 * dia).toInt()),
+      );
+      _zoomLevel = zoom;
+    } catch (e) {
+      _dirtySubject.add(true);
+    }
   }
 
   Future<void> fetchMarkersForRegion(MapDataRegion region) async {

@@ -20,7 +20,7 @@ class _GymMarkerInfoPageViewState extends State<GymMarkerInfoPageView> {
   @override
   void initState() {
     super.initState();
-    gymMarkerList.displayableMarkersStream.listen((event) {
+    gymMarkerList.onDisplayableMarkersChange.listen((event) {
       markers = event;
     });
     gymMarkerList.selectedMarkerIdStream.listen((event) {
@@ -31,7 +31,7 @@ class _GymMarkerInfoPageViewState extends State<GymMarkerInfoPageView> {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<List<DisplayableGymMarker>>(
-        stream: gymMarkerList.displayableMarkersStream,
+        stream: gymMarkerList.onDisplayableMarkersChange,
         builder: (context, snapshot) {
           return _buildCardViews(
               context, GymInfoCard.convertMarkersToCards(snapshot.data));

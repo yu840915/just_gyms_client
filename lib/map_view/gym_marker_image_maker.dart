@@ -16,7 +16,7 @@ class GymMarkerImageMakerContainers extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
       child: StreamBuilder<List<GymMarker>>(
-        stream: gymMarkerList.markerStream,
+        stream: gymMarkerList.onMarkersChange,
         builder: (context, snapshot) {
           return _buildMarkerMakers(context, snapshot.data);
         },
