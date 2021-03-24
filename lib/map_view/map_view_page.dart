@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:where_gym/app_bar_factory.dart';
 import 'package:where_gym/gym_list.dart';
 import 'package:where_gym/map_view/gym_marker_image_maker.dart';
 import 'package:where_gym/map_view/gym_marker_info_page_view.dart';
@@ -60,7 +61,7 @@ class _MapViewPageState extends State<MapViewPage> {
       children: [
         if (markerList != null) GymMarkerImageMakerContainers(markerList),
         new Scaffold(
-          appBar: AppBar(),
+          appBar: AppBarFactory.shrinkedAppBar(),
           body: _buildBody(context),
         ),
       ],
