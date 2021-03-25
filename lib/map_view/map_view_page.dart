@@ -5,6 +5,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:where_gym/app_bar_factory.dart';
 import 'package:where_gym/gym_list.dart';
+import 'package:where_gym/gym_list_page.dart';
 import 'package:where_gym/map_view/gym_marker_image_maker.dart';
 import 'package:where_gym/map_view/gym_marker_info_page_view.dart';
 import 'package:where_gym/map_view/gym_marker_list.dart';
@@ -50,6 +51,16 @@ class _MapViewPageState extends State<MapViewPage> {
     bottomSheetController = null;
   }
 
+  void _showListView(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => GymListPage(),
+        fullscreenDialog: true,
+      ),
+    );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -75,6 +86,16 @@ class _MapViewPageState extends State<MapViewPage> {
           stream: gymList.myLocationStream.take(1),
           builder: (context, snapshot) => _buildMapView(context, snapshot.data),
         ),
+        SafeArea(bottom: false, child: _buildOverlay(context)),
+      ],
+    );
+  }
+
+  Widget _buildOverlay(BuildContext context) {
+    return Column(
+      children: [
+        _buildTopBar(context),
+        SizedBox(height: 10),
         if (markerList != null)
           StreamBuilder<bool>(
             stream: markerList.onIsDirty,
@@ -82,7 +103,31 @@ class _MapViewPageState extends State<MapViewPage> {
               return _buildRefreshButton(
                   context, snapshot.hasData ? snapshot.data : false);
             },
-          )
+          ),
+        Spacer(),
+      ],
+    );
+  }
+
+  Widget _buildTopBar(BuildContext context) {
+    return Row(
+      children: [
+        SizedBox(width: 16),
+        ElevatedButton(
+          child: Icon(
+            Icons.list,
+            color: AppColors.theme,
+          ),
+          style: ElevatedButton.styleFrom(
+            shape: StadiumBorder(),
+            primary: Colors.white,
+            
+            minimumSize: Size.square(40),
+          ),
+          onPressed: () => _showListView(context),
+        ),
+        Spacer(),
+        SizedBox(width: 16),
       ],
     );
   }
