@@ -49,40 +49,76 @@ class GymMarkerImageMaker extends StatefulWidget {
 
 class _GymMarkerImageMakerState extends State<GymMarkerImageMaker>
     with AfterLayoutMixin<GymMarkerImageMaker> {
-  final GlobalKey iconKey = GlobalKey();
+  final GlobalKey normalKey = GlobalKey();
+  final GlobalKey selectionKey = GlobalKey();
   GymMarker get gymMarker => widget.gymMarker;
 
   @override
   void afterFirstLayout(BuildContext context) async {
-    RenderRepaintBoundary boundary = iconKey.currentContext.findRenderObject();
-    final image = await boundary.toImage(pixelRatio: 3.0);
-    final byteData = await image.toByteData(format: ImageByteFormat.png);
-    final pngBytes = byteData.buffer.asUint8List();
     widget.gymMarkerList.insertDisplayableMarker(
       DisplayableGymMarker(
-        icon: BitmapDescriptor.fromBytes(pngBytes),
+        icon: await _getBitmapDescriptorFromRenderObjser(
+          normalKey.currentContext.findRenderObject(),
+        ),
+        selectionIcon: await _getBitmapDescriptorFromRenderObjser(
+          selectionKey.currentContext.findRenderObject(),
+        ),
         marker: widget.gymMarker,
       ),
     );
   }
 
+  Future<BitmapDescriptor> _getBitmapDescriptorFromRenderObjser(
+      RenderRepaintBoundary boundary) async {
+    RenderRepaintBoundary boundary =
+        normalKey.currentContext.findRenderObject();
+    final image = await boundary.toImage(pixelRatio: 3.0);
+    final byteData = await image.toByteData(format: ImageByteFormat.png);
+    final pngBytes = byteData.buffer.asUint8List();
+    return BitmapDescriptor.fromBytes(pngBytes);
+  }
+
   @override
   Widget build(BuildContext context) {
-    return RepaintBoundary(
-      key: iconKey,
-      child: _buildMarkerContent(),
+    return Stack(
+      children: [
+        RepaintBoundary(
+          key: selectionKey,
+          child: _buildSelectionIcon(Key('selected')),
+        ),
+        RepaintBoundary(
+          key: normalKey,
+          child: _buildNormalIcon(Key('normal')),
+        ),
+      ],
     );
   }
 
-  Widget _buildMarkerContent() {
+  Widget _buildNormalIcon(Key key) {
     return Container(
+      key: key,
       child: gymMarker.gyms.length == 1
           ? _buildMarkerContentForGym(gymMarker.gyms.first)
           : _buildMarkerContentForCollection(gymMarker.gyms),
-      padding: EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
         color: AppColors.theme,
         border: Border.all(color: Colors.green.shade900),
+        borderRadius: BorderRadius.circular(8),
+      ),
+    );
+  }
+
+  Widget _buildSelectionIcon(Key key) {
+    return Container(
+      key: key,
+      child: gymMarker.gyms.length == 1
+          ? _buildMarkerContentForGym(gymMarker.gyms.first)
+          : _buildMarkerContentForCollection(gymMarker.gyms),
+      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.red,
+        border: Border.all(color: Colors.red.shade900),
         borderRadius: BorderRadius.circular(8),
       ),
     );
@@ -92,7 +128,7 @@ class _GymMarkerImageMakerState extends State<GymMarkerImageMaker>
     return Text(
       '${list.length} 項結果',
       style: TextStyle(
-        color: Colors.green.shade900,
+        color: Colors.white,
         fontSize: 12,
       ),
     );
@@ -103,7 +139,7 @@ class _GymMarkerImageMakerState extends State<GymMarkerImageMaker>
       return Text(
         '1 項結果',
         style: TextStyle(
-          color: Colors.green.shade900,
+          color: Colors.white,
           fontSize: 12,
         ),
       );
@@ -111,7 +147,7 @@ class _GymMarkerImageMakerState extends State<GymMarkerImageMaker>
     return Text(
       '${gym.hourlyRate.currency} ${gym.hourlyRate.amount}',
       style: TextStyle(
-        color: Colors.green.shade900,
+        color: Colors.white,
         fontSize: 12,
       ),
     );

@@ -25,7 +25,9 @@ class _MapViewPageState extends State<MapViewPage> {
   GymMarkerList markerList;
   PersistentBottomSheetController bottomSheetController;
   List<DisplayableGymMarker> _markers = [];
+  List<StreamSubscription> _subscription = [];
   bool needsInitialFetch = true;
+  bool _needsUpdate = false;
 
   void _handleMarkerSelection(BuildContext context, String selection) async {
     if (selection == null) {
@@ -64,6 +66,14 @@ class _MapViewPageState extends State<MapViewPage> {
   @override
   void initState() {
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _subscription?.forEach((element) {
+      element.cancel();
+    });
+    super.dispose();
   }
 
   @override
@@ -121,7 +131,6 @@ class _MapViewPageState extends State<MapViewPage> {
           style: ElevatedButton.styleFrom(
             shape: StadiumBorder(),
             primary: Colors.white,
-            
             minimumSize: Size.square(40),
           ),
           onPressed: () => _showListView(context),
@@ -144,8 +153,13 @@ class _MapViewPageState extends State<MapViewPage> {
       ),
       minMaxZoomPreference: MinMaxZoomPreference(10, 20),
       myLocationEnabled: true,
-      markers:
-          _markers.map((e) => e.toMarker(onTap: () => _onMarkerTap(e))).toSet(),
+      markers: _markers.map((e) {
+        if (markerList?.selectedMarkerId != null &&
+            e.id == markerList.selectedMarkerId) {
+          return e.getSelectedMarker();
+        }
+        return e.getNormalMarker(onTap: () => _onMarkerTap(e));
+      }).toSet(),
       onCameraIdle: () {
         markerList.markAsDirtyIfNeeded();
         if (needsInitialFetch) {
@@ -185,17 +199,22 @@ class _MapViewPageState extends State<MapViewPage> {
   void _prepareMarkerList(
       BuildContext context, GoogleMapController controller) {
     final list = GymMarkerList(controller);
-    list.selectedMarkerIdStream.listen((event) {
+    list.onSelection.listen((event) {
       _handleMarkerSelection(context, event);
     });
     setState(() {
       markerList = list;
     });
-    markerList.onDisplayableMarkersChange.listen((event) {
+    _subscription.add(markerList.onDisplayableMarkersChange.listen((event) {
       setState(() {
         _markers = event ?? [];
       });
-    });
+    }));
+    _subscription.add(markerList.onSelection.listen((event) {
+      setState(() {
+        _needsUpdate = true;
+      });
+    }));
   }
 
   void _onMarkerTap(DisplayableGymMarker marker) {

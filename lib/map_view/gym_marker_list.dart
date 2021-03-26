@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:async';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:geojson/geojson.dart';
@@ -16,7 +17,7 @@ class GymMarkerList {
       BehaviorSubject<List<DisplayableGymMarker>>()..add([]);
   final _selectedMarkerIdSubject = BehaviorSubject<String>();
   final _dirtySubject = BehaviorSubject<bool>();
-  Stream<String> get selectedMarkerIdStream => _selectedMarkerIdSubject;
+  Stream<String> get onSelection => _selectedMarkerIdSubject;
   DisplayableGymMarker get selectedMarker {
     final selectedId = _selectedMarkerIdSubject.valueWrapper?.value;
     if (_displayableMarkersSubject.valueWrapper.value.isEmpty ||
@@ -29,7 +30,7 @@ class GymMarkerList {
     );
   }
 
-  String get selectedMarkerId => _selectedMarkerIdSubject.valueWrapper.value;
+  String get selectedMarkerId => _selectedMarkerIdSubject.valueWrapper?.value;
   Stream<List<GymMarker>> get onMarkersChange => _markersSubject;
   Stream<List<DisplayableGymMarker>> get onDisplayableMarkersChange =>
       _displayableMarkersSubject;
@@ -170,17 +171,31 @@ class DisplayableGymMarker {
 
   GoogleMap.LatLng get latLng => _gymMarker.latLng;
   final GoogleMap.BitmapDescriptor icon;
+  final GoogleMap.BitmapDescriptor selectionIcon;
 
-  DisplayableGymMarker({this.icon, GymMarker marker}) : _gymMarker = marker;
+  DisplayableGymMarker({
+    @required this.icon,
+    @required this.selectionIcon,
+    GymMarker marker,
+  }) : _gymMarker = marker;
 
-  GoogleMap.Marker toMarker({Function onTap}) {
+  GoogleMap.Marker getNormalMarker({Function onTap}) {
     final marker = _gymMarker.toMarker();
-
     return GoogleMap.Marker(
       markerId: marker.markerId,
       position: marker.position,
       icon: icon,
+      alpha: 0.8,
       onTap: onTap,
+    );
+  }
+
+  GoogleMap.Marker getSelectedMarker() {
+    final marker = _gymMarker.toMarker();
+    return GoogleMap.Marker(
+      markerId: marker.markerId,
+      position: marker.position,
+      icon: selectionIcon,
     );
   }
 }

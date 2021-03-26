@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:where_gym/gym_list.dart';
-import 'package:where_gym/map_view/map_view_page.dart';
 import 'package:where_gym/shared_appearances.dart';
 
 class GymListPage extends StatefulWidget {

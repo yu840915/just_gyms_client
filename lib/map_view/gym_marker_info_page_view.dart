@@ -23,7 +23,7 @@ class _GymMarkerInfoPageViewState extends State<GymMarkerInfoPageView> {
     gymMarkerList.onDisplayableMarkersChange.listen((event) {
       markers = event;
     });
-    gymMarkerList.selectedMarkerIdStream.listen((event) {
+    gymMarkerList.onSelection.listen((event) {
       _handleSelectionChanged(gymMarkerList.selectedMarker);
     });
   }
