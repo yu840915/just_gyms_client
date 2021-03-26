@@ -53,6 +53,7 @@ class _MapViewPageState extends State<MapViewPage> {
     bottomSheetController = null;
   }
 
+
   void _showListView(BuildContext context) {
     Navigator.push(
       context,

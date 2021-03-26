@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:async';
-import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:geojson/geojson.dart';
@@ -132,6 +131,15 @@ class GymMarkerList {
       _selectedMarkerIdSubject.add(null);
     } else if (_displayableMarkersSubject.valueWrapper.value.contains(marker)) {
       _selectedMarkerIdSubject.add(marker.id);
+      _scrollToSelectionIfNeeded(marker);
+    }
+  }
+
+  void _scrollToSelectionIfNeeded(DisplayableGymMarker marker) async {
+    final bounds = await mapController.getVisibleRegion();
+    if (!bounds.contains(marker.latLng)) {
+      mapController
+          .animateCamera(GoogleMap.CameraUpdate.newLatLng(marker.latLng));
     }
   }
 }
