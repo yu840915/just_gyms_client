@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'gym_list.dart';
+part of 'gym.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator

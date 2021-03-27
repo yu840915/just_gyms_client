@@ -7,6 +7,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart' as GoogleMap;
 import 'package:latlong/latlong.dart';
 import 'package:rxdart/subjects.dart';
 import 'package:where_gym/api_services/api_services.dart';
+import 'package:where_gym/gym.dart';
 import 'package:where_gym/gym_list.dart';
 
 class GymMarkerList {

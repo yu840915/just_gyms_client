@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:where_gym/gym.dart';
 import 'package:where_gym/gym_list.dart';
 import 'package:where_gym/map_view/gym_marker_list.dart';
 import 'package:where_gym/shared_appearances.dart';
