@@ -119,6 +119,7 @@ class GymInfoCardView extends StatelessWidget {
                 style: TextStyles.title.copyWith(color: Colors.black)),
             Text(card.gym.address,
                 style: TextStyles.detail.copyWith(color: Colors.black)),
+            _buildOpenIndicator(),
             if (card.gym.hourlyRate != null)
               Text(
                   card.gym.hourlyRate.currency +
@@ -130,6 +131,19 @@ class GymInfoCardView extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
         ),
       ),
+    );
+  }
+
+  Widget _buildOpenIndicator() {
+    final isOpen = card.gym.isOpenNow();
+    final text = isOpen != null
+        ? isOpen
+            ? '營業中'
+            : '休息中'
+        : '未提供';
+    return Text(
+      text,
+      style: TextStyles.detail.copyWith(color: Colors.black),
     );
   }
 

@@ -28,11 +28,13 @@ class Gym {
   }
 
   bool isOpenNow() {
-    return _weekdayBusinessHours.values.firstWhere(
-          (element) => element.isOpenAt(DateTime.now()),
-          orElse: () => null,
-        ) !=
-        null;
+    return _weekdayBusinessHours != null
+        ? _weekdayBusinessHours.values.firstWhere(
+              (element) => element.isOpenAt(DateTime.now()),
+              orElse: () => null,
+            ) !=
+            null
+        : null;
   }
 
   Map<String, dynamic> toJson() => _$GymToJson(this);
