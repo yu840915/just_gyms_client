@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 part 'gym.g.dart';
 
@@ -7,8 +8,10 @@ class Gym {
   final String name;
   final String address;
   final List<Equipments> equipments;
-  final List<BusinessHours> businessHours;
-  
+  final List<BusinessHoursDescriptor> businessHours;
+  Map<Weekday, BusinessHours> _weekdayBusinessHours;
+  Map<Weekday, BusinessHours> get weekdayBusinessHours => _weekdayBusinessHours;
+  final List<Fare> pricing;
   final Price hourlyRate;
   final List<String> phones;
   String get phone => phones != null && phones.isNotEmpty ? phones.first : null;
@@ -19,7 +22,10 @@ class Gym {
       this.equipments,
       this.businessHours,
       this.hourlyRate,
-      this.phones});
+      this.phones,
+      this.pricing}) {
+    _weekdayBusinessHours = BusinessHours.fromDescriptors(businessHours);
+  }
 
   Map<String, dynamic> toJson() => _$GymToJson(this);
   factory Gym.fromJson(Map<String, dynamic> json) => _$GymFromJson(json);
@@ -49,13 +55,162 @@ class Price {
   factory Price.fromJson(Map<String, dynamic> json) => _$PriceFromJson(json);
 }
 
-@JsonSerializable()
 class BusinessHours {
+  final Weekday weekday;
+  final HourMin start;
+  final HourMin end;
+  bool get isOff => start.isZero && end.isZero;
+  BusinessHours({
+    @required this.weekday,
+    @required this.start,
+    @required this.end,
+  });
+
+  static Map<Weekday, BusinessHours> fromDescriptors(
+      List<BusinessHoursDescriptor> descriptors) {
+    if (descriptors == null || descriptors.isEmpty) {
+      return null;
+    }
+    BusinessHoursDescriptor base;
+    Map<Weekday, BusinessHoursDescriptor> dayDescriptors = {};
+    for (var descriptor in descriptors) {
+      if (descriptor.weekday == null) {
+        base = descriptor;
+      } else {
+        dayDescriptors[descriptor.weekday] = descriptor;
+      }
+    }
+    if (base == null && dayDescriptors.length != 7) {
+      return null;
+    }
+    final weekdays = [
+      Weekday.mon,
+      Weekday.tue,
+      Weekday.wed,
+      Weekday.thu,
+      Weekday.fri,
+      Weekday.sat,
+      Weekday.sun,
+    ];
+    Map<Weekday, BusinessHours> retVal = {};
+    for (var weekday in weekdays) {
+      final descriptor = dayDescriptors[weekday] ?? base;
+      retVal[weekday] = BusinessHours(
+        weekday: weekday,
+        start: descriptor.parsedStart,
+        end: descriptor.parsedEnd,
+      );
+    }
+    return retVal;
+  }
+}
+
+@JsonSerializable()
+class BusinessHoursDescriptor {
+  final String dayOfWeek;
   final String start;
   final String end;
-  BusinessHours({this.start, this.end});
+  Weekday _weekday;
+  HourMin _parsedStart;
+  HourMin _parsedEnd;
+  Weekday get weekday => _weekday;
+  HourMin get parsedStart => _parsedStart;
+  HourMin get parsedEnd => _parsedEnd;
+  BusinessHoursDescriptor({this.dayOfWeek, this.start, this.end}) {
+    _weekday = WeekdayMethods.fromString(dayOfWeek);
+    _parsedStart = HourMin.fromString(start);
+    _parsedEnd = HourMin.fromString(end);
+  }
 
-  Map<String, dynamic> toJson() => _$BusinessHoursToJson(this);
-  factory BusinessHours.fromJson(Map<String, dynamic> json) =>
-      _$BusinessHoursFromJson(json);
+  Map<String, dynamic> toJson() => _$BusinessHoursDescriptorToJson(this);
+  factory BusinessHoursDescriptor.fromJson(Map<String, dynamic> json) =>
+      _$BusinessHoursDescriptorFromJson(json);
+}
+
+enum Weekday { mon, tue, wed, thu, fri, sat, sun }
+
+extension WeekdayMethods on Weekday {
+  static Weekday fromString(String str) {
+    if (str == null) {
+      return null;
+    }
+    switch (str.toLowerCase()) {
+      case 'mon':
+        return Weekday.mon;
+      case 'tue':
+        return Weekday.tue;
+      case 'wed':
+        return Weekday.wed;
+      case 'thu':
+        return Weekday.thu;
+      case 'fri':
+        return Weekday.fri;
+      case 'sat':
+        return Weekday.sat;
+      case 'sun':
+        return Weekday.sun;
+      default:
+        throw 'Invalid string value $str';
+    }
+  }
+
+  int get intValue {
+    switch (this) {
+      case Weekday.mon:
+        return 1;
+      case Weekday.tue:
+        return 2;
+      case Weekday.wed:
+        return 3;
+      case Weekday.thu:
+        return 4;
+      case Weekday.fri:
+        return 5;
+      case Weekday.sat:
+        return 6;
+      case Weekday.sun:
+        return 7;
+    }
+    throw 'Unexpected error';
+  }
+}
+
+class HourMin {
+  final int hour;
+  final int min;
+  HourMin({this.hour, this.min});
+  static HourMin fromString(String str) {
+    final components = str.split(':');
+    if (components.length != 2) {
+      throw 'Invalid format';
+    }
+    return HourMin(
+      hour: int.parse(components.first),
+      min: int.parse(components.last),
+    );
+  }
+
+  bool get isZero => hour == 0 && min == 0;
+
+  bool isBefore(DateTime time) {
+    if (hour != time.hour) {
+      return hour < time.hour;
+    }
+    return min < time.minute;
+  }
+
+  bool isAfter(DateTime time) {
+    return !isBefore(time);
+  }
+}
+
+@JsonSerializable()
+class Fare {
+  final String unit;
+  final int amount;
+  final Price price;
+  Fare({this.unit, this.amount, this.price});
+
+  Map<String, dynamic> toJson() => _$FareToJson(this);
+  factory Fare.fromJson(Map<String, dynamic> json) => _$FareFromJson(json);
 }

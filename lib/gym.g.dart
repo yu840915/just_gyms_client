@@ -18,12 +18,16 @@ Gym _$GymFromJson(Map<String, dynamic> json) {
     businessHours: (json['businessHours'] as List)
         ?.map((e) => e == null
             ? null
-            : BusinessHours.fromJson(e as Map<String, dynamic>))
+            : BusinessHoursDescriptor.fromJson(e as Map<String, dynamic>))
         ?.toList(),
     hourlyRate: json['hourlyRate'] == null
         ? null
         : Price.fromJson(json['hourlyRate'] as Map<String, dynamic>),
     phones: (json['phones'] as List)?.map((e) => e as String)?.toList(),
+    pricing: (json['pricing'] as List)
+        ?.map(
+            (e) => e == null ? null : Fare.fromJson(e as Map<String, dynamic>))
+        ?.toList(),
   );
 }
 
@@ -33,6 +37,7 @@ Map<String, dynamic> _$GymToJson(Gym instance) => <String, dynamic>{
       'address': instance.address,
       'equipments': instance.equipments,
       'businessHours': instance.businessHours,
+      'pricing': instance.pricing,
       'hourlyRate': instance.hourlyRate,
       'phones': instance.phones,
     };
@@ -64,15 +69,35 @@ Map<String, dynamic> _$PriceToJson(Price instance) => <String, dynamic>{
       'currency': instance.currency,
     };
 
-BusinessHours _$BusinessHoursFromJson(Map<String, dynamic> json) {
-  return BusinessHours(
+BusinessHoursDescriptor _$BusinessHoursDescriptorFromJson(
+    Map<String, dynamic> json) {
+  return BusinessHoursDescriptor(
+    dayOfWeek: json['dayOfWeek'] as String,
     start: json['start'] as String,
     end: json['end'] as String,
   );
 }
 
-Map<String, dynamic> _$BusinessHoursToJson(BusinessHours instance) =>
+Map<String, dynamic> _$BusinessHoursDescriptorToJson(
+        BusinessHoursDescriptor instance) =>
     <String, dynamic>{
+      'dayOfWeek': instance.dayOfWeek,
       'start': instance.start,
       'end': instance.end,
+    };
+
+Fare _$FareFromJson(Map<String, dynamic> json) {
+  return Fare(
+    unit: json['unit'] as String,
+    amount: json['amount'] as int,
+    price: json['price'] == null
+        ? null
+        : Price.fromJson(json['price'] as Map<String, dynamic>),
+  );
+}
+
+Map<String, dynamic> _$FareToJson(Fare instance) => <String, dynamic>{
+      'unit': instance.unit,
+      'amount': instance.amount,
+      'price': instance.price,
     };
