@@ -27,6 +27,14 @@ class Gym {
     _weekdayBusinessHours = BusinessHours.fromDescriptors(businessHours);
   }
 
+  bool isOpenNow() {
+    return _weekdayBusinessHours.values.firstWhere(
+          (element) => element.isOpenAt(DateTime.now()),
+          orElse: () => null,
+        ) !=
+        null;
+  }
+
   Map<String, dynamic> toJson() => _$GymToJson(this);
   factory Gym.fromJson(Map<String, dynamic> json) => _$GymFromJson(json);
 }
@@ -60,11 +68,26 @@ class BusinessHours {
   final HourMin start;
   final HourMin end;
   bool get isOff => start.isZero && end.isZero;
+  bool get isCrossing => !isOff && end.isBefore(start);
   BusinessHours({
     @required this.weekday,
     @required this.start,
     @required this.end,
   });
+
+  bool isOpenAt(DateTime dateTime) {
+    if (isOff) {
+      return false;
+    }
+    if (weekday.intValue == dateTime.weekday) {
+      return start.isBeforeDate(dateTime) &&
+          (isCrossing || end.isAfterDate(dateTime));
+    }
+    if (isCrossing && weekday.intValue + 1 == dateTime.weekday) {
+      return end.isAfterDate(dateTime);
+    }
+    return false;
+  }
 
   static Map<Weekday, BusinessHours> fromDescriptors(
       List<BusinessHoursDescriptor> descriptors) {
@@ -192,25 +215,74 @@ class HourMin {
 
   bool get isZero => hour == 0 && min == 0;
 
-  bool isBefore(DateTime time) {
+  bool isBefore(HourMin time) {
+    if (hour != time.hour) {
+      return hour < time.hour;
+    }
+    return min < time.min;
+  }
+
+  bool isAfter(HourMin time) {
+    return !isBefore(time);
+  }
+
+  bool isBeforeDate(DateTime time) {
     if (hour != time.hour) {
       return hour < time.hour;
     }
     return min < time.minute;
   }
 
-  bool isAfter(DateTime time) {
-    return !isBefore(time);
+  bool isAfterDate(DateTime time) {
+    return !isBeforeDate(time);
   }
 }
 
 @JsonSerializable()
 class Fare {
   final String unit;
+  FareTimeUnit get timeUnit => FareTimeUnitMethods.fromString(unit);
   final int amount;
   final Price price;
   Fare({this.unit, this.amount, this.price});
 
   Map<String, dynamic> toJson() => _$FareToJson(this);
   factory Fare.fromJson(Map<String, dynamic> json) => _$FareFromJson(json);
+}
+
+enum FareTimeUnit { day, hour, min, time }
+
+extension FareTimeUnitMethods on FareTimeUnit {
+  static FareTimeUnit fromString(String str) {
+    if (str == null) {
+      return null;
+    }
+    switch (str) {
+      case 'day':
+        return FareTimeUnit.day;
+      case 'hour':
+        return FareTimeUnit.hour;
+      case 'min':
+        return FareTimeUnit.min;
+      case 'time':
+        return FareTimeUnit.time;
+      default:
+        return null;
+    }
+  }
+
+  String get displayName {
+    switch (this) {
+      case FareTimeUnit.day:
+        return '天';
+      case FareTimeUnit.hour:
+        return '小時';
+      case FareTimeUnit.min:
+        return '分';
+      case FareTimeUnit.time:
+        return '次';
+      default:
+        return null;
+    }
+  }
 }
