@@ -3,6 +3,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:where_gym/gym.dart';
 import 'package:where_gym/gym_list.dart';
 import 'package:where_gym/map_view/gym_marker_list.dart';
+import 'package:where_gym/price_format.dart';
 import 'package:where_gym/shared_appearances.dart';
 
 class GymMarkerInfoPageView extends StatefulWidget {
@@ -121,9 +122,7 @@ class GymInfoCardView extends StatelessWidget {
                 style: TextStyles.detail.copyWith(color: Colors.black)),
             _buildOpenIndicator(),
             if (card.gym.hourlyRate != null)
-              Text(
-                  card.gym.hourlyRate.currency +
-                      ' ${card.gym.hourlyRate.amount}',
+              Text(PriceFormat.format(card.gym.hourlyRate),
                   style: TextStyles.detail.copyWith(color: Colors.black)),
             Spacer(),
             if (card.gym.phone != null) _buildContactButton(card.gym.phone)

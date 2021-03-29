@@ -6,6 +6,7 @@ import 'package:flutter/rendering.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:where_gym/gym.dart';
 import 'package:where_gym/map_view/gym_marker_list.dart';
+import 'package:where_gym/price_format.dart';
 import 'package:where_gym/shared_appearances.dart';
 
 class GymMarkerImageMakerContainers extends StatelessWidget {
@@ -145,7 +146,7 @@ class _GymMarkerImageMakerState extends State<GymMarkerImageMaker>
       );
     }
     return Text(
-      '${gym.hourlyRate.currency} ${gym.hourlyRate.amount}',
+      PriceFormat.format(gym.hourlyRate),
       style: TextStyle(
         color: Colors.white,
         fontSize: 12,

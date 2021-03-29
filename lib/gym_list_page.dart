@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:where_gym/gym.dart';
 import 'package:where_gym/gym_list.dart';
+import 'package:where_gym/price_format.dart';
 import 'package:where_gym/shared_appearances.dart';
 
 class GymListPage extends StatefulWidget {
@@ -80,7 +81,10 @@ class _Row extends StatelessWidget {
             ),
             SizedBox(height: 8),
             if (gym.hourlyRate != null)
-              Text(gym.hourlyRate.currency + ' ${gym.hourlyRate.amount}'),
+              Text(
+                PriceFormat.format(gym.hourlyRate),
+                style: TextStyles.detail.copyWith(color: Colors.black),
+              ),
             SizedBox(height: 8),
             Text(
               gym.address,
