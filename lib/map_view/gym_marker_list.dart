@@ -8,7 +8,6 @@ import 'package:latlong/latlong.dart';
 import 'package:rxdart/subjects.dart';
 import 'package:where_gym/api_services/api_services.dart';
 import 'package:where_gym/gym.dart';
-import 'package:where_gym/gym_list.dart';
 
 class GymMarkerList {
   final GoogleMap.GoogleMapController mapController;

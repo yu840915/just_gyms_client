@@ -5,7 +5,6 @@ import 'package:rxdart/subjects.dart';
 import 'package:where_gym/api_services/api_services.dart';
 import 'package:where_gym/gym.dart';
 
-
 class GymList {
   final _myLocationSubject = BehaviorSubject<Position>();
   Stream<Position> get myLocationStream => _myLocationSubject;
@@ -67,7 +66,8 @@ class GymList {
             'Location permissions are denied (actual value: $permission).');
       }
     }
-    final pos = await Geolocator.getCurrentPosition();
+    final pos = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.low);
     _myLocationSubject.add(pos);
     return pos;
   }
@@ -76,4 +76,3 @@ class GymList {
     _listSubject.close();
   }
 }
-

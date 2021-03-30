@@ -15,12 +15,15 @@ class GymMarkerImageMakerContainers extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      child: StreamBuilder<List<GymMarker>>(
-        stream: gymMarkerList.onMarkersChange,
-        builder: (context, snapshot) {
-          return _buildMarkerMakers(context, snapshot.data);
-        },
+    return IgnorePointer(
+      child: Material(
+        child: StreamBuilder<List<GymMarker>>(
+          stream: gymMarkerList.onMarkersChange,
+          builder: (context, snapshot) {
+            return _buildMarkerMakers(context, snapshot.data);
+          },
+        ),
+        color: Colors.transparent,
       ),
     );
   }

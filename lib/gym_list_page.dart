@@ -17,7 +17,9 @@ class _GymListPageState extends State<GymListPage> {
   void initState() {
     super.initState();
     _gymList = GymList();
-    _gymList.refresh().catchError(print);
+    _gymList.refresh().catchError((e) {
+      print(e);
+    });
   }
 
   @override
@@ -82,7 +84,7 @@ class _Row extends StatelessWidget {
             SizedBox(height: 8),
             if (gym.hourlyRate != null)
               Text(
-                PriceFormat.format(gym.hourlyRate),
+                '相當於 ' + PriceFormat.format(gym.hourlyRate) + '/小時',
                 style: TextStyles.detail.copyWith(color: Colors.black),
               ),
             SizedBox(height: 8),
