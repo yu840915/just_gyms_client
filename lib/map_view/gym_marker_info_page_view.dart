@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:where_gym/gym.dart';
+import 'package:where_gym/gym_detail_page.dart';
 import 'package:where_gym/gym_list.dart';
 import 'package:where_gym/map_view/gym_marker_list.dart';
 import 'package:where_gym/price_format.dart';
@@ -97,7 +98,14 @@ class GymInfoCardView extends StatelessWidget {
     launch('tel://$phone');
   }
 
-  void _showDetail(BuildContext context) {}
+  void _showDetail(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => GymDetailPage(gym: card.gym),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -117,13 +125,13 @@ class GymInfoCardView extends StatelessWidget {
         child: Column(
           children: [
             Text(card.gym.name,
-                style: TextStyles.title.copyWith(color: Colors.black)),
+                style: SmallTextStyles.title.copyWith(color: Colors.black)),
             Text(card.gym.address,
-                style: TextStyles.detail.copyWith(color: Colors.black)),
+                style: SmallTextStyles.detail.copyWith(color: Colors.black)),
             _buildOpenIndicator(),
             if (card.gym.hourlyRate != null)
               Text(PriceFormat.format(card.gym.hourlyRate),
-                  style: TextStyles.detail.copyWith(color: Colors.black)),
+                  style: SmallTextStyles.detail.copyWith(color: Colors.black)),
             Spacer(),
             if (card.gym.phone != null) _buildContactButton(card.gym.phone)
           ],
@@ -142,7 +150,7 @@ class GymInfoCardView extends StatelessWidget {
         : '未提供';
     return Text(
       text,
-      style: TextStyles.detail.copyWith(color: Colors.black),
+      style: SmallTextStyles.detail.copyWith(color: Colors.black),
     );
   }
 
@@ -154,7 +162,7 @@ class GymInfoCardView extends StatelessWidget {
       ),
       style: ButtonStyle(
         shape: MaterialStateProperty.all(StadiumBorder()),
-        textStyle: MaterialStateProperty.all(TextStyles.actionSmall),
+        textStyle: MaterialStateProperty.all(SmallTextStyles.action),
         minimumSize: MaterialStateProperty.all(Size(60, 30)),
         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
       ),

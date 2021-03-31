@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:where_gym/app_bar_factory.dart';
 import 'package:where_gym/gym.dart';
+import 'package:where_gym/gym_detail_page.dart';
 import 'package:where_gym/gym_list.dart';
 import 'package:where_gym/price_format.dart';
 import 'package:where_gym/shared_appearances.dart';
@@ -31,7 +33,7 @@ class _GymListPageState extends State<GymListPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBarFactory.appBar(),
       body: _buildBody(context),
     );
   }
@@ -67,7 +69,14 @@ class _Row extends StatelessWidget {
     launch('tel://$phone');
   }
 
-  void _showDetail(BuildContext context) {}
+  void _showDetail(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => GymDetailPage(gym: gym),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -79,18 +88,18 @@ class _Row extends StatelessWidget {
           children: [
             Text(
               gym.name,
-              style: TextStyles.title.copyWith(color: Colors.black),
+              style: SmallTextStyles.title.copyWith(color: Colors.black),
             ),
             SizedBox(height: 8),
             if (gym.hourlyRate != null)
               Text(
                 '相當於 ' + PriceFormat.format(gym.hourlyRate) + '/小時',
-                style: TextStyles.detail.copyWith(color: Colors.black),
+                style: SmallTextStyles.detail.copyWith(color: Colors.black),
               ),
             SizedBox(height: 8),
             Text(
               gym.address,
-              style: TextStyles.detail.copyWith(color: Colors.black),
+              style: SmallTextStyles.detail.copyWith(color: Colors.black),
             ),
             if (gym.phone != null) ...[
               SizedBox(height: 8),
@@ -116,7 +125,7 @@ class _Row extends StatelessWidget {
       ),
       style: ButtonStyle(
         shape: MaterialStateProperty.all(StadiumBorder()),
-        textStyle: MaterialStateProperty.all(TextStyles.actionSmall),
+        textStyle: MaterialStateProperty.all(SmallTextStyles.action),
         minimumSize: MaterialStateProperty.all(Size(60, 30)),
         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
       ),

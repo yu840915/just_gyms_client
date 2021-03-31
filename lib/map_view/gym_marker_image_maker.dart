@@ -107,7 +107,6 @@ class _GymMarkerImageMakerState extends State<GymMarkerImageMaker>
       padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
         color: AppColors.theme,
-        border: Border.all(color: Colors.green.shade900),
         borderRadius: BorderRadius.circular(8),
       ),
     );
