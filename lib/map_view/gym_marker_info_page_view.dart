@@ -4,6 +4,7 @@ import 'package:where_gym/gym.dart';
 import 'package:where_gym/gym_detail_page.dart';
 import 'package:where_gym/gym_list.dart';
 import 'package:where_gym/map_view/gym_marker_list.dart';
+import 'package:where_gym/map_view/open_hour_indicator.dart';
 import 'package:where_gym/price_format.dart';
 import 'package:where_gym/shared_appearances.dart';
 
@@ -125,13 +126,13 @@ class GymInfoCardView extends StatelessWidget {
         child: Column(
           children: [
             Text(card.gym.name,
-                style: SmallTextStyles.title.copyWith(color: Colors.black)),
+                style: TextStyles.small.title.copyWith(color: Colors.black)),
             Text(card.gym.address,
-                style: SmallTextStyles.detail.copyWith(color: Colors.black)),
+                style: TextStyles.small.detail.copyWith(color: Colors.black)),
             _buildOpenIndicator(),
             if (card.gym.hourlyRate != null)
               Text(PriceFormat.format(card.gym.hourlyRate),
-                  style: SmallTextStyles.detail.copyWith(color: Colors.black)),
+                  style: TextStyles.small.detail.copyWith(color: Colors.black)),
             Spacer(),
             if (card.gym.phone != null) _buildContactButton(card.gym.phone)
           ],
@@ -142,16 +143,7 @@ class GymInfoCardView extends StatelessWidget {
   }
 
   Widget _buildOpenIndicator() {
-    final isOpen = card.gym.isOpenNow();
-    final text = isOpen != null
-        ? isOpen
-            ? '營業中'
-            : '休息中'
-        : '未提供';
-    return Text(
-      text,
-      style: SmallTextStyles.detail.copyWith(color: Colors.black),
-    );
+    return OpenHourIndicator(gym: card.gym, styles: TextStyles.small);
   }
 
   Widget _buildContactButton(String phone) {
@@ -162,7 +154,7 @@ class GymInfoCardView extends StatelessWidget {
       ),
       style: ButtonStyle(
         shape: MaterialStateProperty.all(StadiumBorder()),
-        textStyle: MaterialStateProperty.all(SmallTextStyles.action),
+        textStyle: MaterialStateProperty.all(TextStyles.small.action),
         minimumSize: MaterialStateProperty.all(Size(60, 30)),
         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
       ),

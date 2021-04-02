@@ -189,7 +189,7 @@ class _MapViewPageState extends State<MapViewPage> {
         style: TextButton.styleFrom(
           primary: AppColors.theme,
           backgroundColor: Colors.white,
-          textStyle: SmallTextStyles.action,
+          textStyle: TextStyles.small.action,
           shape: StadiumBorder(),
           elevation: 1,
         ),

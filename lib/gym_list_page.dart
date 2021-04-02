@@ -4,6 +4,7 @@ import 'package:where_gym/app_bar_factory.dart';
 import 'package:where_gym/gym.dart';
 import 'package:where_gym/gym_detail_page.dart';
 import 'package:where_gym/gym_list.dart';
+import 'package:where_gym/map_view/open_hour_indicator.dart';
 import 'package:where_gym/price_format.dart';
 import 'package:where_gym/shared_appearances.dart';
 
@@ -65,10 +66,6 @@ class _Row extends StatelessWidget {
   final Gym gym;
   _Row(this.gym);
 
-  void _callGym(String phone) {
-    launch('tel://$phone');
-  }
-
   void _showDetail(BuildContext context) {
     Navigator.push(
       context,
@@ -82,53 +79,47 @@ class _Row extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () => _showDetail(context),
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-        child: Column(
-          children: [
-            Text(
-              gym.name,
-              style: SmallTextStyles.title.copyWith(color: Colors.black),
-            ),
-            SizedBox(height: 8),
-            if (gym.hourlyRate != null)
+      child: ConstrainedBox(
+        constraints: BoxConstraints(minHeight: 140),
+        child: Container(
+          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          child: Column(
+            children: [
               Text(
-                '相當於 ' + PriceFormat.format(gym.hourlyRate) + '/小時',
-                style: SmallTextStyles.detail.copyWith(color: Colors.black),
+                gym.name,
+                style: TextStyles.small.title,
               ),
-            SizedBox(height: 8),
-            Text(
-              gym.address,
-              style: SmallTextStyles.detail.copyWith(color: Colors.black),
-            ),
-            if (gym.phone != null) ...[
               SizedBox(height: 8),
+              Text(
+                gym.address,
+                style: TextStyles.small.detail,
+              ),
+              SizedBox(height: 8),
+              OpenHourIndicator(gym: gym, styles: TextStyles.small),
+              SizedBox(height: 12),
               Row(
                 children: [
-                  Spacer(),
-                  _buildContactButton(gym.phone),
+                  buildPricingTable(gym.pricing),
+                  if (gym.hourlyRate != null)
+                    Text(
+                      '(最低相當於' + PriceFormat.format(gym.hourlyRate) + '/小時)',
+                      style: TextStyles.small.subscription,
+                    ),
                 ],
-              )
+              ),
             ],
-          ],
-          crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildContactButton(String phone) {
-    return ElevatedButton(
-      onPressed: () => _callGym(phone),
-      child: Text(
-        '立即預約',
-      ),
-      style: ButtonStyle(
-        shape: MaterialStateProperty.all(StadiumBorder()),
-        textStyle: MaterialStateProperty.all(SmallTextStyles.action),
-        minimumSize: MaterialStateProperty.all(Size(60, 30)),
-        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-      ),
-    );
+  Widget buildPricingTable(List<Fare> fares) {
+    String plans = '請電洽';
+    if (fares != null && fares.isNotEmpty) {
+      plans = fares.map((e) => FareFormat.format(e)).join('、');
+    }
+    return Text('計費方案：' + plans, style: TextStyles.small.detail);
   }
 }

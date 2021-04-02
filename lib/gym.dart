@@ -14,6 +14,7 @@ class Gym {
   final List<Fare> pricing;
   final Price hourlyRate;
   final List<String> phones;
+  final String pageLink;
   String get phone => phones != null && phones.isNotEmpty ? phones.first : null;
   Gym(
       {this.id,
@@ -23,7 +24,8 @@ class Gym {
       this.businessHours,
       this.hourlyRate,
       this.phones,
-      this.pricing}) {
+      this.pricing,
+      this.pageLink}) {
     _weekdayBusinessHours = BusinessHours.fromDescriptors(businessHours);
   }
 

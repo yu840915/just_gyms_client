@@ -6,46 +6,57 @@ class AppColors {
   static final theme = const Color(0xffa1352b);
 }
 
-class LargeTextStyles {
-  LargeTextStyles._();
+class TextStyles {
+  TextStyle title;
+  TextStyle detail;
+  TextStyle subscription;
+  TextStyle action;
+  TextStyles._({this.title, this.detail, this.action, this.subscription});
 
-  static const title = TextStyle(
-    fontSize: 18,
-    fontWeight: FontWeight.w600,
-    color: Colors.black,
+  static final large = TextStyles._(
+    title: TextStyle(
+      fontSize: 18,
+      fontWeight: FontWeight.w600,
+      color: Colors.black,
+    ),
+    detail: TextStyle(
+      fontSize: 14,
+      fontWeight: FontWeight.w400,
+      color: Colors.black,
+    ),
+    subscription: TextStyle(
+      fontSize: 11,
+      fontStyle: FontStyle.italic,
+      fontWeight: FontWeight.w400,
+      color: Colors.grey,
+    ),
+    action: TextStyle(
+      fontSize: 14,
+      fontWeight: FontWeight.w600,
+      color: Colors.black,
+    ),
   );
-
-  static const detail = TextStyle(
-    fontSize: 14,
-    fontWeight: FontWeight.w400,
-    color: Colors.black,
-  );
-
-  static const action = TextStyle(
-    fontSize: 14,
-    fontWeight: FontWeight.w600,
-    color: Colors.black,
-  );
-}
-
-class SmallTextStyles {
-  SmallTextStyles._();
-
-  static const title = TextStyle(
-    fontSize: 16,
-    fontWeight: FontWeight.w600,
-    color: Colors.black,
-  );
-
-  static const detail = TextStyle(
-    fontSize: 12,
-    fontWeight: FontWeight.w400,
-    color: Colors.black,
-  );
-
-  static const action = TextStyle(
-    fontSize: 12,
-    fontWeight: FontWeight.w600,
-    color: Colors.black,
+  static final small = TextStyles._(
+    title: TextStyle(
+      fontSize: 16,
+      fontWeight: FontWeight.w600,
+      color: Colors.black,
+    ),
+    detail: TextStyle(
+      fontSize: 12,
+      fontWeight: FontWeight.w400,
+      color: Colors.black,
+    ),
+    subscription: TextStyle(
+      fontSize: 10,
+      fontStyle: FontStyle.italic,
+      fontWeight: FontWeight.w400,
+      color: Colors.grey,
+    ),
+    action: TextStyle(
+      fontSize: 12,
+      fontWeight: FontWeight.w600,
+      color: Colors.black,
+    ),
   );
 }
