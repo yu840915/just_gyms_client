@@ -52,7 +52,10 @@ class _GymListPageState extends State<GymListPage> {
     }
     return ListView.separated(
       padding: EdgeInsets.only(top: 20, bottom: 80),
-      itemBuilder: (context, idx) => _Row(gyms[idx]),
+      itemBuilder: (context, idx) {
+        final gym = gyms[idx];
+        return _Row(gym, km: _gymList.kilometersFrom(gym));
+      },
       separatorBuilder: (context, idx) => Container(
         height: 1,
         color: Colors.grey.shade300,
@@ -63,8 +66,9 @@ class _GymListPageState extends State<GymListPage> {
 }
 
 class _Row extends StatelessWidget {
+  final num km;
   final Gym gym;
-  _Row(this.gym);
+  _Row(this.gym, {this.km});
 
   void _showDetail(BuildContext context) {
     Navigator.push(
@@ -105,6 +109,8 @@ class _Row extends StatelessWidget {
                       '(最低相當於' + PriceFormat.format(gym.hourlyRate) + '/小時)',
                       style: TextStyles.small.subscription,
                     ),
+                  Spacer(),
+                  _buildDistanceLable(),
                 ],
               ),
             ],
@@ -112,6 +118,16 @@ class _Row extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildDistanceLable() {
+    if (km == null) {
+      return Container();
+    }
+    return Text(
+      '距離 ${NumberFormats.distance.format(km)} 公里',
+      style: TextStyles.small.subscription,
     );
   }
 

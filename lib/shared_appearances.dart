@@ -1,9 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class AppColors {
   AppColors._();
   // static final theme = const Color(0xffad4d47);
   static final theme = const Color(0xffa1352b);
+}
+
+class NumberFormats {
+  static final NumberFormat distance = _createDistanceFormat();
+
+  static NumberFormat _createDistanceFormat() {
+    final format = NumberFormat.decimalPattern();
+    format.maximumFractionDigits = 1;
+    format.minimumFractionDigits = 1;
+    return format;
+  }
 }
 
 class TextStyles {

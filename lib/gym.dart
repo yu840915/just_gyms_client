@@ -15,11 +15,15 @@ class Gym {
   final Price hourlyRate;
   final List<String> phones;
   final String pageLink;
+  final double lat;
+  final double lon;
   String get phone => phones != null && phones.isNotEmpty ? phones.first : null;
   Gym(
       {this.id,
       this.name,
       this.address,
+      this.lat,
+      this.lon,
       this.equipments,
       this.businessHours,
       this.hourlyRate,
