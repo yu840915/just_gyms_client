@@ -106,7 +106,7 @@ class _Row extends StatelessWidget {
                   buildPricingTable(gym.pricing),
                   if (gym.hourlyRate != null)
                     Text(
-                      '(最低相當於' + PriceFormat.format(gym.hourlyRate) + '/小時)',
+                      '(' + PriceFormat.format(gym.hourlyRate) + '/小時)',
                       style: TextStyles.small.subscription,
                     ),
                   Spacer(),
@@ -126,7 +126,7 @@ class _Row extends StatelessWidget {
       return Container();
     }
     return Text(
-      '距離 ${NumberFormats.distance.format(km)} 公里',
+      '${NumberFormats.distance.format(km)} 公里',
       style: TextStyles.small.subscription,
     );
   }

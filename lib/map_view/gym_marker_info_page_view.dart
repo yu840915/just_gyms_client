@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:where_gym/gym.dart';
 import 'package:where_gym/gym_detail_page.dart';
-import 'package:where_gym/gym_list.dart';
 import 'package:where_gym/map_view/gym_marker_list.dart';
 import 'package:where_gym/map_view/open_hour_indicator.dart';
 import 'package:where_gym/price_format.dart';
@@ -95,10 +93,6 @@ class GymInfoCardView extends StatelessWidget {
   final GymInfoCard card;
   GymInfoCardView(this.card);
 
-  void _callGym(String phone) {
-    launch('tel://$phone');
-  }
-
   void _showDetail(BuildContext context) {
     Navigator.push(
       context,
@@ -114,27 +108,40 @@ class GymInfoCardView extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 10),
       child: ElevatedButton(
         clipBehavior: Clip.none,
-        style: ButtonStyle(
-          padding: MaterialStateProperty.all(EdgeInsets.all(10)),
-          backgroundColor: MaterialStateProperty.all(Colors.white),
-          overlayColor: MaterialStateProperty.all(Colors.grey.shade200),
-          shape: MaterialStateProperty.all(
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-          ),
+        style: ElevatedButton.styleFrom(
+          padding: EdgeInsets.all(10),
+          primary: Colors.white,
+          shadowColor: Colors.grey.shade200,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
         onPressed: () => _showDetail(context),
         child: Column(
           children: [
-            Text(card.gym.name,
-                style: TextStyles.small.title.copyWith(color: Colors.black)),
-            Text(card.gym.address,
-                style: TextStyles.small.detail.copyWith(color: Colors.black)),
-            _buildOpenIndicator(),
-            if (card.gym.hourlyRate != null)
-              Text(PriceFormat.format(card.gym.hourlyRate),
-                  style: TextStyles.small.detail.copyWith(color: Colors.black)),
+            Text(
+              card.gym.name,
+              style: TextStyles.small.title,
+            ),
+            SizedBox(height: 8),
+            Text(
+              card.gym.address,
+              style: TextStyles.small.detail,
+            ),
+            SizedBox(height: 8),
+            OpenHourIndicator(gym: card.gym, styles: TextStyles.small),
+            SizedBox(height: 12),
+            Row(
+              children: [
+                buildPricingTable(card.gym.pricing),
+                if (card.gym.hourlyRate != null)
+                  Text(
+                    '(' + PriceFormat.format(card.gym.hourlyRate) + '/小時)',
+                    style: TextStyles.small.subscription,
+                  ),
+                Spacer(),
+                // _buildDistanceLable(),
+              ],
+            ),
             Spacer(),
-            if (card.gym.phone != null) _buildContactButton(card.gym.phone)
           ],
           crossAxisAlignment: CrossAxisAlignment.start,
         ),
@@ -142,23 +149,22 @@ class GymInfoCardView extends StatelessWidget {
     );
   }
 
-  Widget _buildOpenIndicator() {
-    return OpenHourIndicator(gym: card.gym, styles: TextStyles.small);
-  }
+  // Widget _buildDistanceLable() {
+  //   if (km == null) {
+  //     return Container();
+  //   }
+  //   return Text(
+  //     '距離 ${NumberFormats.distance.format(km)} 公里',
+  //     style: TextStyles.small.subscription,
+  //   );
+  // }
 
-  Widget _buildContactButton(String phone) {
-    return ElevatedButton(
-      onPressed: () => _callGym(phone),
-      child: Text(
-        '立即預約',
-      ),
-      style: ButtonStyle(
-        shape: MaterialStateProperty.all(StadiumBorder()),
-        textStyle: MaterialStateProperty.all(TextStyles.small.action),
-        minimumSize: MaterialStateProperty.all(Size(60, 30)),
-        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-      ),
-    );
+  Widget buildPricingTable(List<Fare> fares) {
+    String plans = '請電洽';
+    if (fares != null && fares.isNotEmpty) {
+      plans = fares.map((e) => FareFormat.format(e)).join('、');
+    }
+    return Text('計費方案：' + plans, style: TextStyles.small.detail);
   }
 }
 
