@@ -59,6 +59,7 @@ class GymDetailPage extends StatelessWidget {
         Text(gym.address, style: TextStyles.large.detail),
         SizedBox(height: 20),
         Text('器材', style: TextStyles.large.title),
+        _buildEquipmentSection(),
         SizedBox(height: 12),
         Text('設施', style: TextStyles.large.title),
       ],
@@ -105,11 +106,10 @@ class GymDetailPage extends StatelessWidget {
   Widget _buildBusinessHourDetail() {
     final today = gym.businessHoursOfToday();
     return Text(
-      '，' +
-          (gym.isOpenNow()
-              ? '營業至 ${today.end.stringValue}'
-              : '將於 ${today.start.stringValue} 開始營業'),
-      style: TextStyles.large.detail,
+      (gym.isOpenNow()
+          ? '營業至 ${today.end.stringValue}'
+          : '將於 ${today.start.stringValue} 開始營業'),
+      style: TextStyles.large.detail.copyWith(color: Colors.grey),
     );
   }
 
@@ -142,6 +142,18 @@ class GymDetailPage extends StatelessWidget {
       ),
     );
   }
+
+  Widget _buildEquipmentSection() {
+    if (gym.equipments == null || gym.equipments.isEmpty) {
+      return Text('待加入', style: TextStyles.large.subscription);
+    }
+    return Text(
+      gym.equipments.map((e) => '${e.name} * ${e.number}').join('、'),
+      style: TextStyles.large.detail,
+    );
+  }
+
+  Widget _buildFacilitySection() {}
 
   Widget _buildPageButton(String link) {
     return TextButton(
