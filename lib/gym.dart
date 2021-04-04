@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:where_gym/gym_facility.dart';
 part 'gym.g.dart';
 
 @JsonSerializable()
@@ -17,6 +18,9 @@ class Gym {
   final String pageLink;
   final double lat;
   final double lon;
+  final List<String> facilities;
+  List<GymFacility> _gymFacilities;
+  List<GymFacility> get gymFacilities => _gymFacilities;
   bool get hasContactInfos => phone != null || pageLink != null;
   String get phone => phones != null && phones.isNotEmpty ? phones.first : null;
   Gym(
@@ -26,12 +30,16 @@ class Gym {
       this.lat,
       this.lon,
       this.equipments,
+      this.facilities,
       this.businessHours,
       this.hourlyRate,
       this.phones,
       this.pricing,
       this.pageLink}) {
     _weekdayBusinessHours = BusinessHours.fromDescriptors(businessHours);
+    _gymFacilities = facilities != null
+        ? facilities.map((e) => GymFacility.table[e]).toList()
+        : [];
   }
 
   bool isOpenNow() {

@@ -62,6 +62,7 @@ class GymDetailPage extends StatelessWidget {
         _buildEquipmentSection(),
         SizedBox(height: 12),
         Text('設施', style: TextStyles.large.title),
+        _buildFacilitySection(),
       ],
       crossAxisAlignment: CrossAxisAlignment.start,
     );
@@ -153,7 +154,15 @@ class GymDetailPage extends StatelessWidget {
     );
   }
 
-  Widget _buildFacilitySection() {}
+  Widget _buildFacilitySection() {
+    if (gym.gymFacilities == null || gym.gymFacilities.isEmpty) {
+      return Text('未提供', style: TextStyles.large.subscription);
+    }
+    return Text(
+      gym.gymFacilities.map((e) => e.displayName).join('、'),
+      style: TextStyles.large.detail,
+    );
+  }
 
   Widget _buildPageButton(String link) {
     return TextButton(
