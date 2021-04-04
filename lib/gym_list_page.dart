@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:where_gym/app_bar_factory.dart';
+import 'package:where_gym/distance_format.dart';
 import 'package:where_gym/gym.dart';
 import 'package:where_gym/gym_detail_page.dart';
 import 'package:where_gym/gym_list.dart';
@@ -54,7 +54,7 @@ class _GymListPageState extends State<GymListPage> {
       padding: EdgeInsets.only(top: 20, bottom: 80),
       itemBuilder: (context, idx) {
         final gym = gyms[idx];
-        return _Row(gym, km: _gymList.kilometersFrom(gym));
+        return _Row(gym, meters: _gymList.metersFrom(gym));
       },
       separatorBuilder: (context, idx) => Container(
         height: 1,
@@ -66,9 +66,9 @@ class _GymListPageState extends State<GymListPage> {
 }
 
 class _Row extends StatelessWidget {
-  final num km;
+  final num meters;
   final Gym gym;
-  _Row(this.gym, {this.km});
+  _Row(this.gym, {this.meters});
 
   void _showDetail(BuildContext context) {
     Navigator.push(
@@ -91,7 +91,7 @@ class _Row extends StatelessWidget {
             children: [
               Text(
                 gym.name,
-                style: TextStyles.small.title,
+                style: TextStyles.small.header,
               ),
               SizedBox(height: 8),
               Text(
@@ -122,11 +122,12 @@ class _Row extends StatelessWidget {
   }
 
   Widget _buildDistanceLable() {
-    if (km == null) {
+    if (meters == null) {
       return Container();
     }
+    
     return Text(
-      '${NumberFormats.distance.format(km)} 公里',
+      DistanceFormat.format(meters),
       style: TextStyles.small.subscription,
     );
   }

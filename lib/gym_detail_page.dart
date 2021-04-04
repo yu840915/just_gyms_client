@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:where_gym/app_bar_factory.dart';
 import 'package:where_gym/gym.dart';
+import 'package:where_gym/map_view/open_hour_indicator.dart';
+import 'package:where_gym/price_format.dart';
 import 'package:where_gym/shared_appearances.dart';
 
 class GymDetailPage extends StatelessWidget {
@@ -25,22 +27,119 @@ class GymDetailPage extends StatelessWidget {
   }
 
   Widget _buildBody(BuildContext context) {
+    return Stack(
+      children: [
+        SingleChildScrollView(
+          padding: EdgeInsets.only(top: 20, bottom: 100),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: _buildContents(context),
+          ),
+        ),
+        if (gym.hasContactInfos) _buildActions(context),
+      ],
+    );
+  }
+
+  Widget _buildContents(BuildContext context) {
     return Column(
       children: [
-        Container(),
         Text(
           gym.name,
-          style: TextStyles.large.title,
+          style: TextStyles.large.header,
         ),
-        Spacer(),
-        Row(
-          children: [
-            
-            if (gym.phone != null)
-              Expanded(child: _buildReserveButton(gym.phone))
-          ],
-        ),
+        SizedBox(height: 20),
+        Text('計價方案', style: TextStyles.large.title),
+        _buildPricingRow(),
+        SizedBox(height: 12),
+        Text('今日營業時間', style: TextStyles.large.title),
+        _buildBusinessHourRow(),
+        SizedBox(height: 12),
+        Text('地址', style: TextStyles.large.title),
+        Text(gym.address, style: TextStyles.large.detail),
+        SizedBox(height: 20),
+        Text('器材', style: TextStyles.large.title),
+        SizedBox(height: 12),
+        Text('設施', style: TextStyles.large.title),
       ],
+      crossAxisAlignment: CrossAxisAlignment.start,
+    );
+  }
+
+  Widget _buildPricingRow() {
+    if (gym.pricing == null || gym.pricing.isEmpty) {
+      return Text('請電洽');
+    }
+    if (gym.pricing.length == 1) {
+      return _buildFareRow(null, gym.pricing.first);
+    }
+    final rows = List<Widget>.empty(growable: true);
+    for (var i = 0; i < gym.pricing.length; i++) {
+      rows.add(_buildFareRow(i + 1, gym.pricing[i]));
+      rows.add(SizedBox(height: 4));
+    }
+    return Column(
+      children: rows,
+    );
+  }
+
+  Widget _buildFareRow(int bullet, Fare fare) {
+    return Text(
+      (bullet != null ? '$bullet. ' : '') + FareFormat.format(fare),
+      style: TextStyles.large.detail,
+    );
+  }
+
+  Widget _buildBusinessHourRow() {
+    return Row(
+      children: [
+        OpenHourIndicator(gym: gym, styles: TextStyles.large),
+        if (gym.isOpenNow() != null) ...[
+          SizedBox(width: 8),
+          _buildBusinessHourDetail(),
+        ]
+      ],
+    );
+  }
+
+  Widget _buildBusinessHourDetail() {
+    final today = gym.businessHoursOfToday();
+    return Text(
+      '，' +
+          (gym.isOpenNow()
+              ? '營業至 ${today.end.stringValue}'
+              : '將於 ${today.start.stringValue} 開始營業'),
+      style: TextStyles.large.detail,
+    );
+  }
+
+  Widget _buildActions(BuildContext context) {
+    return Align(
+      alignment: Alignment.bottomCenter,
+      child: Container(
+        child: Column(
+          children: [
+            SafeArea(
+              top: false,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Row(
+                  children: [
+                    if (gym.pageLink != null)
+                      Expanded(child: _buildPageButton(gym.pageLink)),
+                    if (gym.pageLink != null && gym.phone != null)
+                      SizedBox(width: 12),
+                    if (gym.phone != null)
+                      Expanded(child: _buildReserveButton(gym.phone)),
+                  ],
+                ),
+              ),
+            ),
+          ],
+          mainAxisSize: MainAxisSize.min,
+        ),
+        color: Colors.white,
+      ),
     );
   }
 
@@ -58,15 +157,12 @@ class GymDetailPage extends StatelessWidget {
   }
 
   Widget _buildReserveButton(String phone) {
-    return TextButton(
+    return OutlinedButton(
       onPressed: () => _callGym(phone),
       child: Text(
         '立即預約',
       ),
-      style: TextButton.styleFrom(
-        textStyle: TextStyles.large.action,
-        minimumSize: Size(double.infinity, 50),
-      ),
+      style: ButtonStyles.action,
     );
   }
 }

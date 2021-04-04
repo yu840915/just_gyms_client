@@ -74,13 +74,13 @@ class GymList {
     return pos;
   }
 
-  num kilometersFrom(Gym gym) {
+  num metersFrom(Gym gym) {
     if (_myLocationSubject.valueWrapper == null) {
       return null;
     }
     final location = _myLocationSubject.valueWrapper.value;
     return _distance.as(LengthUnit.Meter, LatLng(gym.lat, gym.lon),
-        LatLng(location.latitude, location.longitude)) / 1000;
+        LatLng(location.latitude, location.longitude));
   }
 
   void dispose() {

@@ -138,9 +138,9 @@ class _GymMarkerImageMakerState extends State<GymMarkerImageMaker>
   }
 
   Widget _buildMarkerContentForGym(Gym gym) {
-    if (gym.hourlyRate == null) {
+    if (gym.pricing == null || gym.pricing.isEmpty) {
       return Text(
-        '1 項結果',
+        '請電洽',
         style: TextStyle(
           color: Colors.white,
           fontSize: 12,

@@ -17,6 +17,7 @@ class Gym {
   final String pageLink;
   final double lat;
   final double lon;
+  bool get hasContactInfos => phone != null || pageLink != null;
   String get phone => phones != null && phones.isNotEmpty ? phones.first : null;
   Gym(
       {this.id,
@@ -41,6 +42,23 @@ class Gym {
             ) !=
             null
         : null;
+  }
+
+  BusinessHours businessHoursOfToday() {
+    if (_weekdayBusinessHours == null) {
+      return null;
+    }
+    final openingDay = _weekdayBusinessHours.values.firstWhere(
+      (element) => element.isOpenAt(DateTime.now()),
+      orElse: () => null,
+    );
+    if (openingDay != null) {
+      return openingDay;
+    }
+    return _weekdayBusinessHours.values.firstWhere(
+      (element) => element.opensAfter(DateTime.now()),
+      orElse: () => null,
+    );
   }
 
   Map<String, dynamic> toJson() => _$GymToJson(this);
@@ -95,6 +113,19 @@ class BusinessHours {
       return end.isAfterDate(dateTime);
     }
     return false;
+  }
+
+  bool opensAfter(DateTime dateTime) {
+    if (dateTime.weekday == 7 && weekday.intValue == 1) {
+      return true;
+    }
+    if (weekday.intValue < dateTime.weekday) {
+      return false;
+    }
+    if (weekday.intValue > dateTime.weekday) {
+      return true;
+    }
+    return start.isAfterDate(dateTime);
   }
 
   static Map<Weekday, BusinessHours> fromDescriptors(
@@ -209,13 +240,15 @@ extension WeekdayMethods on Weekday {
 class HourMin {
   final int hour;
   final int min;
-  HourMin({this.hour, this.min});
+  final String stringValue;
+  HourMin({this.stringValue, this.hour, this.min});
   static HourMin fromString(String str) {
     final components = str.split(':');
     if (components.length != 2) {
       throw 'Invalid format';
     }
     return HourMin(
+      stringValue: str,
       hour: int.parse(components.first),
       min: int.parse(components.last),
     );

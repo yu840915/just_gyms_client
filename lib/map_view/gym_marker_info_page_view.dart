@@ -119,7 +119,7 @@ class GymInfoCardView extends StatelessWidget {
           children: [
             Text(
               card.gym.name,
-              style: TextStyles.small.title,
+              style: TextStyles.small.header,
             ),
             SizedBox(height: 8),
             Text(

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 class AppColors {
   AppColors._();
@@ -7,27 +6,23 @@ class AppColors {
   static final theme = const Color(0xffa1352b);
 }
 
-class NumberFormats {
-  static final NumberFormat distance = _createDistanceFormat();
-
-  static NumberFormat _createDistanceFormat() {
-    final format = NumberFormat.decimalPattern();
-    format.maximumFractionDigits = 1;
-    format.minimumFractionDigits = 1;
-    return format;
-  }
-}
-
 class TextStyles {
+  TextStyle header;
   TextStyle title;
   TextStyle detail;
   TextStyle subscription;
   TextStyle action;
-  TextStyles._({this.title, this.detail, this.action, this.subscription});
+  TextStyles._(
+      {this.header, this.title, this.detail, this.action, this.subscription});
 
   static final large = TextStyles._(
-    title: TextStyle(
+    header: TextStyle(
       fontSize: 18,
+      fontWeight: FontWeight.w500,
+      color: Colors.black,
+    ),
+    title: TextStyle(
+      fontSize: 14,
       fontWeight: FontWeight.w600,
       color: Colors.black,
     ),
@@ -49,8 +44,13 @@ class TextStyles {
     ),
   );
   static final small = TextStyles._(
-    title: TextStyle(
+    header: TextStyle(
       fontSize: 16,
+      fontWeight: FontWeight.w500,
+      color: Colors.black,
+    ),
+    title: TextStyle(
+      fontSize: 12,
       fontWeight: FontWeight.w600,
       color: Colors.black,
     ),
@@ -70,5 +70,17 @@ class TextStyles {
       fontWeight: FontWeight.w600,
       color: Colors.black,
     ),
+  );
+}
+
+class ButtonStyles {
+  static final ButtonStyle action = OutlinedButton.styleFrom(
+    textStyle: TextStyles.large.action,
+    minimumSize: Size(double.infinity, 44),
+    shape: RoundedRectangleBorder(
+      side: BorderSide(color: Colors.grey),
+      borderRadius: BorderRadius.circular(8),
+    ),
+    primary: Colors.black,
   );
 }
