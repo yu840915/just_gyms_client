@@ -117,9 +117,28 @@ class GymInfoCardView extends StatelessWidget {
         onPressed: () => _showDetail(context),
         child: Column(
           children: [
-            Text(
-              card.gym.name,
-              style: TextStyles.small.header,
+            Row(
+              children: [
+                Container(
+                  width: 70,
+                  height: 50,
+                  decoration: BoxDecoration(
+                      color: Colors.grey.shade100,
+                      image: card.gym.cover != null
+                          ? DecorationImage(
+                              image: NetworkImage(card.gym.cover),
+                              fit: BoxFit.cover,
+                            )
+                          : null),
+                ),
+                SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    card.gym.name,
+                    style: TextStyles.small.header,
+                  ),
+                ),
+              ],
             ),
             SizedBox(height: 8),
             Text(

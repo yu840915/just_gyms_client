@@ -19,6 +19,8 @@ class Gym {
   final double lat;
   final double lon;
   final List<String> facilities;
+  final List<String> images;
+  String get cover => images != null && images.isNotEmpty ? images.first : null;
   List<GymFacility> _gymFacilities;
   List<GymFacility> get gymFacilities => _gymFacilities;
   bool get hasContactInfos => phone != null || pageLink != null;
@@ -35,7 +37,8 @@ class Gym {
       this.hourlyRate,
       this.phones,
       this.pricing,
-      this.pageLink}) {
+      this.pageLink,
+      this.images}) {
     _weekdayBusinessHours = BusinessHours.fromDescriptors(businessHours);
     _gymFacilities = facilities != null
         ? facilities.map((e) => GymFacility.table[e]).toList()

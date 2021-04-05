@@ -89,9 +89,28 @@ class _Row extends StatelessWidget {
           padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
           child: Column(
             children: [
-              Text(
-                gym.name,
-                style: TextStyles.small.header,
+              Row(
+                children: [
+                  Container(
+                    width: 70,
+                    height: 50,
+                    decoration: BoxDecoration(
+                        color: Colors.grey.shade100,
+                        image: gym.cover != null
+                            ? DecorationImage(
+                                image: NetworkImage(gym.cover),
+                                fit: BoxFit.cover,
+                              )
+                            : null),
+                  ),
+                  SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      gym.name,
+                      style: TextStyles.small.header,
+                    ),
+                  ),
+                ],
               ),
               SizedBox(height: 8),
               Text(
@@ -125,7 +144,7 @@ class _Row extends StatelessWidget {
     if (meters == null) {
       return Container();
     }
-    
+
     return Text(
       DistanceFormat.format(meters),
       style: TextStyles.small.subscription,
