@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class AppColors {
   AppColors._();
   // static final theme = const Color(0xffad4d47);
-  static final theme = const Color(0xffa1352b);
+  static final theme = const Color(0xff019858);
 }
 
 class TextStyles {

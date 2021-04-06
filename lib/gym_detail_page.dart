@@ -3,6 +3,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:where_gym/app_bar_factory.dart';
 import 'package:where_gym/gym.dart';
 import 'package:where_gym/map_view/open_hour_indicator.dart';
+import 'package:where_gym/photo_gallery_view.dart';
 import 'package:where_gym/price_format.dart';
 import 'package:where_gym/shared_appearances.dart';
 
@@ -21,7 +22,8 @@ class GymDetailPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBarFactory.appBar(),
+      appBar: AppBarFactory.transparentAppBar(),
+      extendBodyBehindAppBar: true,
       body: _buildBody(context),
     );
   }
@@ -30,10 +32,15 @@ class GymDetailPage extends StatelessWidget {
     return Stack(
       children: [
         SingleChildScrollView(
-          padding: EdgeInsets.only(top: 20, bottom: 100),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: _buildContents(context),
+          padding: EdgeInsets.only(bottom: 100),
+          child: Column(
+            children: [
+              PhotoGalleryView(gym.images),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: _buildContents(context),
+              ),
+            ],
           ),
         ),
         if (gym.hasContactInfos) _buildActions(context),
@@ -44,6 +51,7 @@ class GymDetailPage extends StatelessWidget {
   Widget _buildContents(BuildContext context) {
     return Column(
       children: [
+        SizedBox(height: 20),
         Text(
           gym.name,
           style: TextStyles.large.header,

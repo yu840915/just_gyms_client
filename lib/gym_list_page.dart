@@ -84,7 +84,7 @@ class _Row extends StatelessWidget {
     return InkWell(
       onTap: () => _showDetail(context),
       child: ConstrainedBox(
-        constraints: BoxConstraints(minHeight: 140),
+        constraints: BoxConstraints(minHeight: 120),
         child: Container(
           padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
           child: Column(
@@ -105,9 +105,16 @@ class _Row extends StatelessWidget {
                   ),
                   SizedBox(width: 8),
                   Expanded(
-                    child: Text(
-                      gym.name,
-                      style: TextStyles.small.header,
+                    child: Column(
+                      children: [
+                        Text(
+                          gym.name,
+                          style: TextStyles.small.header,
+                        ),
+                        SizedBox(height: 8),
+                        OpenHourIndicator(gym: gym, styles: TextStyles.small),
+                      ],
+                      crossAxisAlignment: CrossAxisAlignment.start,
                     ),
                   ),
                 ],
@@ -117,8 +124,6 @@ class _Row extends StatelessWidget {
                 gym.address,
                 style: TextStyles.small.detail,
               ),
-              SizedBox(height: 8),
-              OpenHourIndicator(gym: gym, styles: TextStyles.small),
               SizedBox(height: 12),
               Row(
                 children: [

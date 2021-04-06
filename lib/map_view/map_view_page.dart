@@ -80,12 +80,12 @@ class _MapViewPageState extends State<MapViewPage> {
   Widget build(BuildContext context) {
     return Stack(
       children: [
+        if (markerList != null)
+          Center(child: GymMarkerImageMakerContainers(markerList)),
         new Scaffold(
           appBar: AppBarFactory.shrinkedAppBar(),
           body: _buildBody(context),
         ),
-        if (markerList != null)
-          Center(child: GymMarkerImageMakerContainers(markerList)),
       ],
     );
   }

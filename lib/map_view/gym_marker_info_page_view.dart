@@ -133,9 +133,17 @@ class GymInfoCardView extends StatelessWidget {
                 ),
                 SizedBox(width: 8),
                 Expanded(
-                  child: Text(
-                    card.gym.name,
-                    style: TextStyles.small.header,
+                  child: Column(
+                    children: [
+                      Text(
+                        card.gym.name,
+                        style: TextStyles.small.header,
+                      ),
+                      SizedBox(height: 8),
+                      OpenHourIndicator(
+                          gym: card.gym, styles: TextStyles.small),
+                    ],
+                    crossAxisAlignment: CrossAxisAlignment.start,
                   ),
                 ),
               ],
@@ -145,8 +153,6 @@ class GymInfoCardView extends StatelessWidget {
               card.gym.address,
               style: TextStyles.small.detail,
             ),
-            SizedBox(height: 8),
-            OpenHourIndicator(gym: card.gym, styles: TextStyles.small),
             SizedBox(height: 12),
             Row(
               children: [

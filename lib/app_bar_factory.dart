@@ -17,6 +17,21 @@ class AppBarFactory {
     );
   }
 
+  static Widget transparentAppBar(
+      {Widget leading, Widget title, List<Widget> actions}) {
+    return PreferredSize(
+      preferredSize: Size.fromHeight(42),
+      child: AppBar(
+        leading: leading,
+        title: title,
+        actions: actions,
+        iconTheme: IconThemeData(color: Colors.white),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+      ),
+    );
+  }
+
   static Widget shrinkedAppBar() {
     return PreferredSize(
       preferredSize: Size.fromHeight(0),
