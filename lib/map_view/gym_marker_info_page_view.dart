@@ -83,9 +83,9 @@ class _GymMarkerInfoPageViewState extends State<GymMarkerInfoPageView> {
   }
 
   void _initPageControllerWithSelection(DisplayableGymMarker marker) {
-    final idx = markers.indexWhere((element) => element.id == marker.id);
+    final idx = markers.indexWhere((element) => element.id == marker.id);    
     pageController =
-        PageController(initialPage: 1000 + idx, viewportFraction: 0.8);
+        PageController(initialPage: markers.length * 30 + idx, viewportFraction: 0.8);
   }
 }
 
