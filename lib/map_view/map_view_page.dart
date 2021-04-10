@@ -6,6 +6,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:where_gym/app_bar_factory.dart';
 import 'package:where_gym/gym_list.dart';
 import 'package:where_gym/gym_list_page.dart';
+import 'package:where_gym/main_menu.dart';
 import 'package:where_gym/map_view/gym_marker_image_maker.dart';
 import 'package:where_gym/map_view/gym_marker_info_page_view.dart';
 import 'package:where_gym/map_view/gym_marker_list.dart';
@@ -105,6 +106,7 @@ class _MapViewPageState extends State<MapViewPage> {
   Widget _buildOverlay(BuildContext context) {
     return Column(
       children: [
+        SizedBox(height: 10),
         _buildTopBar(context),
         SizedBox(height: 10),
         if (markerList != null)
@@ -124,19 +126,38 @@ class _MapViewPageState extends State<MapViewPage> {
     return Row(
       children: [
         SizedBox(width: 16),
-        ElevatedButton(
+        MainMenu(),
+        SizedBox(width: 12),
+        Expanded(
+          child: ElevatedButton(
+            onPressed: () {},
+            child: Row(
+              children: [
+                Text(
+                  '搜尋地點',
+                  style: TextStyles.large.action.copyWith(color: Colors.grey),
+                ),
+              ],
+            ),
+            style: ElevatedButton.styleFrom(
+              primary: Colors.white,
+              shape: StadiumBorder(),
+            ),
+          ),
+        ),
+        SizedBox(width: 12),
+        TextButton(
           child: Icon(
             Icons.list,
             color: AppColors.theme,
           ),
-          style: ElevatedButton.styleFrom(
+          style: TextButton.styleFrom(
             shape: StadiumBorder(),
-            primary: Colors.white,
+            backgroundColor: Colors.white,
             minimumSize: Size.square(40),
           ),
           onPressed: () => _showListView(context),
         ),
-        Spacer(),
         SizedBox(width: 16),
       ],
     );
