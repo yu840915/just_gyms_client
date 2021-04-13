@@ -6,6 +6,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:where_gym/app_bar_factory.dart';
 import 'package:where_gym/gym_list.dart';
 import 'package:where_gym/gym_list_page.dart';
+import 'package:where_gym/location_search.dart/location_search_view.dart';
 import 'package:where_gym/main_menu.dart';
 import 'package:where_gym/map_view/gym_marker_image_maker.dart';
 import 'package:where_gym/map_view/gym_marker_info_page_view.dart';
@@ -85,7 +86,14 @@ class _MapViewPageState extends State<MapViewPage> {
           Center(child: GymMarkerImageMakerContainers(markerList)),
         new Scaffold(
           appBar: AppBarFactory.shrinkedAppBar(),
-          body: _buildBody(context),
+          body: Stack(
+            children: [
+              _buildBody(context),
+              LocationSearchView(
+                showList: () => _showListView(context),
+              ),
+            ],
+          ),
         ),
       ],
     );
@@ -106,9 +114,7 @@ class _MapViewPageState extends State<MapViewPage> {
   Widget _buildOverlay(BuildContext context) {
     return Column(
       children: [
-        SizedBox(height: 10),
-        _buildTopBar(context),
-        SizedBox(height: 10),
+        SizedBox(height: 60),
         if (markerList != null)
           StreamBuilder<bool>(
             stream: markerList.onIsDirty,
@@ -118,47 +124,6 @@ class _MapViewPageState extends State<MapViewPage> {
             },
           ),
         Spacer(),
-      ],
-    );
-  }
-
-  Widget _buildTopBar(BuildContext context) {
-    return Row(
-      children: [
-        SizedBox(width: 16),
-        MainMenu(),
-        SizedBox(width: 12),
-        Expanded(
-          child: ElevatedButton(
-            onPressed: () {},
-            child: Row(
-              children: [
-                Text(
-                  '搜尋地點',
-                  style: TextStyles.large.action.copyWith(color: Colors.grey),
-                ),
-              ],
-            ),
-            style: ElevatedButton.styleFrom(
-              primary: Colors.white,
-              shape: StadiumBorder(),
-            ),
-          ),
-        ),
-        SizedBox(width: 12),
-        TextButton(
-          child: Icon(
-            Icons.list,
-            color: AppColors.theme,
-          ),
-          style: TextButton.styleFrom(
-            shape: StadiumBorder(),
-            backgroundColor: Colors.white,
-            minimumSize: Size.square(40),
-          ),
-          onPressed: () => _showListView(context),
-        ),
-        SizedBox(width: 16),
       ],
     );
   }

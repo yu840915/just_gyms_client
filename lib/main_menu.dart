@@ -14,7 +14,7 @@ class MainMenu extends StatelessWidget {
       },
       icon: Container(
         child: Icon(
-          Icons.more_horiz,
+          Icons.menu,
           color: AppColors.theme,
           size: 30,
         ),
