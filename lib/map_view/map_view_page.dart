@@ -6,8 +6,8 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:where_gym/app_bar_factory.dart';
 import 'package:where_gym/gym_list.dart';
 import 'package:where_gym/gym_list_page.dart';
+import 'package:where_gym/location_search.dart/location_search.dart';
 import 'package:where_gym/location_search.dart/location_search_view.dart';
-import 'package:where_gym/main_menu.dart';
 import 'package:where_gym/map_view/gym_marker_image_maker.dart';
 import 'package:where_gym/map_view/gym_marker_info_page_view.dart';
 import 'package:where_gym/map_view/gym_marker_list.dart';
@@ -30,6 +30,7 @@ class _MapViewPageState extends State<MapViewPage> {
   List<StreamSubscription> _subscription = [];
   bool needsInitialFetch = true;
   bool _needsUpdate = false;
+  LocationSearch _locationSearch;
 
   void _handleMarkerSelection(BuildContext context, String selection) async {
     if (selection == null) {
@@ -55,6 +56,12 @@ class _MapViewPageState extends State<MapViewPage> {
     bottomSheetController = null;
   }
 
+  void _onSelectAddress(AddressSearchResultItem item) async {
+    final mapController = await _controller.future;
+    mapController.animateCamera(
+        CameraUpdate.newLatLng(item.geometry.location.toLatLng()));
+  }
+
   void _showListView(BuildContext context) {
     Navigator.push(
       context,
@@ -68,10 +75,12 @@ class _MapViewPageState extends State<MapViewPage> {
   @override
   void initState() {
     super.initState();
+    _locationSearch = LocationSearch(onSelectAddress: _onSelectAddress);
   }
 
   @override
   void dispose() {
+    _locationSearch.dispose();
     _subscription?.forEach((element) {
       element.cancel();
     });
@@ -91,6 +100,7 @@ class _MapViewPageState extends State<MapViewPage> {
               _buildBody(context),
               LocationSearchView(
                 showList: () => _showListView(context),
+                locationSearch: _locationSearch,
               ),
             ],
           ),
