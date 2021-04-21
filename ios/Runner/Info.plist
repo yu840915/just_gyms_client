@@ -6,6 +6,8 @@
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>用於找尋附近的健身房</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>用於找尋附近的健身房</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
