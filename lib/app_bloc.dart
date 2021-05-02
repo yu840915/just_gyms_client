@@ -7,27 +7,41 @@ class AppBloc extends Bloc<dynamic, AppPhase> {
   final _hasFinishedIntroKey = 'hasFinishedIntro';
   final permissionChecker = PermissionChecker();
   AppBloc(initialState) : super(initialState) {
-    _setNeedsUpdate();
+    // _checkPermission();
+    add(AppPhase.permission);
+  }
+
+  void _checkPermission() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (!prefs.containsKey(_hasFinishedIntroKey) ||
+        !prefs.getBool(_hasFinishedIntroKey)) {
+      add(AppPhase.intro);
+    } else {
+      _setUpPermission();
+    }
+  }
+
+  void _setUpPermission() {
+    permissionChecker.onHasUnfinishedItems.listen((shouldAsk) {
+      if (shouldAsk) {
+        add(AppPhase.app);
+      } else {
+        add(AppPhase.permission);
+      }
+    });
   }
 
   @override
   Stream<AppPhase> mapEventToState(event) async* {
-    final prefs = await SharedPreferences.getInstance();
-    if (!prefs.containsKey(_hasFinishedIntroKey) ||
-        !prefs.getBool(_hasFinishedIntroKey)) {
-      yield AppPhase.intro;
-    }
-  }
-
-  void _setNeedsUpdate() {
-    add(null);
+    yield AppPhase.permission;
+    // yield event;
   }
 
   void setIntroFinished() async {
     final prefs = await SharedPreferences.getInstance();
     try {
       await prefs.setBool(_hasFinishedIntroKey, true);
-      _setNeedsUpdate();
+      _setUpPermission();
     } catch (e) {
       print(e);
     }

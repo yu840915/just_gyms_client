@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:where_gym/app_bloc.dart';
 import 'package:where_gym/home_page.dart';
 import 'package:where_gym/intro/intro_page.dart';
+import 'package:where_gym/intro/permission_page.dart';
+import 'package:where_gym/shared_appearances.dart';
 
 void main() {
   runApp(MyApp());
@@ -40,6 +42,8 @@ class _MyAppState extends State<MyApp> {
     switch (phase) {
       case AppPhase.intro:
         return IntroPage();
+      case AppPhase.permission:
+        return PermissionPage();
       default:
     }
     return HomePage();

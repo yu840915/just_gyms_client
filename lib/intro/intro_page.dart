@@ -5,6 +5,11 @@ import 'package:where_gym/app_bar_factory.dart';
 import 'package:where_gym/app_bloc.dart';
 
 class IntroPage extends StatelessWidget {
+  void _nextStep(BuildContext context) {
+    AppBloc bloc = BlocProvider.of(context);
+    bloc.setIntroFinished();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -67,7 +72,7 @@ class IntroPage extends StatelessWidget {
         TextButton(
           onPressed: () {},
           child: StreamBuilder<bool>(
-            stream: bloc.permissionChecker.hasUnfinishedItems,
+            stream: bloc.permissionChecker.onHasUnfinishedItems,
             builder: (context, snapshot) {
               if (snapshot.data == null) {
                 return Container();

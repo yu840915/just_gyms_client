@@ -7,7 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class PermissionChecker {
   final _hasUnfinishedItemsSubject = BehaviorSubject<bool>();
-  Stream<bool> get hasUnfinishedItems => _hasUnfinishedItemsSubject;
+  Stream<bool> get onHasUnfinishedItems => _hasUnfinishedItemsSubject;
   final List<PermissionItem> items = [LocationPermissionItem()];
   List<StreamSubscription> _subscriptions;
   PermissionChecker() {
@@ -71,4 +71,35 @@ class LocationPermissionItem implements PermissionItem {
 
   @override
   String message = '為了能讓我們幫您找尋附近的場租，需要您授權定位服務。';
+}
+
+class TrackPermissionItem implements PermissionItem {
+  @override
+  String message;
+
+  @override
+  // TODO: implement icon
+  Widget get icon => throw UnimplementedError();
+
+  @override
+  Future<bool> needsRequestPermission() {
+    // TODO: implement needsRequestPermission
+    throw UnimplementedError();
+  }
+
+  @override
+  // TODO: implement onUpdate
+  Stream get onUpdate => throw UnimplementedError();
+
+  @override
+  Future<void> skipPermissionRequest() {
+    // TODO: implement skipPermissionRequest
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<bool> startPermissionRequest() {
+    // TODO: implement startPermissionRequest
+    throw UnimplementedError();
+  }
 }
