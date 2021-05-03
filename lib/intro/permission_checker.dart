@@ -58,48 +58,17 @@ class LocationPermissionItem implements PermissionItem {
 
   @override
   Future<bool> startPermissionRequest() async {
+    final status = await Permission.locationWhenInUse.request();
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_key, true);
-    final status = await Permission.locationWhenInUse.request();
     _updateSubject.add(null);
     return status == PermissionStatus.granted ||
         status == PermissionStatus.limited;
   }
 
   @override
-  Widget get icon => Icon(Icons.location_on);
+  Widget get icon => Icon(Icons.location_on, size: 44);
 
   @override
   String message = '為了能讓我們幫您找尋附近的場租，需要您授權定位服務。';
-}
-
-class TrackPermissionItem implements PermissionItem {
-  @override
-  String message;
-
-  @override
-  // TODO: implement icon
-  Widget get icon => throw UnimplementedError();
-
-  @override
-  Future<bool> needsRequestPermission() {
-    // TODO: implement needsRequestPermission
-    throw UnimplementedError();
-  }
-
-  @override
-  // TODO: implement onUpdate
-  Stream get onUpdate => throw UnimplementedError();
-
-  @override
-  Future<void> skipPermissionRequest() {
-    // TODO: implement skipPermissionRequest
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<bool> startPermissionRequest() {
-    // TODO: implement startPermissionRequest
-    throw UnimplementedError();
-  }
 }

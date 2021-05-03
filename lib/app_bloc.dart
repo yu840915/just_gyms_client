@@ -7,8 +7,7 @@ class AppBloc extends Bloc<dynamic, AppPhase> {
   final _hasFinishedIntroKey = 'hasFinishedIntro';
   final permissionChecker = PermissionChecker();
   AppBloc(initialState) : super(initialState) {
-    // _checkPermission();
-    add(AppPhase.permission);
+    _checkPermission();
   }
 
   void _checkPermission() async {
@@ -33,8 +32,7 @@ class AppBloc extends Bloc<dynamic, AppPhase> {
 
   @override
   Stream<AppPhase> mapEventToState(event) async* {
-    yield AppPhase.permission;
-    // yield event;
+    yield event;
   }
 
   void setIntroFinished() async {

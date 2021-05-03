@@ -70,7 +70,7 @@ class IntroPage extends StatelessWidget {
       children: [
         Spacer(),
         TextButton(
-          onPressed: () {},
+          onPressed: () => _nextStep(context),
           child: StreamBuilder<bool>(
             stream: bloc.permissionChecker.onHasUnfinishedItems,
             builder: (context, snapshot) {
