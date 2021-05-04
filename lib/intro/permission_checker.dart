@@ -11,7 +11,11 @@ class PermissionChecker {
   final List<PermissionItem> items = [LocationPermissionItem()];
   List<StreamSubscription> _subscriptions;
   PermissionChecker() {
-    _subscriptions = items.map((e) => e.onUpdate.listen((event) {})).toList();
+    _subscriptions = items
+        .map((e) => e.onUpdate.listen((event) {
+              _update();
+            }))
+        .toList();
     _update();
   }
 

@@ -23,9 +23,9 @@ class AppBloc extends Bloc<dynamic, AppPhase> {
   void _setUpPermission() {
     permissionChecker.onHasUnfinishedItems.listen((shouldAsk) {
       if (shouldAsk) {
-        add(AppPhase.app);
-      } else {
         add(AppPhase.permission);
+      } else {
+        add(AppPhase.app);
       }
     });
   }
