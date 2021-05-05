@@ -4,6 +4,7 @@ import 'package:after_layout/after_layout.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:screenshot/screenshot.dart';
 import 'package:where_gym/gym.dart';
 import 'package:where_gym/map_view/gym_marker_list.dart';
 import 'package:where_gym/price_format.dart';
@@ -53,45 +54,46 @@ class GymMarkerImageMaker extends StatefulWidget {
 
 class _GymMarkerImageMakerState extends State<GymMarkerImageMaker>
     with AfterLayoutMixin<GymMarkerImageMaker> {
-  final GlobalKey normalKey = GlobalKey();
-  final GlobalKey selectionKey = GlobalKey();
+  ScreenshotController normalController;
+  ScreenshotController selectionController;
+  final normalStyle = TextStyle(
+    color: Colors.white,
+    fontSize: 12,
+  );
+  final selectionStyle =
+      TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600);
   GymMarker get gymMarker => widget.gymMarker;
 
   @override
+  void initState() {
+    super.initState();
+    normalController = ScreenshotController();
+    selectionController = ScreenshotController();
+  }
+
+  @override
   void afterFirstLayout(BuildContext context) async {
+    final normalIcon = await normalController.capture();
+    final selectionIcon = await selectionController.capture();
     widget.gymMarkerList.insertDisplayableMarker(
       DisplayableGymMarker(
-        icon: await _getBitmapDescriptorFromRenderObjser(
-          normalKey.currentContext.findRenderObject(),
-        ),
-        selectionIcon: await _getBitmapDescriptorFromRenderObjser(
-          selectionKey.currentContext.findRenderObject(),
-        ),
+        icon: BitmapDescriptor.fromBytes(normalIcon),
+        selectionIcon: BitmapDescriptor.fromBytes(selectionIcon),
         marker: widget.gymMarker,
       ),
     );
-  }
-
-  Future<BitmapDescriptor> _getBitmapDescriptorFromRenderObjser(
-      RenderRepaintBoundary boundary) async {
-    RenderRepaintBoundary boundary =
-        normalKey.currentContext.findRenderObject();
-    final image = await boundary.toImage(pixelRatio: 3.0);
-    final byteData = await image.toByteData(format: ImageByteFormat.png);
-    final pngBytes = byteData.buffer.asUint8List();
-    return BitmapDescriptor.fromBytes(pngBytes);
   }
 
   @override
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        RepaintBoundary(
-          key: selectionKey,
+        Screenshot(
+          controller: selectionController,
           child: _buildSelectionIcon(Key('selected')),
         ),
-        RepaintBoundary(
-          key: normalKey,
+        Screenshot(
+          controller: normalController,
           child: _buildNormalIcon(Key('normal')),
         ),
       ],
@@ -102,8 +104,8 @@ class _GymMarkerImageMakerState extends State<GymMarkerImageMaker>
     return Container(
       key: key,
       child: gymMarker.gyms.length == 1
-          ? _buildMarkerContentForGym(gymMarker.gyms.first)
-          : _buildMarkerContentForCollection(gymMarker.gyms),
+          ? _buildMarkerContentForGym(gymMarker.gyms.first, normalStyle)
+          : _buildMarkerContentForCollection(gymMarker.gyms, normalStyle),
       padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
         color: AppColors.theme,
@@ -116,43 +118,25 @@ class _GymMarkerImageMakerState extends State<GymMarkerImageMaker>
     return Container(
       key: key,
       child: gymMarker.gyms.length == 1
-          ? _buildMarkerContentForGym(gymMarker.gyms.first)
-          : _buildMarkerContentForCollection(gymMarker.gyms),
+          ? _buildMarkerContentForGym(gymMarker.gyms.first, selectionStyle)
+          : _buildMarkerContentForCollection(gymMarker.gyms, selectionStyle),
       padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.red,
-        border: Border.all(color: Colors.red.shade900),
+        color: AppColors.theme,
+        border: Border.all(color: Colors.green.shade900, width: 2),
         borderRadius: BorderRadius.circular(8),
       ),
     );
   }
 
-  Widget _buildMarkerContentForCollection(List<Gym> list) {
-    return Text(
-      '${list.length} 項結果',
-      style: TextStyle(
-        color: Colors.white,
-        fontSize: 12,
-      ),
-    );
+  Widget _buildMarkerContentForCollection(List<Gym> list, TextStyle textStyle) {
+    return Text('${list.length} 項結果', style: textStyle);
   }
 
-  Widget _buildMarkerContentForGym(Gym gym) {
+  Widget _buildMarkerContentForGym(Gym gym, TextStyle textStyle) {
     if (gym.pricing == null || gym.pricing.isEmpty) {
-      return Text(
-        '請電洽',
-        style: TextStyle(
-          color: Colors.white,
-          fontSize: 12,
-        ),
-      );
+      return Text('請電洽', style: textStyle);
     }
-    return Text(
-      PriceFormat.format(gym.hourlyRate),
-      style: TextStyle(
-        color: Colors.white,
-        fontSize: 12,
-      ),
-    );
+    return Text(PriceFormat.format(gym.hourlyRate), style: textStyle);
   }
 }
