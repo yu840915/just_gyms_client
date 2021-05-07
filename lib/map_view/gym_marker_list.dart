@@ -190,6 +190,7 @@ class DisplayableGymMarker {
   GoogleMap.Marker getNormalMarker({Function onTap}) {
     final marker = _gymMarker.toMarker();
     return GoogleMap.Marker(
+      zIndex: 1,
       markerId: marker.markerId,
       position: marker.position,
       icon: icon,
@@ -201,6 +202,7 @@ class DisplayableGymMarker {
   GoogleMap.Marker getSelectedMarker() {
     final marker = _gymMarker.toMarker();
     return GoogleMap.Marker(
+      zIndex: 100,
       markerId: marker.markerId,
       position: marker.position,
       icon: selectionIcon,

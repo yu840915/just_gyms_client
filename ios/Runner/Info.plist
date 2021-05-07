@@ -4,6 +4,8 @@
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
+	<key>NSUserTrackingUsageDescription</key>
+	<string>用於暸解改善使用者體驗</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>用於找尋附近的健身房</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>

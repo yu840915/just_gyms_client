@@ -1,13 +1,14 @@
+import 'package:app_tracking_transparency/app_tracking_transparency.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:where_gym/app_bloc.dart';
 import 'package:where_gym/home_page.dart';
 import 'package:where_gym/intro/intro_page.dart';
 import 'package:where_gym/intro/permission_page.dart';
-import 'package:where_gym/shared_appearances.dart';
 
-void main() {
+void main() async {
   runApp(MyApp());
+  await AppTrackingTransparency.requestTrackingAuthorization();
 }
 
 class MyApp extends StatefulWidget {

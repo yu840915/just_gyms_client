@@ -36,6 +36,7 @@ class _LocationSearchViewState extends State<LocationSearchView> {
   @override
   Widget build(BuildContext context) {
     return FloatingSearchBar(
+      automaticallyImplyBackButton: false,
       controller: controller,
       hint: '輸入地址...',
       scrollPadding: const EdgeInsets.only(top: 16, bottom: 56),
