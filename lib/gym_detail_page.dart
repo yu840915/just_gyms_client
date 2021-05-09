@@ -35,7 +35,7 @@ class GymDetailPage extends StatelessWidget {
           padding: EdgeInsets.only(bottom: 100),
           child: Column(
             children: [
-              PhotoGalleryView(gym.images),
+              PhotoGalleryView(gym?.images ?? []),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: _buildContents(context),
