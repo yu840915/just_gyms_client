@@ -1,9 +1,11 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:where_gym/app_bar_factory.dart';
+import 'package:where_gym/app_bloc.dart';
 import 'package:where_gym/gym_list.dart';
 import 'package:where_gym/gym_list_page.dart';
 import 'package:where_gym/location_search.dart/location_search.dart';
@@ -75,7 +77,9 @@ class _MapViewPageState extends State<MapViewPage> {
   @override
   void initState() {
     super.initState();
-    _locationSearch = LocationSearch(onSelectAddress: _onSelectAddress);
+    AppBloc bloc = BlocProvider.of(context);
+    _locationSearch =
+        LocationSearch(onSelectAddress: _onSelectAddress, appBloc: bloc);
   }
 
   @override

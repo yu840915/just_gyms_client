@@ -3,8 +3,9 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:where_gym/app_bloc.dart';
-import 'package:where_gym/error_view.dart';
+import 'package:where_gym/utils/error_view.dart';
 import 'package:where_gym/home_page.dart';
+import 'package:where_gym/initialization.dart';
 import 'package:where_gym/intro/intro_page.dart';
 import 'package:where_gym/intro/permission_page.dart';
 
@@ -15,17 +16,17 @@ void main() async {
 }
 
 class MyApp extends StatefulWidget {
-  // This widget is the root of your application.
   @override
   _MyAppState createState() => _MyAppState();
 }
 
 class _MyAppState extends State<MyApp> {
-  final Future<FirebaseApp> _initialization = Firebase.initializeApp();
+  final Future<InitializedProducts> _initialization =
+      Initialization.initialize();
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<FirebaseApp>(
+    return FutureBuilder<InitializedProducts>(
       future: _initialization,
       builder: (context, snapshot) {
         if (snapshot.hasError) {
@@ -34,14 +35,17 @@ class _MyAppState extends State<MyApp> {
             debugShowCheckedModeBanner: false,
           );
         }
-        return _buildApp(context);
+        if (!snapshot.hasData) {
+          return Container();
+        }
+        return _buildApp(context, snapshot.data);
       },
     );
   }
 
-  Widget _buildApp(BuildContext context) {
+  Widget _buildApp(BuildContext context, InitializedProducts products) {
     return BlocProvider(
-      create: (context) => AppBloc(null),
+      create: (context) => AppBloc(null, initializedProducts: products),
       child: MaterialApp(
         title: 'Just Gyms',
         theme: ThemeData(

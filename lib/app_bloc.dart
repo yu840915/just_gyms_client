@@ -1,12 +1,18 @@
 import 'package:bloc/bloc.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:where_gym/initialization.dart';
 import 'package:where_gym/intro/permission_checker.dart';
 
 class AppBloc extends Bloc<dynamic, AppPhase> {
   final _hasFinishedIntroKey = 'hasFinishedIntro';
   final permissionChecker = PermissionChecker();
-  AppBloc(initialState) : super(initialState) {
+  final UserCredential _userCredential;
+  AppBloc(initialState, {@required InitializedProducts initializedProducts})
+      : _userCredential = initializedProducts.userCredential,
+        super(initialState) {
     _checkPermission();
   }
 
@@ -29,6 +35,8 @@ class AppBloc extends Bloc<dynamic, AppPhase> {
       }
     });
   }
+
+  Future<String> getIdToken() => _userCredential.user.getIdToken();
 
   @override
   Stream<AppPhase> mapEventToState(event) async* {

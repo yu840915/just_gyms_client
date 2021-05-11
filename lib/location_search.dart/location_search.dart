@@ -7,6 +7,7 @@ import 'package:json_annotation/json_annotation.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:rxdart/subjects.dart';
 import 'package:where_gym/api_services/api_services.dart';
+import 'package:where_gym/app_bloc.dart';
 part 'location_search.g.dart';
 
 class LocationSearch {
@@ -15,7 +16,10 @@ class LocationSearch {
   Stream<AddressSearchResult> get onResult => _resultSubject;
   StreamSubscription _subscription;
   final Function(AddressSearchResultItem) _onSelectAddress;
-  LocationSearch({@required Function(AddressSearchResultItem) onSelectAddress})
+  final AppBloc appBloc;
+  LocationSearch(
+      {@required Function(AddressSearchResultItem) onSelectAddress,
+      @required this.appBloc})
       : _onSelectAddress = onSelectAddress {
     _subscription =
         _querySubject.debounceTime(Duration(milliseconds: 300)).listen((event) {
@@ -41,8 +45,8 @@ class LocationSearch {
     if (q == null || q.isEmpty) {
       return _resultSubject.add(null);
     }
-    final res = await APIServices.instances
-        .get('/geocode/search', params: {'q': q, 'country': 'TW'});
+    final res = await APIServices.instances.get('/geocode/search',
+        params: {'q': q, 'country': 'TW'}, token: await appBloc.getIdToken());
     if (_querySubject != null && _querySubject.value != q) {
       return;
     }
