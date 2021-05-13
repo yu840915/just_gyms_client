@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:where_gym/configs.dart';
 import 'package:where_gym/shared_appearances.dart';
 
 class MainMenu extends StatelessWidget {
@@ -26,6 +28,19 @@ class MainMenu extends StatelessWidget {
         height: 40,
       ),
       iconSize: 40,
+      onSelected: (item) {
+        switch (item) {
+          case _MenuItem.tos:
+            launch(Configs.instance.tosLink, forceWebView: true);
+            break;
+          case _MenuItem.pp:
+            launch(Configs.instance.ppLink, forceWebView: true);
+            break;
+          case _MenuItem.contactUs:
+            launch(Configs.instance.contactLink, forceWebView: false);
+            break;
+        }
+      },
     );
   }
 
