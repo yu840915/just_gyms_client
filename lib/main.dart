@@ -61,7 +61,7 @@ class _MyAppState extends State<MyApp> {
   Widget _buildMainFlow(BuildContext context, AppPhase phase) {
     if (phase == null) {
       return Container(
-        color: Colors.green,
+        color: Colors.white,
       );
     }
     switch (phase) {

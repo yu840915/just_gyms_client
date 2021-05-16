@@ -1,13 +1,23 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:where_gym/app_bar_factory.dart';
 import 'package:where_gym/app_bloc.dart';
+import 'package:where_gym/configs.dart';
 
 class IntroPage extends StatelessWidget {
   void _nextStep(BuildContext context) {
     AppBloc bloc = BlocProvider.of(context);
     bloc.setIntroFinished();
+  }
+
+  void _openLink(String link) async {
+    try {
+      await launch(link);
+    } catch (e) {
+      print(e);
+    }
   }
 
   @override
@@ -100,10 +110,21 @@ class IntroPage extends StatelessWidget {
       child: RichText(
           text: TextSpan(children: [
         TextSpan(text: '請先詳細閱讀', style: normal),
-        TextSpan(text: '服務條款', style: link, recognizer: TapGestureRecognizer()),
+        TextSpan(
+            text: '服務條款',
+            style: link,
+            recognizer: TapGestureRecognizer()
+              ..onTap = () {
+                _openLink(Configs.instance.tosLink);
+              }),
         TextSpan(text: '及', style: normal),
         TextSpan(
-            text: '隱私權政策', style: link, recognizer: TapGestureRecognizer()),
+            text: '隱私權政策',
+            style: link,
+            recognizer: TapGestureRecognizer()
+              ..onTap = () {
+                _openLink(Configs.instance.ppLink);
+              }),
         TextSpan(text: '。開始使用即代表閣下已同意上述政策。', style: normal),
       ])),
     );
