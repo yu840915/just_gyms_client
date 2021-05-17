@@ -144,6 +144,7 @@ class GymDetailPage extends StatelessWidget {
                 ),
               ),
             ),
+            SizedBox(height: 12),
           ],
           mainAxisSize: MainAxisSize.min,
         ),

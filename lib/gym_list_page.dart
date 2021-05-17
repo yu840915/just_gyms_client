@@ -34,7 +34,11 @@ class _GymListPageState extends State<GymListPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBarFactory.appBar(),
+      appBar: AppBarFactory.appBar(
+          title: Text(
+        '附近的場租',
+        style: TextStyles.large.title,
+      )),
       body: _buildBody(context),
     );
   }

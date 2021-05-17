@@ -90,7 +90,7 @@ class IntroPage extends StatelessWidget {
               return Text(snapshot.data ? '下一步' : '開始使用');
             },
           ),
-          style: TextButton.styleFrom(primary: Colors.white),
+          style: TextButton.styleFrom(primary: Colors.black),
         ),
         SizedBox(width: 32),
       ],
