@@ -1,8 +1,7 @@
-import 'package:app_tracking_transparency/app_tracking_transparency.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:where_gym/app_bloc.dart';
+import 'package:where_gym/tracking/tracking.dart';
 import 'package:where_gym/utils/error_view.dart';
 import 'package:where_gym/home_page.dart';
 import 'package:where_gym/initialization.dart';
@@ -12,7 +11,7 @@ import 'package:where_gym/intro/permission_page.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(MyApp());
-  await AppTrackingTransparency.requestTrackingAuthorization();
+  await Tracker.initialize();
 }
 
 class MyApp extends StatefulWidget {

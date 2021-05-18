@@ -7,6 +7,8 @@ import 'package:where_gym/gym_list.dart';
 import 'package:where_gym/map_view/open_hour_indicator.dart';
 import 'package:where_gym/price_format.dart';
 import 'package:where_gym/shared_appearances.dart';
+import 'package:where_gym/tracking/event_names.dart';
+import 'package:where_gym/tracking/tracking.dart';
 
 class GymListPage extends StatefulWidget {
   @override
@@ -75,6 +77,11 @@ class _Row extends StatelessWidget {
   _Row(this.gym, {this.meters});
 
   void _showDetail(BuildContext context) {
+    track(EventName.showGymDetail, {
+      ...gym.trackingProps,
+      EventProperties.distance: meters,
+      EventProperties.from: 'gym list',
+    });
     Navigator.push(
       context,
       MaterialPageRoute(

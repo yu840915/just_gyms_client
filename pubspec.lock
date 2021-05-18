@@ -541,6 +541,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.9.7"
+  native_mixpanel:
+    dependency: "direct main"
+    description:
+      name: native_mixpanel
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.1.2"
   nested:
     dependency: transitive
     description:

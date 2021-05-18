@@ -14,6 +14,8 @@ import 'package:where_gym/map_view/gym_marker_image_maker.dart';
 import 'package:where_gym/map_view/gym_marker_info_page_view.dart';
 import 'package:where_gym/map_view/gym_marker_list.dart';
 import 'package:where_gym/shared_appearances.dart';
+import 'package:where_gym/tracking/event_names.dart';
+import 'package:where_gym/tracking/tracking.dart';
 
 class MapViewPage extends StatefulWidget {
   final GymList gymList;
@@ -65,6 +67,7 @@ class _MapViewPageState extends State<MapViewPage> {
   }
 
   void _showListView(BuildContext context) {
+    track(EventName.showGymList, {EventProperties.from: 'map'});
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -184,7 +187,10 @@ class _MapViewPageState extends State<MapViewPage> {
     return Align(
       alignment: Alignment.topCenter,
       child: TextButton(
-        onPressed: () => {markerList.updateMarkerIfNeeded()},
+        onPressed: () {
+          track(EventName.refreshMap);
+          markerList.updateMarkerIfNeeded();
+        },
         child: Text('搜尋此處的場館'),
         style: TextButton.styleFrom(
           primary: AppColors.theme,
@@ -219,6 +225,7 @@ class _MapViewPageState extends State<MapViewPage> {
   }
 
   void _onMarkerTap(DisplayableGymMarker marker) {
+    track(EventName.selectMarker, marker.gyms.first.trackingProps);
     markerList.selecteMarker(marker);
   }
 }

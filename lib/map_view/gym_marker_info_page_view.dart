@@ -5,6 +5,8 @@ import 'package:where_gym/map_view/gym_marker_list.dart';
 import 'package:where_gym/map_view/open_hour_indicator.dart';
 import 'package:where_gym/price_format.dart';
 import 'package:where_gym/shared_appearances.dart';
+import 'package:where_gym/tracking/event_names.dart';
+import 'package:where_gym/tracking/tracking.dart';
 
 class GymMarkerInfoPageView extends StatefulWidget {
   final GymMarkerList gymMarkerList;
@@ -83,9 +85,9 @@ class _GymMarkerInfoPageViewState extends State<GymMarkerInfoPageView> {
   }
 
   void _initPageControllerWithSelection(DisplayableGymMarker marker) {
-    final idx = markers.indexWhere((element) => element.id == marker.id);    
-    pageController =
-        PageController(initialPage: markers.length * 30 + idx, viewportFraction: 0.8);
+    final idx = markers.indexWhere((element) => element.id == marker.id);
+    pageController = PageController(
+        initialPage: markers.length * 30 + idx, viewportFraction: 0.8);
   }
 }
 
@@ -94,6 +96,11 @@ class GymInfoCardView extends StatelessWidget {
   GymInfoCardView(this.card);
 
   void _showDetail(BuildContext context) {
+    track(EventName.showGymDetail, {
+      ...card.gym.trackingProps,
+      EventProperties.from: 'map',
+    });
+
     Navigator.push(
       context,
       MaterialPageRoute(

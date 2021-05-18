@@ -6,12 +6,15 @@ import 'package:where_gym/map_view/open_hour_indicator.dart';
 import 'package:where_gym/photo_gallery_view.dart';
 import 'package:where_gym/price_format.dart';
 import 'package:where_gym/shared_appearances.dart';
+import 'package:where_gym/tracking/event_names.dart';
+import 'package:where_gym/tracking/tracking.dart';
 
 class GymDetailPage extends StatelessWidget {
   final Gym gym;
   GymDetailPage({@required this.gym});
 
   void _callGym(String phone) {
+    track(EventName.contactGym, gym.trackingProps);
     launch('tel://$phone');
   }
 

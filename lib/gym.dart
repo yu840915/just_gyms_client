@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:where_gym/gym_facility.dart';
+import 'package:where_gym/price_format.dart';
+import 'package:where_gym/tracking/event_names.dart';
 part 'gym.g.dart';
 
 @JsonSerializable()
@@ -74,6 +76,12 @@ class Gym {
 
   Map<String, dynamic> toJson() => _$GymToJson(this);
   factory Gym.fromJson(Map<String, dynamic> json) => _$GymFromJson(json);
+
+  Map<String, dynamic> get trackingProps => {
+        EventProperties.gymId: id,
+        EventProperties.price:
+            hourlyRate != null ? PriceFormat.format(hourlyRate) : null,
+      };
 }
 
 @JsonSerializable()

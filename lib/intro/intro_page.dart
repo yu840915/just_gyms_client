@@ -5,11 +5,14 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:where_gym/app_bar_factory.dart';
 import 'package:where_gym/app_bloc.dart';
 import 'package:where_gym/configs.dart';
+import 'package:where_gym/tracking/event_names.dart';
+import 'package:where_gym/tracking/tracking.dart';
 
 class IntroPage extends StatelessWidget {
   void _nextStep(BuildContext context) {
     AppBloc bloc = BlocProvider.of(context);
     bloc.setIntroFinished();
+    track(EventName.finishIntro);
   }
 
   void _openLink(String link) async {

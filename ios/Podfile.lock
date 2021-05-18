@@ -136,11 +136,17 @@ PODS:
   - GoogleUtilities/UserDefaults (7.4.1):
     - GoogleUtilities/Logger
   - GTMSessionFetcher/Core (1.5.0)
+  - Mixpanel-swift (2.6.1):
+    - Mixpanel-swift/Complete (= 2.6.1)
+  - Mixpanel-swift/Complete (2.6.1)
   - nanopb (2.30908.0):
     - nanopb/decode (= 2.30908.0)
     - nanopb/encode (= 2.30908.0)
   - nanopb/decode (2.30908.0)
   - nanopb/encode (2.30908.0)
+  - native_mixpanel (0.0.1):
+    - Flutter
+    - Mixpanel-swift (= 2.6.1)
   - "permission_handler (5.1.0+2)":
     - Flutter
   - PromisesObjC (1.2.12)
@@ -159,6 +165,7 @@ DEPENDENCIES:
   - Flutter (from `Flutter`)
   - geolocator (from `.symlinks/plugins/geolocator/ios`)
   - google_maps_flutter (from `.symlinks/plugins/google_maps_flutter/ios`)
+  - native_mixpanel (from `.symlinks/plugins/native_mixpanel/ios`)
   - permission_handler (from `.symlinks/plugins/permission_handler/ios`)
   - shared_preferences (from `.symlinks/plugins/shared_preferences/ios`)
   - url_launcher (from `.symlinks/plugins/url_launcher/ios`)
@@ -179,6 +186,7 @@ SPEC REPOS:
     - GoogleMaps
     - GoogleUtilities
     - GTMSessionFetcher
+    - Mixpanel-swift
     - nanopb
     - PromisesObjC
 
@@ -201,6 +209,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/geolocator/ios"
   google_maps_flutter:
     :path: ".symlinks/plugins/google_maps_flutter/ios"
+  native_mixpanel:
+    :path: ".symlinks/plugins/native_mixpanel/ios"
   permission_handler:
     :path: ".symlinks/plugins/permission_handler/ios"
   shared_preferences:
@@ -232,7 +242,9 @@ SPEC CHECKSUMS:
   GoogleMaps: 4b5346bddfe6911bb89155d43c903020170523ac
   GoogleUtilities: f8a43108b38a68eebe8b3540e1f4f2d28843ce20
   GTMSessionFetcher: b3503b20a988c4e20cc189aa798fd18220133f52
+  Mixpanel-swift: 13c4556a2792d6d49e71cd9a0565404230e7629f
   nanopb: a0ba3315591a9ae0a16a309ee504766e90db0c96
+  native_mixpanel: fffe07e2d556abe93752ba840778581d68225160
   permission_handler: ccb20a9fad0ee9b1314a52b70b76b473c5f8dab0
   PromisesObjC: 3113f7f76903778cf4a0586bd1ab89329a0b7b97
   shared_preferences: af6bfa751691cdc24be3045c43ec037377ada40d
