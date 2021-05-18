@@ -7,6 +7,15 @@ import 'package:where_gym/api_services/api_services.dart';
 import 'package:where_gym/gym.dart';
 
 class GymList {
+  final _fallbackPosition = Position(
+      latitude: 25.055049,
+      longitude: 121.542653,
+      speed: 0,
+      accuracy: 30,
+      altitude: 0,
+      heading: 0,
+      timestamp: DateTime.now(),
+      speedAccuracy: 0);
   final _myLocationSubject = BehaviorSubject<Position>();
   Stream<Position> get myLocationStream => _myLocationSubject;
   final _listSubject = BehaviorSubject<List<Gym>>();
@@ -51,21 +60,26 @@ class GymList {
 
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
-      return Future.error('Location services are disabled.');
+      print('Location services are disabled.');
+      _myLocationSubject.add(_fallbackPosition);
+      return _fallbackPosition;
     }
 
     permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.deniedForever) {
-      return Future.error(
+      print(
           'Location permissions are permantly denied, we cannot request permissions.');
+      _myLocationSubject.add(_fallbackPosition);
+      return _fallbackPosition;
     }
 
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
       if (permission != LocationPermission.whileInUse &&
           permission != LocationPermission.always) {
-        return Future.error(
-            'Location permissions are denied (actual value: $permission).');
+        print('Location permissions are denied (actual value: $permission).');
+        _myLocationSubject.add(_fallbackPosition);
+        return _fallbackPosition;
       }
     }
     final pos = await Geolocator.getCurrentPosition(
