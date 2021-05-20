@@ -6,8 +6,6 @@
 	<false/>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
-	<key>NSUserTrackingUsageDescription</key>
-	<string>我們不會識別個別使用者，主要收集閃退資訊及功能使用，用於了解改善使用者體驗</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>用於找尋附近的健身場租空間</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>

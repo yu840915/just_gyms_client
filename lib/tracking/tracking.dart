@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:app_tracking_transparency/app_tracking_transparency.dart';
 import 'package:flutter/foundation.dart';
 import 'package:native_mixpanel/native_mixpanel.dart';
 import 'package:where_gym/tracking/event_names.dart';
@@ -13,13 +12,9 @@ class Tracker {
   Tracker._(this.mixpanel);
 
   static Future<void> initialize() async {
-    Mixpanel mixpanel;    
+    Mixpanel mixpanel;
     if (Platform.isIOS) {
-      final status =
-          await AppTrackingTransparency.requestTrackingAuthorization();
-      mixpanel = Mixpanel(
-          isOptedOut: status == TrackingStatus.denied,
-          shouldLogEvents: !kReleaseMode);
+      mixpanel = Mixpanel(isOptedOut: false, shouldLogEvents: !kReleaseMode);
     } else {
       mixpanel = Mixpanel(isOptedOut: false, shouldLogEvents: !kReleaseMode);
     }
