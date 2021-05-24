@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:geolocator/geolocator.dart';
-import 'package:latlong/latlong.dart';
 import 'package:rxdart/subjects.dart';
 import 'package:where_gym/api_services/api_services.dart';
 import 'package:where_gym/gym.dart';
@@ -20,8 +19,7 @@ class GymList {
   Stream<Position> get myLocationStream => _myLocationSubject;
   final _listSubject = BehaviorSubject<List<Gym>>();
   Stream<List<Gym>> get listStream => _listSubject;
-  Future _task;
-  final _distance = Distance();
+  Future _task;  
 
   Future<void> refresh() async {
     if (_task != null) {
@@ -93,8 +91,8 @@ class GymList {
       return null;
     }
     final location = _myLocationSubject.valueWrapper.value;
-    return _distance.as(LengthUnit.Meter, LatLng(gym.lat, gym.lon),
-        LatLng(location.latitude, location.longitude));
+    return Geolocator.distanceBetween(
+        gym.lat, gym.lon, location.latitude, location.longitude);
   }
 
   void dispose() {

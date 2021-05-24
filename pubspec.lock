@@ -465,7 +465,7 @@ packages:
     source: hosted
     version: "3.5.1"
   latlong:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: latlong
       url: "https://pub.dartlang.org"

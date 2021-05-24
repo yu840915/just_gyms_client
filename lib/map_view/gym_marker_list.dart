@@ -3,8 +3,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:geojson/geojson.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart' as GoogleMap;
-import 'package:latlong/latlong.dart';
 import 'package:rxdart/subjects.dart';
 import 'package:where_gym/api_services/api_services.dart';
 import 'package:where_gym/gym.dart';
@@ -154,12 +154,13 @@ class GymMarker {
 
   static Future<GymMarker> fromMarkerFeature(
       GeoJsonFeature<GeoJsonPoint> feature) async {
-    final latLng = feature.geometry.geoPoint.toLatLng();
+    final pt = feature.geometry.geoPoint;
     final collection =
         await featuresFromGeoJson(jsonEncode(feature.properties));
     final gyms =
         collection.collection.map((e) => Gym.fromJson(e.properties)).toList();
-    return GymMarker(latLng: latlongToGMap(latLng), gyms: gyms);
+    return GymMarker(
+        latLng: GoogleMap.LatLng(pt.latitude, pt.longitude), gyms: gyms);
   }
 
   GoogleMap.Marker toMarker() {
@@ -229,15 +230,6 @@ class MapDataRegion {
 }
 
 num distanceGMap(GoogleMap.LatLng p1, GoogleMap.LatLng p2) {
-  return distanceLatLong(gMapToLatlong(p1), gMapToLatlong(p2));
+  return Geolocator.distanceBetween(
+      p1.latitude, p1.longitude, p2.latitude, p2.longitude);
 }
-
-num distanceLatLong(LatLng p1, LatLng p2) {
-  return Distance().distance(p1, p2);
-}
-
-LatLng gMapToLatlong(GoogleMap.LatLng latLng) =>
-    LatLng(latLng.latitude, latLng.longitude);
-
-GoogleMap.LatLng latlongToGMap(LatLng latLng) =>
-    GoogleMap.LatLng(latLng.latitude, latLng.longitude);

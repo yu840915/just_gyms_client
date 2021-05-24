@@ -29,7 +29,6 @@ dependencies:
   json_annotation: ^3.1.1
   http: ^0.13.1
   geojson: ^0.10.0
-  latlong: ^0.6.1
   after_layout: ^1.1.0
   url_launcher: ^6.0.2
   intl: ^0.17.0
