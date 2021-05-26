@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "835416512364",
+    "project_id": "where-gym",
+    "storage_bucket": "where-gym.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:835416512364:android:9011e02d6cd7c304000549",
+        "android_client_info": {
+          "package_name": "app.me.justgyms"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "835416512364-f1ks9pfbuio8eebp4fog4ghd8opa8rrk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBK9dVyrDVB4pENPiugGIEDng3hjHXeQnQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "835416512364-f1ks9pfbuio8eebp4fog4ghd8opa8rrk.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "835416512364-nlcbu4lsksqq2mbb4cuoodbgbcg5t9pt.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "app.me.justgyms",
+                "app_store_id": "1566604298"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,7 +1,7 @@
 import 'dart:convert';
-import 'dart:io';
+import 'package:http/http.dart' as http;
 
-import 'package:where_gym/api_services/http_extensions.dart';
+// final apiBaseUrl = 'http://localhost:5001/where-gym/us-central1/api';
 
 final apiBaseUrl = 'https://us-central1-where-gym.cloudfunctions.net/api';
 
@@ -9,16 +9,18 @@ class APIServices {
   static final instances = APIServices(baseUrl: apiBaseUrl);
   APIServices({this.baseUrl});
   final String baseUrl;
-  final httpClient = HttpClient();
+  final httpClient = http.Client();
 
-  Future<ResponsePair> get(String path,
+  Future<http.Response> get(String path,
       {Map<String, dynamic> params, String token}) async {
-    // ignore: close_sinks
-    final request = await httpClient.getUrl(_makeUri(path, params: params));
+    final headers = Map<String, String>();
     if (token != null) {
-      request.headers.set('Authorization', 'Bearer $token');
+      headers['Authorization'] = 'Bearer $token';
     }
-    return request.send();
+    final response =
+        await httpClient.get(_makeUri(path, params: params), headers: headers);
+    _checkResponse(response);
+    return response;
   }
 
   Uri _makeUri(String path, {Map<String, dynamic> params}) {
@@ -34,31 +36,52 @@ class APIServices {
         queryParameters: params);
   }
 
-  Future<ResponsePair> post(String path, {dynamic body, String token}) async {
-    return _postOrPutRequest(
-      await httpClient.postUrl(_makeUri(path)),
-      body: body,
-      token: token,
-    );
-  }
-
-  Future<ResponsePair> put(String path, {dynamic body, String token}) async {
-    return _postOrPutRequest(
-      await httpClient.putUrl(_makeUri(path)),
-      body: body,
-      token: token,
-    );
-  }
-
-  Future<ResponsePair> _postOrPutRequest(HttpClientRequest request,
-      {dynamic body, String token}) async {
+  Future<http.Response> post(String path, {dynamic body, String token}) async {
+    final headers = Map<String, String>();
+    dynamic postBody = body;
     if (token != null) {
-      request.headers.set('Authorization', token);
+      headers['Authorization'] = 'Bearer $token';
     }
-    if (body != null && body.isNotEmpty) {
-      request.headers.set('Content-Type', 'application/json');
-      request.add(utf8.encode(json.encode(body)));
+    if (body is Map<String, dynamic>) {
+      postBody = jsonEncode(body);
+      headers['Content-Type'] = 'application/json; charset=UTF-8';
     }
-    return request.send();
+    final response = await httpClient.post(
+      _makeUri(path),
+      headers: headers,
+      body: postBody,
+    );
+    _checkResponse(response);
+    return response;
   }
+
+  Future<http.Response> put(String path, {dynamic body, String token}) async {
+    final headers = Map<String, String>();
+    dynamic putBody = body;
+    if (token != null) {
+      headers['Authorization'] = 'Bearer $token';
+    }
+    if (body is Map<String, dynamic>) {
+      putBody = jsonEncode(body);
+      headers['Content-Type'] = 'application/json; charset=UTF-8';
+    }
+    final response = await httpClient.put(
+      _makeUri(path),
+      headers: headers,
+      body: putBody,
+    );
+    _checkResponse(response);
+    return response;
+  }
+
+  void _checkResponse(http.Response response) {
+    if (response.statusCode >= 500) {
+      throw ServiceError(response.body ?? '伺服器錯誤，請稍候再試');
+    }
+  }
+}
+
+class ServiceError extends Error {
+  final dynamic info;
+  ServiceError(this.info);
 }
