@@ -9,7 +9,7 @@ import 'package:rxdart/subjects.dart';
 import 'package:where_gym/api_services/api_services.dart';
 import 'package:where_gym/gym.dart';
 
-class GymMarkerList {
+class GymMarkerList {  
   final GoogleMap.GoogleMapController mapController;
   final _markersSubject = BehaviorSubject<List<GymMarker>>();
   final _displayableMarkersSubject =
