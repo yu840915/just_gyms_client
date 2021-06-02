@@ -3,8 +3,10 @@ import 'dart:ui';
 import 'package:after_layout/after_layout.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:screenshot/screenshot.dart';
+import 'package:where_gym/app_bloc.dart';
 import 'package:where_gym/gym.dart';
 import 'package:where_gym/map_view/gym_marker_list.dart';
 import 'package:where_gym/price_format.dart';
@@ -134,9 +136,25 @@ class _GymMarkerImageMakerState extends State<GymMarkerImageMaker>
   }
 
   Widget _buildMarkerContentForGym(Gym gym, TextStyle textStyle) {
-    if (gym.pricing == null || gym.pricing.isEmpty) {
-      return Text('請電洽', style: textStyle);
+    Text text = Text('請電洽', style: textStyle);
+    if (gym.pricing != null && gym.pricing.isNotEmpty) {
+      text = Text(PriceFormat.format(gym.hourlyRate), style: textStyle);
     }
-    return Text(PriceFormat.format(gym.hourlyRate), style: textStyle);
+    AppBloc bloc = BlocProvider.of(context);
+    if (!bloc.favoriteGymList.isFavorite(gym.id)) {
+      return text;
+    }
+    return Row(
+      children: [
+        Icon(
+          SharedIcons.bookmarked,
+          color: Colors.white,
+          size: 12,
+        ),
+        SizedBox(width: 4),
+        text
+      ],
+      mainAxisSize: MainAxisSize.min,
+    );
   }
 }
