@@ -32,4 +32,9 @@ class FavoriteGymList {
   FavoriteGym getGym(String gymId) {
     return dataStore.getValue(gymId);
   }
+
+  bool isFavorite(String gymId) {
+    return getGym(gymId) != null;
+  }
 }
+

@@ -5,13 +5,16 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:where_gym/initialization.dart';
 import 'package:where_gym/intro/permission_checker.dart';
+import 'package:where_gym/me/favorites.dart';
 
 class AppBloc extends Bloc<dynamic, AppPhase> {
   final _hasFinishedIntroKey = 'hasFinishedIntro';
   final permissionChecker = PermissionChecker();
   final UserCredential _userCredential;
+  final FavoriteGymList _favoriteGymList;
   AppBloc(initialState, {@required InitializedProducts initializedProducts})
       : _userCredential = initializedProducts.userCredential,
+        _favoriteGymList = initializedProducts.favoriteGymList,
         super(initialState) {
     _checkPermission();
   }
