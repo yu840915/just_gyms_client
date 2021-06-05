@@ -13,7 +13,9 @@ class Initialization {
     final firebaseApp = await Firebase.initializeApp();
     final cred = await FirebaseAuth.instance.signInAnonymously();
     final dir = await getApplicationDocumentsDirectory();
-    Hive.init(dir.path);
+    Hive
+      ..init(dir.path)
+      ..registerAdapter(FavoriteGymAdapter());
     final favorites = await FavoriteGymList.createList();
     Configs.setInstance(await Configs.initialize());
     return InitializedProducts(

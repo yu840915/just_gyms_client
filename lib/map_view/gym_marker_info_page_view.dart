@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:where_gym/app_bloc.dart';
 import 'package:where_gym/gym.dart';
 import 'package:where_gym/gym_detail_page.dart';
 import 'package:where_gym/map_view/gym_marker_list.dart';
@@ -111,73 +113,90 @@ class GymInfoCardView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10),
-      child: ElevatedButton(
-        clipBehavior: Clip.none,
-        style: ElevatedButton.styleFrom(
-          padding: EdgeInsets.all(10),
-          primary: Colors.white,
-          shadowColor: Colors.grey.shade200,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        ),
-        onPressed: () => _showDetail(context),
-        child: Column(
-          children: [
-            Row(
-              children: [
-                Container(
-                  width: 70,
-                  height: 50,
-                  decoration: BoxDecoration(
-                      color: Colors.grey.shade100,
-                      image: card.gym.cover != null
-                          ? DecorationImage(
-                              image: NetworkImage(card.gym.cover),
-                              fit: BoxFit.cover,
-                            )
-                          : null),
+    AppBloc bloc = BlocProvider.of(context);
+    return Stack(
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          child: Stack(
+            children: [
+              ElevatedButton(
+                clipBehavior: Clip.none,
+                style: ElevatedButton.styleFrom(
+                  padding: EdgeInsets.all(10),
+                  primary: Colors.white,
+                  shadowColor: Colors.grey.shade200,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8)),
                 ),
-                SizedBox(width: 8),
-                Expanded(
-                  child: Column(
-                    children: [
-                      Text(
-                        card.gym.name,
-                        style: TextStyles.small.header,
-                      ),
-                      SizedBox(height: 8),
-                      OpenHourIndicator(
-                          gym: card.gym, styles: TextStyles.small),
-                    ],
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                  ),
+                onPressed: () => _showDetail(context),
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          width: 70,
+                          height: 50,
+                          decoration: BoxDecoration(
+                              color: Colors.grey.shade100,
+                              image: card.gym.cover != null
+                                  ? DecorationImage(
+                                      image: NetworkImage(card.gym.cover),
+                                      fit: BoxFit.cover,
+                                    )
+                                  : null),
+                        ),
+                        SizedBox(width: 8),
+                        Expanded(
+                          child: Column(
+                            children: [
+                              Text(
+                                card.gym.name,
+                                style: TextStyles.small.header,
+                              ),
+                              SizedBox(height: 8),
+                              OpenHourIndicator(
+                                  gym: card.gym, styles: TextStyles.small),
+                            ],
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 8),
+                    Text(
+                      card.gym.address,
+                      style: TextStyles.small.detail,
+                    ),
+                    SizedBox(height: 12),
+                    Row(
+                      children: [
+                        buildPricingTable(card.gym.pricing),
+                        if (card.gym.hourlyRate != null)
+                          Text(
+                            '(' +
+                                PriceFormat.format(card.gym.hourlyRate) +
+                                '/小時)',
+                            style: TextStyles.small.subscription,
+                          ),
+                        Spacer(),
+                        // _buildDistanceLable(),
+                      ],
+                    ),
+                    Spacer(),
+                  ],
+                  crossAxisAlignment: CrossAxisAlignment.start,
                 ),
-              ],
-            ),
-            SizedBox(height: 8),
-            Text(
-              card.gym.address,
-              style: TextStyles.small.detail,
-            ),
-            SizedBox(height: 12),
-            Row(
-              children: [
-                buildPricingTable(card.gym.pricing),
-                if (card.gym.hourlyRate != null)
-                  Text(
-                    '(' + PriceFormat.format(card.gym.hourlyRate) + '/小時)',
-                    style: TextStyles.small.subscription,
-                  ),
-                Spacer(),
-                // _buildDistanceLable(),
-              ],
-            ),
-            Spacer(),
-          ],
-          crossAxisAlignment: CrossAxisAlignment.start,
+              ),
+              if (bloc.favoriteGymList.isFavorite(card.gym.id))
+                Icon(
+                  SharedIcons.bookmarked,
+                  color: AppColors.theme,
+                ),
+            ],
+          ),
         ),
-      ),
+      ],
     );
   }
 

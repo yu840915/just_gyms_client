@@ -13,6 +13,10 @@ class DataStore {
     return box.get(key);
   }
 
+  Future<void> deleteValue(String key) async {
+    await box.delete(key);
+  }
+
   putValue(String key, HiveObject entry) {
     if (getValue(key) == null) {
       box.put(key, entry);
