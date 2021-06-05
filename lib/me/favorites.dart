@@ -2,6 +2,8 @@ import 'package:rxdart/subjects.dart';
 import 'package:where_gym/data_store.dart';
 import 'package:hive/hive.dart';
 
+part 'favorites.g.dart';
+
 @HiveType(typeId: 1)
 class FavoriteGym extends HiveObject {
   @HiveField(0)
@@ -12,23 +14,6 @@ class FavoriteGym extends HiveObject {
   DateTime lastContactedAt;
   @HiveField(3)
   int contactCount;
-  FavoriteGym([this.id, this.addedAt, this.lastContactedAt, this.contactCount]);
-}
-
-class FavoriteGymAdapter extends TypeAdapter<FavoriteGym> {
-  @override
-  FavoriteGym read(BinaryReader reader) {
-    final data = List.from(reader.read(typeId));
-    return FavoriteGym(data[0], data[1], data[2], data[3]);
-  }
-
-  @override
-  int get typeId => 1;
-
-  @override
-  void write(BinaryWriter writer, FavoriteGym obj) {
-    writer.write([obj.id, obj.addedAt, obj.lastContactedAt, obj.contactCount]);
-  }
 }
 
 class FavoriteGymList {

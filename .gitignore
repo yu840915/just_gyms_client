@@ -85,3 +85,4 @@ ios/Runner/GoogleService-Info.plist
 
 .last_build_id
 key.properties
+**/*.g.dart

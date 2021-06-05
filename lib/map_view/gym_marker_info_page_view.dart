@@ -188,16 +188,28 @@ class GymInfoCardView extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                 ),
               ),
-              if (bloc.favoriteGymList.isFavorite(card.gym.id))
-                Icon(
-                  SharedIcons.bookmarked,
-                  color: AppColors.theme,
-                ),
+              StreamBuilder<Object>(
+                stream: bloc.favoriteGymList.onListUpdate,
+                builder: (context, snapshot) {
+                  return _buildFavoriteMark(context);
+                },
+              ),
             ],
           ),
         ),
       ],
     );
+  }
+
+  Widget _buildFavoriteMark(BuildContext context) {
+    AppBloc bloc = BlocProvider.of(context);
+    if (bloc.favoriteGymList.isFavorite(card.gym.id)) {
+      return Icon(
+        SharedIcons.bookmarked,
+        color: AppColors.theme,
+      );
+    }
+    return SizedBox();
   }
 
   // Widget _buildDistanceLable() {
