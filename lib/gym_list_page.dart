@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:where_gym/app_bar_factory.dart';
+import 'package:where_gym/app_bloc.dart';
 import 'package:where_gym/distance_format.dart';
 import 'package:where_gym/gym.dart';
 import 'package:where_gym/gym_detail_page.dart';
@@ -92,6 +94,7 @@ class _Row extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    AppBloc bloc = BlocProvider.of(context);
     return InkWell(
       onTap: () => _showDetail(context),
       child: ConstrainedBox(
@@ -128,6 +131,12 @@ class _Row extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                     ),
                   ),
+                  StreamBuilder<Object>(
+                    stream: bloc.favoriteGymList.onListUpdate,
+                    builder: (context, snapshot) {
+                      return _buildFavoriteMark(context);
+                    },
+                  ),
                 ],
               ),
               SizedBox(height: 8),
@@ -154,6 +163,17 @@ class _Row extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Widget _buildFavoriteMark(BuildContext context) {
+    AppBloc bloc = BlocProvider.of(context);
+    if (bloc.favoriteGymList.isFavorite(gym.id)) {
+      return Icon(
+        SharedIcons.bookmarked,
+        color: AppColors.theme,
+      );
+    }
+    return SizedBox();
   }
 
   Widget _buildDistanceLable() {
