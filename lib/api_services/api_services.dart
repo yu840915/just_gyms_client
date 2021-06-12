@@ -1,9 +1,9 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
-// final apiBaseUrl = 'http://localhost:5001/where-gym/us-central1/api';
+final apiBaseUrl = 'http://localhost:5001/where-gym/us-central1/api';
 
-final apiBaseUrl = 'https://us-central1-where-gym.cloudfunctions.net/api';
+// final apiBaseUrl = 'https://us-central1-where-gym.cloudfunctions.net/api';
 
 class APIServices {
   static final instances = APIServices(baseUrl: apiBaseUrl);
