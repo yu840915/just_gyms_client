@@ -8,6 +8,8 @@ class EventName {
   static final contactGym = EventName._('contact gym');
   static final showGymList = EventName._('show gym detail');
   static final selectMarker = EventName._('select marker');
+  static final addBookmark = EventName._('add bookmark');
+  static final removeBookmark = EventName._('remove bookmark');
 }
 
 class EventProperties {

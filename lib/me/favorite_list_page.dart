@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:where_gym/alert_factory.dart';
 import 'package:where_gym/app_bar_factory.dart';
 import 'package:where_gym/app_bloc.dart';
 import 'package:where_gym/distance_format.dart';
@@ -7,6 +9,7 @@ import 'package:where_gym/gym.dart';
 import 'package:where_gym/gym_detail_page.dart';
 import 'package:where_gym/map_view/open_hour_indicator.dart';
 import 'package:where_gym/me/favorite_detail_list.dart';
+import 'package:where_gym/me/favorites.dart';
 import 'package:where_gym/price_format.dart';
 import 'package:where_gym/shared_appearances.dart';
 import 'package:where_gym/tracking/event_names.dart';
@@ -74,6 +77,35 @@ class _Row extends StatelessWidget {
     );
   }
 
+  void _remove(BuildContext context) async {
+    final wantsRemove = await showDialog(
+        context: context,
+        builder: (context) {
+          return AlertFactory.actionAlert(
+            context,
+            title: '是否要移除${gym.name}?',
+            actions: [
+              PlatformDialogAction(
+                child: Text('移除'),
+                onPressed: () {
+                  Navigator.pop(context, true);
+                },
+              ),
+            ],
+          );
+        });
+    if (wantsRemove == null || !wantsRemove) {
+      return;
+    }
+    AppBloc bloc = BlocProvider.of(context);
+    bloc.favoriteGymList.delete(gym.id);
+    track(EventName.removeBookmark, {
+      ...gym.trackingProps,
+      EventProperties.distance: detail.meters,
+      EventProperties.from: 'favorite list',
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return InkWell(
@@ -112,6 +144,8 @@ class _Row extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                     ),
                   ),
+                  SizedBox(width: 8),
+                  _buildRemoveButton(context),
                 ],
               ),
               SizedBox(height: 8),
@@ -136,6 +170,19 @@ class _Row extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildRemoveButton(BuildContext context) {
+    return TextButton(
+      onPressed: () {
+        _remove(context);
+      },
+      child: Icon(Icons.delete),
+      style: TextButton.styleFrom(
+        primary: AppColors.theme,
+        minimumSize: Size(44, 44),
       ),
     );
   }

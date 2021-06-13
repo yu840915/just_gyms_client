@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:where_gym/app_bloc.dart';
 import 'package:where_gym/tracking/tracking.dart';
 import 'package:where_gym/utils/error_view.dart';
@@ -30,8 +31,7 @@ class _MyAppState extends State<MyApp> {
       future: _initialization,
       builder: (context, snapshot) {
         if (snapshot.hasError) {
-          
-          return MaterialApp(
+          return PlatformApp(
             home: ErrorPage(snapshot.error ?? '未知的錯誤，請重新開啟'),
             debugShowCheckedModeBanner: false,
           );
