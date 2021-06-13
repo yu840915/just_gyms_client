@@ -3,16 +3,18 @@ import 'dart:convert';
 
 import 'package:rxdart/subjects.dart';
 import 'package:where_gym/api_services/api_services.dart';
+import 'package:where_gym/current_location.dart';
 import 'package:where_gym/gym.dart';
 import 'package:where_gym/me/favorites.dart';
 
 class FavoriteDetailList {
   final _fetchers = Map<String, GymDetailFetcher>();
-  final _details = BehaviorSubject<List<Gym>>();
+  final _details = BehaviorSubject<List<FavoriteGymDetail>>();
+  final CurrentLocation location;
   StreamSubscription<List<FavoriteGym>> _updateSubscription;
-  Stream<List<Gym>> get onUpdate => _details;
+  Stream<List<FavoriteGymDetail>> get onUpdate => _details;
 
-  FavoriteDetailList(FavoriteGymList list) {
+  FavoriteDetailList(FavoriteGymList list, this.location) {
     _updateSubscription = list.onListUpdate.listen(_getDetailsOnUpdate);
   }
 
@@ -30,8 +32,11 @@ class FavoriteDetailList {
     if (_details.isClosed) {
       return;
     }
+    final gyms = await Future.wait(list.map((e) => _getFetchers(e.id).fetch()));
+    await location.getLocation();
     final details =
-        await Future.wait(list.map((e) => _getFetchers(e.id).fetch()));
+        gyms.map((e) => FavoriteGymDetail(e, location.metersFrom(e))).toList();
+    details.sort((a, b) => (a.meters - b.meters).toInt());
     if (_details.isClosed) {
       return;
     }
@@ -42,6 +47,12 @@ class FavoriteDetailList {
     _updateSubscription.cancel();
     _details.close();
   }
+}
+
+class FavoriteGymDetail {
+  final Gym gym;
+  final num meters;
+  FavoriteGymDetail(this.gym, this.meters);
 }
 
 class GymDetailFetcher {

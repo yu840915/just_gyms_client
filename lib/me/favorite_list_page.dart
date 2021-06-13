@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:where_gym/app_bar_factory.dart';
 import 'package:where_gym/app_bloc.dart';
+import 'package:where_gym/distance_format.dart';
 import 'package:where_gym/gym.dart';
 import 'package:where_gym/gym_detail_page.dart';
 import 'package:where_gym/map_view/open_hour_indicator.dart';
@@ -22,8 +23,8 @@ class _FavoriteListPageState extends State<FavoriteListPage> {
   @override
   void initState() {
     super.initState();
-    AppBloc bloc = BlocProvider.of(context);    
-    list = FavoriteDetailList(bloc.favoriteGymList);
+    AppBloc bloc = BlocProvider.of(context);
+    list = FavoriteDetailList(bloc.favoriteGymList, bloc.location);
   }
 
   @override
@@ -34,7 +35,7 @@ class _FavoriteListPageState extends State<FavoriteListPage> {
         '收藏',
         style: TextStyles.large.title,
       )),
-      body: StreamBuilder<List<Gym>>(
+      body: StreamBuilder<List<FavoriteGymDetail>>(
           stream: list.onUpdate,
           builder: (context, snapshot) {
             return _buildList(context, snapshot.data);
@@ -42,26 +43,27 @@ class _FavoriteListPageState extends State<FavoriteListPage> {
     );
   }
 
-  Widget _buildList(BuildContext context, List<Gym> gyms) {
-    if (gyms == null) {
+  Widget _buildList(BuildContext context, List<FavoriteGymDetail> details) {
+    if (details == null) {
       return Container();
     }
     return ListView.separated(
-      itemBuilder: (context, idx) => _Row(gyms[idx]),
+      itemBuilder: (context, idx) => _Row(details[idx]),
       separatorBuilder: (context, idx) => Divider(),
-      itemCount: gyms.length,
+      itemCount: details.length,
     );
   }
 }
 
 class _Row extends StatelessWidget {
-  final Gym gym;
-  _Row(this.gym);
+  final FavoriteGymDetail detail;
+  Gym get gym => detail.gym;
+  _Row(this.detail);
 
   void _showDetail(BuildContext context) {
     track(EventName.showGymDetail, {
       ...gym.trackingProps,
-      // EventProperties.distance: meters,
+      EventProperties.distance: detail.meters,
       EventProperties.from: 'favorite list',
     });
     Navigator.push(
@@ -127,7 +129,7 @@ class _Row extends StatelessWidget {
                       style: TextStyles.small.subscription,
                     ),
                   Spacer(),
-                  // _buildDistanceLable(),
+                  _buildDistanceLable(),
                 ],
               ),
             ],
@@ -138,16 +140,16 @@ class _Row extends StatelessWidget {
     );
   }
 
-  // Widget _buildDistanceLable() {
-  //   if (meters == null) {
-  //     return Container();
-  //   }
+  Widget _buildDistanceLable() {
+    if (detail.meters == null) {
+      return Container();
+    }
 
-  //   return Text(
-  //     DistanceFormat.format(meters),
-  //     style: TextStyles.small.subscription,
-  //   );
-  // }
+    return Text(
+      DistanceFormat.format(detail.meters),
+      style: TextStyles.small.subscription,
+    );
+  }
 
   Widget buildPricingTable(List<Fare> fares) {
     String plans = '請電洽';
