@@ -47,8 +47,16 @@ class GymDetailPage extends StatelessWidget {
       onPressed: () {
         if (isFavorite) {
           bloc.favoriteGymList.delete(gym.id);
+          track(EventName.removeBookmark, {
+            ...gym.trackingProps,
+            EventProperties.from: 'gym detail page',
+          });
         } else {
           bloc.favoriteGymList.add(gym.id);
+          track(EventName.addBookmark, {
+            ...gym.trackingProps,
+            EventProperties.from: 'gym detail page',
+          });
         }
       },
       icon: Icon(isFavorite ? SharedIcons.bookmarked : SharedIcons.bookmark),
