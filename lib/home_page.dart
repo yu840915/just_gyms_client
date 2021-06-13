@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:where_gym/app_bloc.dart';
 import 'package:where_gym/gym_list.dart';
 import 'package:where_gym/map_view/map_view_page.dart';
 
@@ -13,7 +15,8 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    _gymList = GymList();
+    AppBloc bloc = BlocProvider.of(context);
+    _gymList = GymList(bloc.location);
     _gymList.refresh().catchError(print);
   }
 

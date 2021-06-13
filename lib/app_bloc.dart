@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:where_gym/current_location.dart';
 import 'package:where_gym/initialization.dart';
 import 'package:where_gym/intro/permission_checker.dart';
 import 'package:where_gym/me/favorites.dart';
@@ -12,6 +13,7 @@ class AppBloc extends Bloc<dynamic, AppPhase> {
   final permissionChecker = PermissionChecker();
   final UserCredential _userCredential;
   final FavoriteGymList favoriteGymList;
+  final CurrentLocation location = CurrentLocation();
   AppBloc(initialState, {@required InitializedProducts initializedProducts})
       : _userCredential = initializedProducts.userCredential,
         favoriteGymList = initializedProducts.favoriteGymList,

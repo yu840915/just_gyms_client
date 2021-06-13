@@ -23,7 +23,8 @@ class _GymListPageState extends State<GymListPage> {
   @override
   void initState() {
     super.initState();
-    _gymList = GymList();
+    AppBloc bloc = BlocProvider.of(context);
+    _gymList = GymList(bloc.location);
     _gymList.refresh().catchError((e) {
       print(e);
     });

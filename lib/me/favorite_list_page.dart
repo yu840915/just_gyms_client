@@ -22,7 +22,7 @@ class _FavoriteListPageState extends State<FavoriteListPage> {
   @override
   void initState() {
     super.initState();
-    AppBloc bloc = BlocProvider.of(context);
+    AppBloc bloc = BlocProvider.of(context);    
     list = FavoriteDetailList(bloc.favoriteGymList);
   }
 

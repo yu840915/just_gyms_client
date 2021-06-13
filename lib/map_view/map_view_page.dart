@@ -117,10 +117,11 @@ class _MapViewPageState extends State<MapViewPage> {
   }
 
   Widget _buildBody(BuildContext context) {
+    AppBloc bloc = BlocProvider.of(context);
     return Stack(
       children: [
         StreamBuilder<Position>(
-          stream: gymList.myLocationStream.take(1),
+          stream: bloc.location.onUpdate.take(1),
           builder: (context, snapshot) => _buildMapView(context, snapshot.data),
         ),
         SafeArea(bottom: false, child: _buildOverlay(context)),
