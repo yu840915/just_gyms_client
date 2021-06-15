@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
-  AppColors._();  
+  AppColors._();
   static final theme = const Color(0xff019858);
 }
 
@@ -82,4 +82,9 @@ class ButtonStyles {
     ),
     primary: Colors.black,
   );
+}
+
+class SharedIcons {
+  static IconData get bookmark => Icons.star_border;
+  static IconData get bookmarked => Icons.star;
 }

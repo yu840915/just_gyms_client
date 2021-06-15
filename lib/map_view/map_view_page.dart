@@ -117,10 +117,11 @@ class _MapViewPageState extends State<MapViewPage> {
   }
 
   Widget _buildBody(BuildContext context) {
+    AppBloc bloc = BlocProvider.of(context);
     return Stack(
       children: [
         StreamBuilder<Position>(
-          stream: gymList.myLocationStream.take(1),
+          stream: bloc.location.onUpdate.take(1),
           builder: (context, snapshot) => _buildMapView(context, snapshot.data),
         ),
         SafeArea(bottom: false, child: _buildOverlay(context)),
@@ -160,9 +161,9 @@ class _MapViewPageState extends State<MapViewPage> {
       markers: _markers.map((e) {
         if (markerList?.selectedMarkerId != null &&
             e.id == markerList.selectedMarkerId) {
-          return e.getSelectedMarker();
+          return e.getSelectedMarker(context);
         }
-        return e.getNormalMarker(onTap: () => _onMarkerTap(e));
+        return e.getNormalMarker(context, onTap: () => _onMarkerTap(e));
       }).toSet(),
       onCameraIdle: () {
         markerList.markAsDirtyIfNeeded();
@@ -205,6 +206,7 @@ class _MapViewPageState extends State<MapViewPage> {
 
   void _prepareMarkerList(
       BuildContext context, GoogleMapController controller) {
+    AppBloc bloc = BlocProvider.of(context);
     final list = GymMarkerList(controller);
     list.onSelection.listen((event) {
       _handleMarkerSelection(context, event);
@@ -218,6 +220,11 @@ class _MapViewPageState extends State<MapViewPage> {
       });
     }));
     _subscription.add(markerList.onSelection.listen((event) {
+      setState(() {
+        _needsUpdate = true;
+      });
+    }));
+    _subscription.add(bloc.favoriteGymList.onListUpdate.listen((event) {
       setState(() {
         _needsUpdate = true;
       });

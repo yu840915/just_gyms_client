@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:where_gym/app_bar_factory.dart';
+import 'package:where_gym/app_bloc.dart';
 import 'package:where_gym/gym.dart';
 import 'package:where_gym/map_view/open_hour_indicator.dart';
 import 'package:where_gym/photo_gallery_view.dart';
@@ -24,10 +26,40 @@ class GymDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    AppBloc bloc = BlocProvider.of(context);
     return Scaffold(
-      appBar: AppBarFactory.transparentAppBar(),
+      appBar: AppBarFactory.transparentAppBar(actions: [
+        StreamBuilder<Object>(
+            stream: bloc.favoriteGymList.onListUpdate,
+            builder: (context, snapshot) {
+              return _buildFavoriteButton(context);
+            })
+      ]),
       extendBodyBehindAppBar: true,
       body: _buildBody(context),
+    );
+  }
+
+  Widget _buildFavoriteButton(BuildContext context) {
+    AppBloc bloc = BlocProvider.of(context);
+    final isFavorite = bloc.favoriteGymList.isFavorite(gym.id);
+    return IconButton(
+      onPressed: () {
+        if (isFavorite) {
+          bloc.favoriteGymList.delete(gym.id);
+          track(EventName.removeBookmark, {
+            ...gym.trackingProps,
+            EventProperties.from: 'gym detail page',
+          });
+        } else {
+          bloc.favoriteGymList.add(gym.id);
+          track(EventName.addBookmark, {
+            ...gym.trackingProps,
+            EventProperties.from: 'gym detail page',
+          });
+        }
+      },
+      icon: Icon(isFavorite ? SharedIcons.bookmarked : SharedIcons.bookmark),
     );
   }
 
