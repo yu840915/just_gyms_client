@@ -2,11 +2,13 @@ import 'dart:convert';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geojson/geojson.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart' as GoogleMap;
-import 'package:latlong/latlong.dart';
 import 'package:rxdart/subjects.dart';
 import 'package:where_gym/api_services/api_services.dart';
+import 'package:where_gym/app_bloc.dart';
 import 'package:where_gym/gym.dart';
 
 class GymMarkerList {
@@ -154,12 +156,13 @@ class GymMarker {
 
   static Future<GymMarker> fromMarkerFeature(
       GeoJsonFeature<GeoJsonPoint> feature) async {
-    final latLng = feature.geometry.geoPoint.toLatLng();
+    final pt = feature.geometry.geoPoint;
     final collection =
         await featuresFromGeoJson(jsonEncode(feature.properties));
     final gyms =
         collection.collection.map((e) => Gym.fromJson(e.properties)).toList();
-    return GymMarker(latLng: latlongToGMap(latLng), gyms: gyms);
+    return GymMarker(
+        latLng: GoogleMap.LatLng(pt.latitude, pt.longitude), gyms: gyms);
   }
 
   GoogleMap.Marker toMarker() {
@@ -180,32 +183,44 @@ class DisplayableGymMarker {
   GoogleMap.LatLng get latLng => _gymMarker.latLng;
   final GoogleMap.BitmapDescriptor icon;
   final GoogleMap.BitmapDescriptor selectionIcon;
+  final GoogleMap.BitmapDescriptor markedIcon;
+  final GoogleMap.BitmapDescriptor markedSelectionIcon;
 
   DisplayableGymMarker({
     @required this.icon,
     @required this.selectionIcon,
+    @required this.markedIcon,
+    @required this.markedSelectionIcon,
     GymMarker marker,
   }) : _gymMarker = marker;
 
-  GoogleMap.Marker getNormalMarker({Function onTap}) {
+  GoogleMap.Marker getNormalMarker(BuildContext context, {Function onTap}) {
     final marker = _gymMarker.toMarker();
     return GoogleMap.Marker(
       zIndex: 1,
       markerId: marker.markerId,
       position: marker.position,
-      icon: icon,
+      icon: _isFavorite(context) ? markedIcon : icon,
       alpha: 0.8,
       onTap: onTap,
     );
   }
 
-  GoogleMap.Marker getSelectedMarker() {
+  bool _isFavorite(BuildContext context) {
+    if (gyms.length == 1) {
+      AppBloc bloc = BlocProvider.of(context);
+      return bloc.favoriteGymList.isFavorite(gyms.first.id);
+    }
+    return false;
+  }
+
+  GoogleMap.Marker getSelectedMarker(BuildContext context) {
     final marker = _gymMarker.toMarker();
     return GoogleMap.Marker(
       zIndex: 100,
       markerId: marker.markerId,
       position: marker.position,
-      icon: selectionIcon,
+      icon: _isFavorite(context) ? markedSelectionIcon : selectionIcon,
     );
   }
 }
@@ -229,15 +244,6 @@ class MapDataRegion {
 }
 
 num distanceGMap(GoogleMap.LatLng p1, GoogleMap.LatLng p2) {
-  return distanceLatLong(gMapToLatlong(p1), gMapToLatlong(p2));
+  return Geolocator.distanceBetween(
+      p1.latitude, p1.longitude, p2.latitude, p2.longitude);
 }
-
-num distanceLatLong(LatLng p1, LatLng p2) {
-  return Distance().distance(p1, p2);
-}
-
-LatLng gMapToLatlong(GoogleMap.LatLng latLng) =>
-    LatLng(latLng.latitude, latLng.longitude);
-
-GoogleMap.LatLng latlongToGMap(LatLng latLng) =>
-    GoogleMap.LatLng(latLng.latitude, latLng.longitude);

@@ -1,39 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:where_gym/alert_factory.dart';
 import 'package:where_gym/app_bar_factory.dart';
 import 'package:where_gym/app_bloc.dart';
 import 'package:where_gym/distance_format.dart';
 import 'package:where_gym/gym.dart';
 import 'package:where_gym/gym_detail_page.dart';
-import 'package:where_gym/gym_list.dart';
 import 'package:where_gym/map_view/open_hour_indicator.dart';
+import 'package:where_gym/me/favorite_detail_list.dart';
+import 'package:where_gym/me/favorites.dart';
 import 'package:where_gym/price_format.dart';
 import 'package:where_gym/shared_appearances.dart';
 import 'package:where_gym/tracking/event_names.dart';
 import 'package:where_gym/tracking/tracking.dart';
 
-class GymListPage extends StatefulWidget {
+class FavoriteListPage extends StatefulWidget {
   @override
-  _GymListPageState createState() => _GymListPageState();
+  _FavoriteListPageState createState() => _FavoriteListPageState();
 }
 
-class _GymListPageState extends State<GymListPage> {
-  GymList _gymList;
+class _FavoriteListPageState extends State<FavoriteListPage> {
+  FavoriteDetailList list;
 
   @override
   void initState() {
     super.initState();
     AppBloc bloc = BlocProvider.of(context);
-    _gymList = GymList(bloc.location);
-    _gymList.refresh().catchError((e) {
-      print(e);
-    });
-  }
-
-  @override
-  void dispose() {
-    _gymList.dispose();
-    super.dispose();
+    list = FavoriteDetailList(bloc.favoriteGymList, bloc.location);
   }
 
   @override
@@ -41,49 +35,39 @@ class _GymListPageState extends State<GymListPage> {
     return Scaffold(
       appBar: AppBarFactory.appBar(
           title: Text(
-        '附近的場租',
+        '收藏',
         style: TextStyles.large.title,
       )),
-      body: _buildBody(context),
+      body: StreamBuilder<List<FavoriteGymDetail>>(
+          stream: list.onUpdate,
+          builder: (context, snapshot) {
+            return _buildList(context, snapshot.data);
+          }),
     );
   }
 
-  Widget _buildBody(BuildContext context) {
-    return StreamBuilder<List<Gym>>(
-      stream: _gymList.listStream,
-      builder: (context, snap) => _buildList(context, snap.data),
-    );
-  }
-
-  Widget _buildList(BuildContext context, List<Gym> gyms) {
-    if (gyms == null) {
+  Widget _buildList(BuildContext context, List<FavoriteGymDetail> details) {
+    if (details == null) {
       return Container();
     }
     return ListView.separated(
-      padding: EdgeInsets.only(top: 20, bottom: 80),
-      itemBuilder: (context, idx) {
-        final gym = gyms[idx];
-        return _Row(gym, meters: _gymList.metersFrom(gym));
-      },
-      separatorBuilder: (context, idx) => Container(
-        height: 1,
-        color: Colors.grey.shade300,
-      ),
-      itemCount: gyms.length,
+      itemBuilder: (context, idx) => _Row(details[idx]),
+      separatorBuilder: (context, idx) => Divider(),
+      itemCount: details.length,
     );
   }
 }
 
 class _Row extends StatelessWidget {
-  final num meters;
-  final Gym gym;
-  _Row(this.gym, {this.meters});
+  final FavoriteGymDetail detail;
+  Gym get gym => detail.gym;
+  _Row(this.detail);
 
   void _showDetail(BuildContext context) {
     track(EventName.showGymDetail, {
       ...gym.trackingProps,
-      EventProperties.distance: meters,
-      EventProperties.from: 'gym list',
+      EventProperties.distance: detail.meters,
+      EventProperties.from: 'favorite list',
     });
     Navigator.push(
       context,
@@ -93,9 +77,37 @@ class _Row extends StatelessWidget {
     );
   }
 
+  void _remove(BuildContext context) async {
+    final wantsRemove = await showDialog(
+        context: context,
+        builder: (context) {
+          return AlertFactory.actionAlert(
+            context,
+            title: '是否要移除${gym.name}?',
+            actions: [
+              PlatformDialogAction(
+                child: Text('移除'),
+                onPressed: () {
+                  Navigator.pop(context, true);
+                },
+              ),
+            ],
+          );
+        });
+    if (wantsRemove == null || !wantsRemove) {
+      return;
+    }
+    AppBloc bloc = BlocProvider.of(context);
+    bloc.favoriteGymList.delete(gym.id);
+    track(EventName.removeBookmark, {
+      ...gym.trackingProps,
+      EventProperties.distance: detail.meters,
+      EventProperties.from: 'favorite list',
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    AppBloc bloc = BlocProvider.of(context);
     return InkWell(
       onTap: () => _showDetail(context),
       child: ConstrainedBox(
@@ -132,12 +144,8 @@ class _Row extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                     ),
                   ),
-                  StreamBuilder<Object>(
-                    stream: bloc.favoriteGymList.onListUpdate,
-                    builder: (context, snapshot) {
-                      return _buildFavoriteMark(context);
-                    },
-                  ),
+                  SizedBox(width: 8),
+                  _buildRemoveButton(context),
                 ],
               ),
               SizedBox(height: 8),
@@ -166,24 +174,26 @@ class _Row extends StatelessWidget {
     );
   }
 
-  Widget _buildFavoriteMark(BuildContext context) {
-    AppBloc bloc = BlocProvider.of(context);
-    if (bloc.favoriteGymList.isFavorite(gym.id)) {
-      return Icon(
-        SharedIcons.bookmarked,
-        color: AppColors.theme,
-      );
-    }
-    return SizedBox();
+  Widget _buildRemoveButton(BuildContext context) {
+    return TextButton(
+      onPressed: () {
+        _remove(context);
+      },
+      child: Icon(Icons.delete),
+      style: TextButton.styleFrom(
+        primary: AppColors.theme,
+        minimumSize: Size(44, 44),
+      ),
+    );
   }
 
   Widget _buildDistanceLable() {
-    if (meters == null) {
+    if (detail.meters == null) {
       return Container();
     }
 
     return Text(
-      DistanceFormat.format(meters),
+      DistanceFormat.format(detail.meters),
       style: TextStyles.small.subscription,
     );
   }

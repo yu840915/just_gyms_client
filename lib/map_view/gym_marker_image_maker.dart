@@ -20,8 +20,8 @@ class GymMarkerImageMakerContainers extends StatelessWidget {
       child: Material(
         child: StreamBuilder<List<GymMarker>>(
           stream: gymMarkerList.onMarkersChange,
-          builder: (context, snapshot) {
-            return _buildMarkerMakers(context, snapshot.data);
+          builder: (context, listSnapshot) {
+            return _buildMarkerMakers(context, listSnapshot.data);
           },
         ),
         color: Colors.transparent,
@@ -56,6 +56,8 @@ class _GymMarkerImageMakerState extends State<GymMarkerImageMaker>
     with AfterLayoutMixin<GymMarkerImageMaker> {
   ScreenshotController normalController;
   ScreenshotController selectionController;
+  ScreenshotController markedSelectionController;
+  ScreenshotController markedNormalController;
   final normalStyle = TextStyle(
     color: Colors.white,
     fontSize: 12,
@@ -69,16 +71,22 @@ class _GymMarkerImageMakerState extends State<GymMarkerImageMaker>
     super.initState();
     normalController = ScreenshotController();
     selectionController = ScreenshotController();
+    markedSelectionController = ScreenshotController();
+    markedNormalController = ScreenshotController();
   }
 
   @override
   void afterFirstLayout(BuildContext context) async {
     final normalIcon = await normalController.capture();
     final selectionIcon = await selectionController.capture();
+    final markedNormalIcon = await markedNormalController.capture();
+    final markedSelectionIcon = await markedSelectionController.capture();
     widget.gymMarkerList.insertDisplayableMarker(
       DisplayableGymMarker(
         icon: BitmapDescriptor.fromBytes(normalIcon),
         selectionIcon: BitmapDescriptor.fromBytes(selectionIcon),
+        markedIcon: BitmapDescriptor.fromBytes(markedNormalIcon),
+        markedSelectionIcon: BitmapDescriptor.fromBytes(markedSelectionIcon),
         marker: widget.gymMarker,
       ),
     );
@@ -90,21 +98,29 @@ class _GymMarkerImageMakerState extends State<GymMarkerImageMaker>
       children: [
         Screenshot(
           controller: selectionController,
-          child: _buildSelectionIcon(Key('selected')),
+          child: _buildSelectionIcon(Key('selected'), false),
         ),
         Screenshot(
           controller: normalController,
-          child: _buildNormalIcon(Key('normal')),
+          child: _buildNormalIcon(Key('normal'), false),
+        ),
+        Screenshot(
+          controller: markedSelectionController,
+          child: _buildSelectionIcon(Key('marked_selected'), true),
+        ),
+        Screenshot(
+          controller: markedNormalController,
+          child: _buildNormalIcon(Key('marked_normal'), true),
         ),
       ],
     );
   }
 
-  Widget _buildNormalIcon(Key key) {
+  Widget _buildNormalIcon(Key key, bool marked) {
     return Container(
       key: key,
       child: gymMarker.gyms.length == 1
-          ? _buildMarkerContentForGym(gymMarker.gyms.first, normalStyle)
+          ? _buildMarkerContentForGym(gymMarker.gyms.first, normalStyle, marked)
           : _buildMarkerContentForCollection(gymMarker.gyms, normalStyle),
       padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
@@ -114,11 +130,12 @@ class _GymMarkerImageMakerState extends State<GymMarkerImageMaker>
     );
   }
 
-  Widget _buildSelectionIcon(Key key) {
+  Widget _buildSelectionIcon(Key key, bool marked) {
     return Container(
       key: key,
       child: gymMarker.gyms.length == 1
-          ? _buildMarkerContentForGym(gymMarker.gyms.first, selectionStyle)
+          ? _buildMarkerContentForGym(
+              gymMarker.gyms.first, selectionStyle, marked)
           : _buildMarkerContentForCollection(gymMarker.gyms, selectionStyle),
       padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
@@ -133,10 +150,25 @@ class _GymMarkerImageMakerState extends State<GymMarkerImageMaker>
     return Text('${list.length} 項結果', style: textStyle);
   }
 
-  Widget _buildMarkerContentForGym(Gym gym, TextStyle textStyle) {
-    if (gym.pricing == null || gym.pricing.isEmpty) {
-      return Text('請電洽', style: textStyle);
+  Widget _buildMarkerContentForGym(Gym gym, TextStyle textStyle, bool marked) {
+    Text text = Text('請電洽', style: textStyle);
+    if (gym.pricing != null && gym.pricing.isNotEmpty) {
+      text = Text(PriceFormat.format(gym.hourlyRate), style: textStyle);
     }
-    return Text(PriceFormat.format(gym.hourlyRate), style: textStyle);
+    if (!marked) {
+      return text;
+    }
+    return Row(
+      children: [
+        Icon(
+          SharedIcons.bookmarked,
+          color: Colors.white,
+          size: 12,
+        ),
+        SizedBox(width: 4),
+        text
+      ],
+      mainAxisSize: MainAxisSize.min,
+    );
   }
 }
