@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:where_gym/app_bloc.dart';
+import 'package:where_gym/distance_format.dart';
+import 'package:where_gym/gen/assets.gen.dart';
 import 'package:where_gym/gym.dart';
 import 'package:where_gym/gym_detail_page.dart';
 import 'package:where_gym/map_view/gym_marker_list.dart';
@@ -137,6 +139,9 @@ class GymInfoCardView extends StatelessWidget {
                         Container(
                           width: 70,
                           height: 50,
+                          child: card.gym.cover == null
+                              ? Assets.images.wait.image()
+                              : null,
                           decoration: BoxDecoration(
                               color: Colors.grey.shade100,
                               image: card.gym.cover != null
@@ -155,8 +160,14 @@ class GymInfoCardView extends StatelessWidget {
                                 style: TextStyles.small.header,
                               ),
                               SizedBox(height: 8),
-                              OpenHourIndicator(
-                                  gym: card.gym, styles: TextStyles.small),
+                              Row(
+                                children: [
+                                  OpenHourIndicator(
+                                      gym: card.gym, styles: TextStyles.small),
+                                  Spacer(),
+                                  _buildDistanceLable(context),
+                                ],
+                              ),
                             ],
                             crossAxisAlignment: CrossAxisAlignment.start,
                           ),
@@ -179,8 +190,6 @@ class GymInfoCardView extends StatelessWidget {
                                 '/小時)',
                             style: TextStyles.small.subscription,
                           ),
-                        Spacer(),
-                        // _buildDistanceLable(),
                       ],
                     ),
                     Spacer(),
@@ -212,15 +221,17 @@ class GymInfoCardView extends StatelessWidget {
     return SizedBox();
   }
 
-  // Widget _buildDistanceLable() {
-  //   if (km == null) {
-  //     return Container();
-  //   }
-  //   return Text(
-  //     '距離 ${NumberFormats.distance.format(km)} 公里',
-  //     style: TextStyles.small.subscription,
-  //   );
-  // }
+  Widget _buildDistanceLable(BuildContext context) {
+    AppBloc bloc = BlocProvider.of(context);
+    final num meters = bloc.location.metersFrom(card.gym);
+    if (meters == null) {
+      return Container();
+    }
+    return Text(
+      '距離 ${DistanceFormat.format(meters)}',
+      style: TextStyles.small.subscription,
+    );
+  }
 
   Widget buildPricingTable(List<Fare> fares) {
     String plans = '請電洽';
