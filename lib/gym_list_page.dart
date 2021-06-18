@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:where_gym/app_bar_factory.dart';
 import 'package:where_gym/app_bloc.dart';
 import 'package:where_gym/distance_format.dart';
+import 'package:where_gym/gen/assets.gen.dart';
 import 'package:where_gym/gym.dart';
 import 'package:where_gym/gym_detail_page.dart';
 import 'package:where_gym/gym_list.dart';
@@ -109,6 +110,8 @@ class _Row extends StatelessWidget {
                   Container(
                     width: 70,
                     height: 50,
+                    child:
+                        gym.cover == null ? Assets.images.wait.image() : null,
                     decoration: BoxDecoration(
                         color: Colors.grey.shade100,
                         image: gym.cover != null
