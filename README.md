@@ -1,16 +1,22 @@
-# where_gym
+## Library Overview
 
-A new Flutter project.
+[json_serializable](https://pub.dev/packages/json_serializable) for JSON parser generation.
+[flutter_gen_runner](https://pub.dev/packages/flutter_gen_runner) for resouce accessing code generation.
+[hive](https://pub.dev/packages/hive) for local persistent storage.
+[geojson](https://pub.dev/packages/geojson) for GeoJSON parsing, which sticks to older version of Firebase.
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+After modifying JSON models, hive models, or adding new assets, you have to update generated code accordingly, run
 
-A few resources to get you started if this is your first Flutter project:
+```
+flutter packages pub run build_runner build
+```
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
+or, if conflicts occurs, run
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+```
+flutter packages pub run build_runner build --delete-conflicting-outputs
+```
+
+Make sure `{proj}/.dart_tool/flutter_gen/pubjpec.yaml` is created before generation.
