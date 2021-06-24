@@ -3,7 +3,7 @@ import 'package:rxdart/subjects.dart';
 import 'package:where_gym/gym.dart';
 
 class CurrentLocation {
-  final _fallbackPosition = Position(
+  Position _fallbackPosition = Position(
       latitude: 25.055049,
       longitude: 121.542653,
       speed: 0,
@@ -58,7 +58,13 @@ class CurrentLocation {
       }
     }
     final pos = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.low);
+            desiredAccuracy: LocationAccuracy.medium)
+        .timeout(Duration(seconds: 3), onTimeout: () async {
+      return _myLocationSubject.valueWrapper != null
+          ? _myLocationSubject.valueWrapper.value ?? _fallbackPosition
+          : _fallbackPosition;
+    });
+    print(pos);
     _myLocationSubject.add(pos);
     return pos;
   }
