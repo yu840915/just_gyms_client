@@ -13,10 +13,11 @@ class AppBloc extends Bloc<dynamic, AppPhase> {
   final permissionChecker = PermissionChecker();
   final UserCredential _userCredential;
   final FavoriteGymList favoriteGymList;
-  final CurrentLocation location = CurrentLocation();
+  final CurrentLocation location;
   AppBloc(initialState, {@required InitializedProducts initializedProducts})
       : _userCredential = initializedProducts.userCredential,
         favoriteGymList = initializedProducts.favoriteGymList,
+        location = initializedProducts.location,
         super(initialState) {
     _checkPermission();
   }
