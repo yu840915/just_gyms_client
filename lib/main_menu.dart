@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:where_gym/configs.dart';
+import 'package:where_gym/login/login_page.dart';
 import 'package:where_gym/me/favorite_list_page.dart';
 import 'package:where_gym/shared_appearances.dart';
 
@@ -14,6 +15,7 @@ class MainMenu extends StatelessWidget {
           _buildItem('服務條款', _MenuItem.tos),
           _buildItem('隱私權政策', _MenuItem.pp),
           _buildItem('聯絡我們', _MenuItem.contactUs),
+          _buildItem('登入', _MenuItem.login),
         ];
       },
       icon: Container(
@@ -44,6 +46,11 @@ class MainMenu extends StatelessWidget {
           case _MenuItem.contactUs:
             launch(Configs.instance.contactLink, forceWebView: false);
             break;
+          case _MenuItem.login:
+            Navigator.push(context, MaterialPageRoute(builder: (context) {
+              return LoginPage();
+            }));
+            break;
         }
       },
     );
@@ -67,4 +74,5 @@ enum _MenuItem {
   tos,
   pp,
   contactUs,
+  login,
 }
