@@ -14,7 +14,8 @@ class Initialization {
     final dir = await getApplicationDocumentsDirectory();
     Hive
       ..init(dir.path)
-      ..registerAdapter(FavoriteGymAdapter());
+      ..registerAdapter(FavoriteGymAdapter())
+      ..registerAdapter(LocationRecordAdapter());
     final favorites = await FavoriteGymList.createList();
     Configs.setInstance(await Configs.initialize());
     final location = await CurrentLocation.create();
