@@ -17,7 +17,7 @@ class FavoriteGym extends HiveObject {
 }
 
 class FavoriteGymList {
-  DataStore dataStore;
+  final DataStore dataStore;
   FavoriteGymList(this.dataStore) {
     _updateList();
   }
