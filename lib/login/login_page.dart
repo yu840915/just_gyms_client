@@ -16,6 +16,7 @@ class LoginPage extends StatelessWidget {
       children: [
         _buildFBButton(context),
         _buildGoogleButton(context),
+        _buildAppleButton(context),
       ],
     );
   }
@@ -34,5 +35,13 @@ class LoginPage extends StatelessWidget {
           await LoginManager.signInWithGoogle();
         },
         child: Text('Google'));
+  }
+
+  Widget _buildAppleButton(BuildContext context) {
+    return TextButton(
+        onPressed: () async {
+          await LoginManager.signInWithApple();
+        },
+        child: Text('Apple'));
   }
 }
