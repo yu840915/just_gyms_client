@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:bloc/bloc.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -11,16 +13,36 @@ import 'package:where_gym/me/favorites.dart';
 class AppBloc extends Bloc<dynamic, AppPhase> {
   final _hasFinishedIntroKey = 'hasFinishedIntro';
   final permissionChecker = PermissionChecker();
-  final UserCredential _userCredential;
+  User _firebaseUser;
   final FavoriteGymList favoriteGymList;
   final CurrentLocation location;
+  final _subscriptions = List<StreamSubscription>.empty(growable: true);
   AppBloc(initialState, {@required InitializedProducts initializedProducts})
-      : _userCredential = initializedProducts.userCredential,
+      : _firebaseUser = initializedProducts.userCredential.user,
         favoriteGymList = initializedProducts.favoriteGymList,
         location = initializedProducts.location,
         super(initialState) {
     _checkPermission();
+    _subscribeEvents();
   }
+
+  bool get isLoggedIn =>
+      _firebaseUser == null ? false : !_firebaseUser.isAnonymous;
+
+  void _subscribeEvents() {
+    _subscriptions.add(FirebaseAuth.instance.authStateChanges().listen((event) {
+      _handleUserUpdate(event);
+    }));
+  }
+
+  void _handleUserUpdate(User user) {
+    if (user == null) {
+      _firebaseUser = null;
+      return;
+    }
+    _firebaseUser = user;
+  }
+
 
   void _checkPermission() async {
     final prefs = await SharedPreferences.getInstance();
@@ -42,7 +64,7 @@ class AppBloc extends Bloc<dynamic, AppPhase> {
     });
   }
 
-  Future<String> getIdToken() => _userCredential.user.getIdToken();
+  Future<String> getIdToken() => _firebaseUser?.getIdToken();
 
   @override
   Stream<AppPhase> mapEventToState(event) async* {

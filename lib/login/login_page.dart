@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:where_gym/app_bar_factory.dart';
-import 'package:where_gym/login/login_manager.dart';
+import 'package:where_gym/login/authenticators.dart';
 
 class LoginPage extends StatelessWidget {
   @override
@@ -24,7 +24,7 @@ class LoginPage extends StatelessWidget {
   Widget _buildFBButton(BuildContext context) {
     return TextButton(
         onPressed: () async {
-          await LoginManager.signInWithFacebook();
+          await Authenticators.signInWithFacebook();
         },
         child: Text('Facebook'));
   }
@@ -32,7 +32,7 @@ class LoginPage extends StatelessWidget {
   Widget _buildGoogleButton(BuildContext context) {
     return TextButton(
         onPressed: () async {
-          await LoginManager.signInWithGoogle();
+          await Authenticators.signInWithGoogle();
         },
         child: Text('Google'));
   }
@@ -40,7 +40,7 @@ class LoginPage extends StatelessWidget {
   Widget _buildAppleButton(BuildContext context) {
     return TextButton(
         onPressed: () async {
-          await LoginManager.signInWithApple();
+          await Authenticators.signInWithApple();
         },
         child: Text('Apple'));
   }

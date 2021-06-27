@@ -7,7 +7,7 @@ import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
-class LoginManager {
+class Authenticators {
   static Future<UserCredential> signInWithFacebook() async {
     final AccessToken result = await FacebookAuth.instance.login();
     if (result == null) {
@@ -30,7 +30,7 @@ class LoginManager {
     return await FirebaseAuth.instance.signInWithCredential(credential);
   }
 
-  static String generateNonce([int length = 32]) {
+  static String _generateNonce([int length = 32]) {
     final charset =
         '0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._';
     final random = Random.secure();
@@ -38,15 +38,15 @@ class LoginManager {
         .join();
   }
 
-  static String sha256ofString(String input) {
+  static String _sha256ofString(String input) {
     final bytes = utf8.encode(input);
     final digest = sha256.convert(bytes);
     return digest.toString();
   }
 
   static Future<UserCredential> signInWithApple() async {
-    final rawNonce = generateNonce();
-    final nonce = sha256ofString(rawNonce);
+    final rawNonce = _generateNonce();
+    final nonce = _sha256ofString(rawNonce);
 
     final appleCredential = await SignInWithApple.getAppleIDCredential(
       scopes: [
@@ -61,5 +61,18 @@ class LoginManager {
       rawNonce: rawNonce,
     );
     return await FirebaseAuth.instance.signInWithCredential(oauthCredential);
+  }
+
+  Future<void> logOut() async {
+    try {
+      await FirebaseAuth.instance.signOut();
+      await FirebaseAuth.instance.signInAnonymously();
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  Future<void> disableAndLogOut() async {
+    
   }
 }

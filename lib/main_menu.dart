@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:where_gym/configs.dart';
+import 'package:where_gym/login/loginCheckFlow.dart';
 import 'package:where_gym/login/login_page.dart';
 import 'package:where_gym/me/favorite_list_page.dart';
 import 'package:where_gym/shared_appearances.dart';
@@ -32,7 +33,7 @@ class MainMenu extends StatelessWidget {
         height: 40,
       ),
       iconSize: 40,
-      onSelected: (item) {
+      onSelected: (item) async {
         switch (item) {
           case _MenuItem.favorites:
             _showFavorites(context);
@@ -47,9 +48,7 @@ class MainMenu extends StatelessWidget {
             launch(Configs.instance.contactLink, forceWebView: false);
             break;
           case _MenuItem.login:
-            Navigator.push(context, MaterialPageRoute(builder: (context) {
-              return LoginPage();
-            }));
+            await LoginCheckFlow.check(context, where: 'menu');
             break;
         }
       },
