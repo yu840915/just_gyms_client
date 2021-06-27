@@ -14,6 +14,30 @@
       },
       "oauth_client": [
         {
+          "client_id": "835416512364-37ql3sk7sbaugicfirdm85eug64uqcjb.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "app.me.justgyms",
+            "certificate_hash": "bee995021701c2d236ab948cba0cf10d79e2f716"
+          }
+        },
+        {
+          "client_id": "835416512364-8cqb38dr0oqqb57tn2gab4k9594cnkab.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "app.me.justgyms",
+            "certificate_hash": "53679d48c60e8a8c4aaab7bd52c076735708b532"
+          }
+        },
+        {
+          "client_id": "835416512364-iovc7v4vbnbncthpicf2sdt0lf9d2bre.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "app.me.justgyms",
+            "certificate_hash": "2603367d48253123ef44b4d95529b4710a96ad7a"
+          }
+        },
+        {
           "client_id": "835416512364-f1ks9pfbuio8eebp4fog4ghd8opa8rrk.apps.googleusercontent.com",
           "client_type": 3
         }

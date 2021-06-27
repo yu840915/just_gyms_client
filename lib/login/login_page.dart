@@ -29,6 +29,10 @@ class LoginPage extends StatelessWidget {
   }
 
   Widget _buildGoogleButton(BuildContext context) {
-    return TextButton(onPressed: () {}, child: Text('Google'));
+    return TextButton(
+        onPressed: () async {
+          await LoginManager.signInWithGoogle();
+        },
+        child: Text('Google'));
   }
 }
