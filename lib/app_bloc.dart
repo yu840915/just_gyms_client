@@ -14,7 +14,7 @@ class AppBloc extends Bloc<dynamic, AppPhase> {
   final _hasFinishedIntroKey = 'hasFinishedIntro';
   final permissionChecker = PermissionChecker();
   User _firebaseUser;
-  final FavoriteGymList favoriteGymList;
+  final LocalFavoriteGymList favoriteGymList;
   final CurrentLocation location;
   final _subscriptions = List<StreamSubscription>.empty(growable: true);
   AppBloc(initialState, {@required InitializedProducts initializedProducts})

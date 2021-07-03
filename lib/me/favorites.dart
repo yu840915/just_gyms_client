@@ -4,8 +4,15 @@ import 'package:hive/hive.dart';
 
 part 'favorites.g.dart';
 
+mixin FavoriteGymMixin {
+  String get id;
+  DateTime get addedAt;
+  DateTime get lastContactedAt;
+  int get contactCount;
+}
+
 @HiveType(typeId: 1)
-class FavoriteGym extends HiveObject {
+class FavoriteGym extends HiveObject with FavoriteGymMixin {
   @HiveField(0)
   String id;
   @HiveField(1)
@@ -16,15 +23,23 @@ class FavoriteGym extends HiveObject {
   int contactCount;
 }
 
-class FavoriteGymList {
+abstract class FavoriteGymList {
+  Stream<List<FavoriteGymMixin>> get onListUpdate;
+  Future<void> add(String gymId);
+  Future<void> delete(String gymId);
+  FavoriteGymMixin getGym(String gymId);
+  bool isFavorite(String gymId);
+}
+
+class LocalFavoriteGymList implements FavoriteGymList {
   final DataStore dataStore;
-  FavoriteGymList(this.dataStore) {
+  LocalFavoriteGymList(this.dataStore) {
     _updateList();
   }
   final _list = BehaviorSubject<List<FavoriteGym>>();
   Stream<List<FavoriteGym>> get onListUpdate => _list;
-  static Future<FavoriteGymList> createList() async {
-    return FavoriteGymList(await DataStore.createWithName('favorites'));
+  static Future<LocalFavoriteGymList> createList() async {
+    return LocalFavoriteGymList(await DataStore.createWithName('favorites'));
   }
 
   List<FavoriteGym> get records => List<FavoriteGym>.from(dataStore.box.values);
@@ -33,7 +48,7 @@ class FavoriteGymList {
     _list.add(records);
   }
 
-  add(String gymId) {
+  Future<void> add(String gymId) async {
     final gym = FavoriteGym()
       ..id = gymId
       ..contactCount = 0
@@ -51,6 +66,7 @@ class FavoriteGymList {
     return dataStore.getValue(gymId);
   }
 
+  @override
   bool isFavorite(String gymId) {
     return getGym(gymId) != null;
   }

@@ -9,7 +9,6 @@ import 'package:where_gym/gym.dart';
 import 'package:where_gym/gym_detail_page.dart';
 import 'package:where_gym/map_view/open_hour_indicator.dart';
 import 'package:where_gym/me/favorite_detail_list.dart';
-import 'package:where_gym/me/favorites.dart';
 import 'package:where_gym/price_format.dart';
 import 'package:where_gym/shared_appearances.dart';
 import 'package:where_gym/tracking/event_names.dart';
@@ -34,10 +33,12 @@ class _FavoriteListPageState extends State<FavoriteListPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBarFactory.appBar(
-          title: Text(
-        '收藏',
-        style: TextStyles.large.title,
-      )),
+        title: Text(
+          '收藏',
+          style: TextStyles.large.title,
+        ),
+        actions: [],
+      ),
       body: StreamBuilder<List<FavoriteGymDetail>>(
           stream: list.onUpdate,
           builder: (context, snapshot) {

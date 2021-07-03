@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:where_gym/app_bloc.dart';
 import 'package:where_gym/configs.dart';
 import 'package:where_gym/login/loginCheckFlow.dart';
 import 'package:where_gym/login/login_page.dart';
@@ -9,6 +11,7 @@ import 'package:where_gym/shared_appearances.dart';
 class MainMenu extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    AppBloc bloc = BlocProvider.of(context);
     return PopupMenuButton<_MenuItem>(
       itemBuilder: (context) {
         return [
@@ -16,7 +19,7 @@ class MainMenu extends StatelessWidget {
           _buildItem('服務條款', _MenuItem.tos),
           _buildItem('隱私權政策', _MenuItem.pp),
           _buildItem('聯絡我們', _MenuItem.contactUs),
-          _buildItem('登入', _MenuItem.login),
+          if (bloc.isLoggedIn) _buildItem('個人設定', _MenuItem.settings),
         ];
       },
       icon: Container(
@@ -47,8 +50,7 @@ class MainMenu extends StatelessWidget {
           case _MenuItem.contactUs:
             launch(Configs.instance.contactLink, forceWebView: false);
             break;
-          case _MenuItem.login:
-            await LoginCheckFlow.check(context, where: 'menu');
+          case _MenuItem.settings:
             break;
         }
       },
@@ -73,5 +75,5 @@ enum _MenuItem {
   tos,
   pp,
   contactUs,
-  login,
+  settings,
 }

@@ -14,7 +14,7 @@ class FavoriteDetailList {
   StreamSubscription<List<FavoriteGym>> _updateSubscription;
   Stream<List<FavoriteGymDetail>> get onUpdate => _details;
 
-  FavoriteDetailList(FavoriteGymList list, this.location) {
+  FavoriteDetailList(LocalFavoriteGymList list, this.location) {
     _updateSubscription = list.onListUpdate.listen(_getDetailsOnUpdate);
   }
 

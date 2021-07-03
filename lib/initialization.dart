@@ -16,7 +16,7 @@ class Initialization {
       ..init(dir.path)
       ..registerAdapter(FavoriteGymAdapter())
       ..registerAdapter(LocationRecordAdapter());
-    final favorites = await FavoriteGymList.createList();
+    final favorites = await LocalFavoriteGymList.createList();
     Configs.setInstance(await Configs.initialize());
     final location = await CurrentLocation.create();
     return InitializedProducts(
@@ -30,7 +30,7 @@ class Initialization {
 class InitializedProducts {
   final FirebaseApp firebaseApp;
   final UserCredential userCredential;
-  final FavoriteGymList favoriteGymList;
+  final LocalFavoriteGymList favoriteGymList;
   final CurrentLocation location;
   InitializedProducts({
     @required this.firebaseApp,
