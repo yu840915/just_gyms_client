@@ -14,7 +14,7 @@ class AppBloc extends Bloc<dynamic, AppPhase> {
   final _hasFinishedIntroKey = 'hasFinishedIntro';
   final permissionChecker = PermissionChecker();
   User _firebaseUser;
-  final LocalFavoriteGymList favoriteGymList;
+  final FavoriteGymList favoriteGymList;
   final CurrentLocation location;
   final _subscriptions = List<StreamSubscription>.empty(growable: true);
   AppBloc(initialState, {@required InitializedProducts initializedProducts})
@@ -42,7 +42,6 @@ class AppBloc extends Bloc<dynamic, AppPhase> {
     }
     _firebaseUser = user;
   }
-
 
   void _checkPermission() async {
     final prefs = await SharedPreferences.getInstance();

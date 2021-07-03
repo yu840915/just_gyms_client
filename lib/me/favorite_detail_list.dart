@@ -11,10 +11,10 @@ class FavoriteDetailList {
   final _fetchers = Map<String, GymDetailFetcher>();
   final _details = BehaviorSubject<List<FavoriteGymDetail>>();
   final CurrentLocation location;
-  StreamSubscription<List<FavoriteGym>> _updateSubscription;
+  StreamSubscription<List<FavoriteGymMixin>> _updateSubscription;
   Stream<List<FavoriteGymDetail>> get onUpdate => _details;
 
-  FavoriteDetailList(LocalFavoriteGymList list, this.location) {
+  FavoriteDetailList(FavoriteGymList list, this.location) {
     _updateSubscription = list.onListUpdate.listen(_getDetailsOnUpdate);
   }
 
@@ -28,7 +28,7 @@ class FavoriteDetailList {
     return fetcher;
   }
 
-  void _getDetailsOnUpdate(List<FavoriteGym> list) async {
+  void _getDetailsOnUpdate(List<FavoriteGymMixin> list) async {
     if (_details.isClosed) {
       return;
     }

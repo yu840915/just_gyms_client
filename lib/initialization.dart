@@ -5,7 +5,7 @@ import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:where_gym/configs.dart';
 import 'package:where_gym/current_location.dart';
-import 'package:where_gym/me/favorites.dart';
+import 'package:where_gym/me/local_favorites.dart';
 
 class Initialization {
   static Future<InitializedProducts> initialize() async {
@@ -16,8 +16,8 @@ class Initialization {
       ..init(dir.path)
       ..registerAdapter(FavoriteGymAdapter())
       ..registerAdapter(LocationRecordAdapter());
-    final favorites = await LocalFavoriteGymList.createList();
     Configs.setInstance(await Configs.initialize());
+    final favorites = await LocalFavoriteGymList.createList();
     final location = await CurrentLocation.create();
     return InitializedProducts(
         firebaseApp: firebaseApp,
