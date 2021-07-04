@@ -1,6 +1,3 @@
-import 'package:rxdart/subjects.dart';
-import 'package:where_gym/data_store.dart';
-
 mixin FavoriteGymMixin {
   String get id;
   DateTime get addedAt;
@@ -15,5 +12,3 @@ abstract class FavoriteGymList {
   FavoriteGymMixin getGym(String gymId);
   bool isFavorite(String gymId);
 }
-
-
