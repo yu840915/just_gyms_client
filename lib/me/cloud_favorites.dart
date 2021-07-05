@@ -1,4 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:rxdart/subjects.dart';
+import 'package:where_gym/api_services/api_services.dart';
+import 'package:where_gym/app_bloc.dart';
 import 'package:where_gym/me/favorites.dart';
 
 class CloudFavoriteGym implements FavoriteGymMixin {
@@ -23,32 +26,51 @@ class CloudFavoriteGym implements FavoriteGymMixin {
 }
 
 class CloudFavoriteGymList implements FavoriteGymList {
-  @override
-  Future<void> add(String gymId) {
-    // TODO: implement add
-    throw UnimplementedError();
+  final AppBloc bloc;
+  final _gymListSubject = BehaviorSubject<List<FavoriteGymMixin>>();
+  CloudFavoriteGymList(this.bloc) {
+    //TODO: get list from user's doc
   }
 
   @override
-  Future<void> delete(String gymId) {
-    // TODO: implement delete
-    throw UnimplementedError();
+  void dispost() {
+    _gymListSubject.close();
+  }
+
+  @override
+  Future<void> add(String gymId) async {
+    await APIServices.instances.patch(
+      '/me/favorites/gyms',
+      body: {
+        'gyms',
+        [gymId]
+      },
+      token: await bloc.getIdToken(),
+    );
+  }
+
+  @override
+  Future<void> delete(String gymId) async {
+    await APIServices.instances.delete(
+      '/me/favorites/gyms/$gymId',
+      token: await bloc.getIdToken(),
+    );
   }
 
   @override
   FavoriteGymMixin getGym(String gymId) {
-    // TODO: implement getGym
-    throw UnimplementedError();
+    if (_gymListSubject.valueWrapper == null) {
+      return null;
+    }
+    return _gymListSubject.valueWrapper.value
+        .firstWhere((e) => e.id == gymId, orElse: () => null);
   }
 
   @override
   bool isFavorite(String gymId) {
-    // TODO: implement isFavorite
-    throw UnimplementedError();
+    return getGym(gymId) != null;
   }
 
   @override
-  // TODO: implement onListUpdate
-  Stream<List<FavoriteGymMixin>> get onListUpdate => throw UnimplementedError();
-  
+  Stream<List<FavoriteGymMixin>> get onListUpdate => _gymListSubject;
 }
