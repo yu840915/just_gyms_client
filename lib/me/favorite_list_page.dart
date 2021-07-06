@@ -29,15 +29,31 @@ class _FavoriteListPageState extends State<FavoriteListPage> {
     list = FavoriteDetailList(bloc.favoriteGymList, bloc.location);
   }
 
+  void _syncWithLocal(BuildContext context) {
+    //TODO: Login check
+    //TODO: call sync on login
+  }
+
   @override
   Widget build(BuildContext context) {
+    AppBloc bloc = BlocProvider.of(context);
     return Scaffold(
       appBar: AppBarFactory.appBar(
         title: Text(
           '收藏',
           style: TextStyles.large.title,
         ),
-        actions: [],
+        actions: [
+          if (!bloc.isLoggedIn)
+            TextButton(
+                onPressed: () {
+                  _syncWithLocal(context);
+                },
+                child: Text(
+                  '同步Ｆ',
+                  style: TextStyles.large.title,
+                ))
+        ],
       ),
       body: StreamBuilder<List<FavoriteGymDetail>>(
           stream: list.onUpdate,

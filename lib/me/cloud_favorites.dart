@@ -5,6 +5,7 @@ import 'package:rxdart/subjects.dart';
 import 'package:where_gym/api_services/api_services.dart';
 import 'package:where_gym/app_bloc.dart';
 import 'package:where_gym/me/favorites.dart';
+import 'package:where_gym/me/local_favorites.dart';
 
 class CloudFavoriteGym implements FavoriteGymMixin {
   @override
@@ -71,6 +72,14 @@ class CloudFavoriteGymList implements FavoriteGymList {
 
   @override
   Stream<List<FavoriteGymMixin>> get onListUpdate => _gymListSubject;
+
+  Future syncWithLocalList(LocalFavoriteGymList list) async {
+    await APIServices.instances.patch(
+      '/me/favorites/gyms',
+      body: {'gyms', list.records.map((e) => e.id).toList()},
+      token: await bloc.getIdToken(),
+    );
+  }
 }
 
 class CloudFavorites {
