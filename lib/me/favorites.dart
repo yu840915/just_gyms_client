@@ -1,8 +1,5 @@
 mixin FavoriteGymMixin {
-  String get id;
-  DateTime get addedAt;
-  DateTime get lastContactedAt;
-  int get contactCount;
+  String get id;  
 }
 
 abstract class FavoriteGymList {

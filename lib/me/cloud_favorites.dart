@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:rxdart/subjects.dart';
 import 'package:where_gym/api_services/api_services.dart';
@@ -6,34 +8,30 @@ import 'package:where_gym/me/favorites.dart';
 
 class CloudFavoriteGym implements FavoriteGymMixin {
   @override
-  final DateTime addedAt;
-
-  @override
-  final int contactCount;
-
-  @override
   final String id;
 
-  @override
-  final DateTime lastContactedAt;
-
-  CloudFavoriteGym.fromMap(this.id, Map map)
-      : addedAt = (map['addedAt'] as Timestamp).toDate(),
-        contactCount = map['contactCount'] ?? 0,
-        lastContactedAt = map['lastContactedAt'] != null
-            ? (map['lastContactedAt'] as Timestamp).toDate()
-            : null;
+  CloudFavoriteGym(this.id);
 }
 
 class CloudFavoriteGymList implements FavoriteGymList {
   final AppBloc bloc;
   final _gymListSubject = BehaviorSubject<List<FavoriteGymMixin>>();
+  StreamSubscription _subscription;
   CloudFavoriteGymList(this.bloc) {
-    //TODO: get list from user's doc
+    _subscription = FirebaseFirestore.instance
+        .collection('Favorites')
+        .doc(bloc.userRef.id)
+        .snapshots()
+        .map((event) => CloudFavorites.fromMap(event.data())
+            .gyms
+            .map((e) => CloudFavoriteGym(e))
+            .toList())
+        .listen(_gymListSubject.add);
   }
 
   @override
   void dispost() {
+    _subscription.cancel();
     _gymListSubject.close();
   }
 
@@ -73,4 +71,10 @@ class CloudFavoriteGymList implements FavoriteGymList {
 
   @override
   Stream<List<FavoriteGymMixin>> get onListUpdate => _gymListSubject;
+}
+
+class CloudFavorites {
+  final List<String> gyms;
+  CloudFavorites.fromMap(Map map)
+      : gyms = map['gyms'] != null ? List<String>.from(map['gyms']) : [];
 }

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -17,6 +18,9 @@ class AppBloc extends Bloc<dynamic, AppPhase> {
   final FavoriteGymList favoriteGymList;
   final CurrentLocation location;
   final _subscriptions = List<StreamSubscription>.empty(growable: true);
+  DocumentReference get userRef => isLoggedIn
+      ? FirebaseFirestore.instance.collection('users').doc(_firebaseUser.uid)
+      : null;
   AppBloc(initialState, {@required InitializedProducts initializedProducts})
       : _firebaseUser = initializedProducts.userCredential.user,
         favoriteGymList = initializedProducts.favoriteGymList,

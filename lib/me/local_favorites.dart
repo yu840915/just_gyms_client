@@ -28,9 +28,13 @@ class LocalFavoriteGymList implements FavoriteGymList {
     return LocalFavoriteGymList(await DataStore.createWithName('favorites'));
   }
 
+  @override
+  void dispost() {
+    _list.close();
+  }
+
   List<FavoriteGym> get records => List<FavoriteGym>.from(dataStore.box.values);
   void _updateList() {
-    print(records);
     _list.add(records);
   }
 
