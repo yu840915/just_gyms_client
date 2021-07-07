@@ -8,5 +8,5 @@ abstract class FavoriteGymList {
   Future<void> delete(String gymId);
   FavoriteGymMixin getGym(String gymId);
   bool isFavorite(String gymId);
-  void dispost();
+  void dispose();
 }

@@ -7,6 +7,7 @@ import 'package:where_gym/app_bloc.dart';
 import 'package:where_gym/distance_format.dart';
 import 'package:where_gym/gym.dart';
 import 'package:where_gym/gym_detail_page.dart';
+import 'package:where_gym/login/loginCheckFlow.dart';
 import 'package:where_gym/map_view/open_hour_indicator.dart';
 import 'package:where_gym/me/favorite_detail_list.dart';
 import 'package:where_gym/price_format.dart';
@@ -27,11 +28,34 @@ class _FavoriteListPageState extends State<FavoriteListPage> {
     super.initState();
     AppBloc bloc = BlocProvider.of(context);
     list = FavoriteDetailList(bloc.favoriteGymList, bloc.location);
+    
   }
 
-  void _syncWithLocal(BuildContext context) {
-    //TODO: Login check
-    //TODO: call sync on login
+  void _syncWithLocalIfLoggedIn(BuildContext context) async {
+    final isLoggedIn =
+        await LoginCheckFlow.check(context, where: 'syncFavoriteGyms');
+    if (isLoggedIn == null || !isLoggedIn) {
+      return;
+    }
+    await Future.delayed(Duration.zero, () {
+      _syncWithLocal(context);
+    });
+  }
+
+  void _syncWithLocal(BuildContext context) async {
+    try {
+      AppBloc bloc = BlocProvider.of(context);
+      await bloc.syncFavoriteGyms();
+    } catch (e) {
+      showDialog(
+        context: context,
+        builder: (context) => AlertFactory.actionAlert(
+          context,
+          message: e.toString(),
+          actions: null,
+        ),
+      );
+    }
   }
 
   @override
@@ -47,10 +71,10 @@ class _FavoriteListPageState extends State<FavoriteListPage> {
           if (!bloc.isLoggedIn)
             TextButton(
                 onPressed: () {
-                  _syncWithLocal(context);
+                  _syncWithLocalIfLoggedIn(context);
                 },
                 child: Text(
-                  '同步Ｆ',
+                  '同步',
                   style: TextStyles.large.title,
                 ))
         ],

@@ -31,7 +31,7 @@ class CloudFavoriteGymList implements FavoriteGymList {
   }
 
   @override
-  void dispost() {
+  void dispose() {
     _subscription.cancel();
     _gymListSubject.close();
   }

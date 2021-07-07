@@ -14,7 +14,7 @@ class AlertFactory {
             Navigator.pop(context, false);
           },
         ),
-        ...actions
+        if (actions != null) ...actions
       ],
     );
   }

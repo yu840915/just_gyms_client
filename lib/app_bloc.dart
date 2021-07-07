@@ -9,13 +9,18 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:where_gym/current_location.dart';
 import 'package:where_gym/initialization.dart';
 import 'package:where_gym/intro/permission_checker.dart';
+import 'package:where_gym/me/cloud_favorites.dart';
 import 'package:where_gym/me/favorites.dart';
+import 'package:where_gym/me/local_favorites.dart';
 
 class AppBloc extends Bloc<dynamic, AppPhase> {
   final _hasFinishedIntroKey = 'hasFinishedIntro';
   final permissionChecker = PermissionChecker();
   User _firebaseUser;
-  final FavoriteGymList favoriteGymList;
+  FavoriteGymList get favoriteGymList =>
+      _cloudFavoriteGymList ?? _localFavoriteGymList;
+  final LocalFavoriteGymList _localFavoriteGymList;
+  CloudFavoriteGymList _cloudFavoriteGymList;
   final CurrentLocation location;
   final _subscriptions = List<StreamSubscription>.empty(growable: true);
   DocumentReference get userRef => isLoggedIn
@@ -23,7 +28,7 @@ class AppBloc extends Bloc<dynamic, AppPhase> {
       : null;
   AppBloc(initialState, {@required InitializedProducts initializedProducts})
       : _firebaseUser = initializedProducts.userCredential.user,
-        favoriteGymList = initializedProducts.favoriteGymList,
+        _localFavoriteGymList = initializedProducts.favoriteGymList,
         location = initializedProducts.location,
         super(initialState) {
     _checkPermission();
@@ -42,7 +47,12 @@ class AppBloc extends Bloc<dynamic, AppPhase> {
   void _handleUserUpdate(User user) {
     if (user == null) {
       _firebaseUser = null;
+      _cloudFavoriteGymList?.dispose();
+      _cloudFavoriteGymList = null;
       return;
+    }
+    if (!user.isAnonymous) {
+      _cloudFavoriteGymList = CloudFavoriteGymList(this);
     }
     _firebaseUser = user;
   }
@@ -68,6 +78,10 @@ class AppBloc extends Bloc<dynamic, AppPhase> {
   }
 
   Future<String> getIdToken() => _firebaseUser?.getIdToken();
+
+  Future syncFavoriteGyms() async {
+    await _cloudFavoriteGymList?.syncWithLocalList(_localFavoriteGymList);
+  }
 
   @override
   Stream<AppPhase> mapEventToState(event) async* {
