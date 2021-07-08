@@ -20,13 +20,15 @@ class CloudFavoriteGymList implements FavoriteGymList {
   StreamSubscription _subscription;
   CloudFavoriteGymList(this.bloc) {
     _subscription = FirebaseFirestore.instance
-        .collection('Favorites')
+        .collection('favorites')
         .doc(bloc.userRef.id)
         .snapshots()
-        .map((event) => CloudFavorites.fromMap(event.data())
-            .gyms
-            .map((e) => CloudFavoriteGym(e))
-            .toList())
+        .map((event) => !event.exists
+            ? []
+            : CloudFavorites.fromMap(event.data())
+                .gyms
+                .map((e) => CloudFavoriteGym(e))
+                .toList())
         .listen(_gymListSubject.add);
   }
 
@@ -76,7 +78,7 @@ class CloudFavoriteGymList implements FavoriteGymList {
   Future syncWithLocalList(LocalFavoriteGymList list) async {
     await APIServices.instances.patch(
       '/me/favorites/gyms',
-      body: {'gyms', list.records.map((e) => e.id).toList()},
+      body: {'gyms': list.records.map((e) => e.id).toList()},
       token: await bloc.getIdToken(),
     );
   }

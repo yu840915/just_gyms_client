@@ -1,7 +1,16 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:where_gym/login/authenticators.dart';
 
 class LoginPage extends StatelessWidget {
+  void _performSignIn(Future<UserCredential> task) async {
+    try {
+      await task;
+    } catch (e) {
+      print(e);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -27,8 +36,8 @@ class LoginPage extends StatelessWidget {
 
   Widget _buildFBButton(BuildContext context) {
     return TextButton(
-        onPressed: () async {
-          await Authenticators.signInWithFacebook();
+        onPressed: () {
+          _performSignIn(Authenticators.signInWithFacebook());
         },
         child: Text('Facebook'));
   }
@@ -36,7 +45,7 @@ class LoginPage extends StatelessWidget {
   Widget _buildGoogleButton(BuildContext context) {
     return TextButton(
         onPressed: () async {
-          await Authenticators.signInWithGoogle();
+          _performSignIn(Authenticators.signInWithGoogle());
         },
         child: Text('Google'));
   }
@@ -44,7 +53,7 @@ class LoginPage extends StatelessWidget {
   Widget _buildAppleButton(BuildContext context) {
     return TextButton(
         onPressed: () async {
-          await Authenticators.signInWithApple();
+          _performSignIn(Authenticators.signInWithApple());
         },
         child: Text('Apple'));
   }

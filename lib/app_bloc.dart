@@ -51,10 +51,10 @@ class AppBloc extends Bloc<dynamic, AppPhase> {
       _cloudFavoriteGymList = null;
       return;
     }
+    _firebaseUser = user;
     if (!user.isAnonymous) {
       _cloudFavoriteGymList = CloudFavoriteGymList(this);
     }
-    _firebaseUser = user;
   }
 
   void _checkPermission() async {
