@@ -1,36 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg width="18px" height="18px" viewBox="0 0 18 18" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
     <title>Shape</title>
-    <defs>
-        <rect id="path-1" x="0" y="0" width="185" height="40" rx="2"></rect>
-        <filter x="-2.2%" y="-10.0%" width="104.3%" height="125.0%" filterUnits="objectBoundingBox" id="filter-2">
-            <feOffset dx="0" dy="2" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
-            <feGaussianBlur stdDeviation="1" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
-            <feColorMatrix values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.24 0" type="matrix" in="shadowBlurOuter1" result="shadowMatrixOuter1"></feColorMatrix>
-            <feOffset dx="0" dy="0" in="SourceAlpha" result="shadowOffsetOuter2"></feOffset>
-            <feGaussianBlur stdDeviation="1" in="shadowOffsetOuter2" result="shadowBlurOuter2"></feGaussianBlur>
-            <feColorMatrix values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.12 0" type="matrix" in="shadowBlurOuter2" result="shadowMatrixOuter2"></feColorMatrix>
-            <feMerge>
-                <feMergeNode in="shadowMatrixOuter1"></feMergeNode>
-                <feMergeNode in="shadowMatrixOuter2"></feMergeNode>
-            </feMerge>
-        </filter>
-    </defs>
-    <g id="Google-Button" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="BUTTONS-WITH-TEXT" transform="translate(-257.000000, -170.000000)"></g>
-        <g id="btn_google_signin_light_focus_web" transform="translate(-15.000000, -15.000000)">
-            <rect id="Rectangle-14" fill-opacity="0.3" fill="#4285F4" x="1" y="1" width="191" height="46"></rect>
-            <g id="button-bg" transform="translate(4.000000, 4.000000)">
-                <use fill="black" fill-opacity="1" filter="url(#filter-2)" xlink:href="#path-1"></use>
-                <use fill="#FFFFFF" fill-rule="evenodd" xlink:href="#path-1"></use>
-            </g>
-            <g id="logo_googleg_48dp" transform="translate(15.000000, 15.000000)">
-                <path d="M17.64,9.20454545 C17.64,8.56636364 17.5827273,7.95272727 17.4763636,7.36363636 L9,7.36363636 L9,10.845 L13.8436364,10.845 C13.635,11.97 13.0009091,12.9231818 12.0477273,13.5613636 L12.0477273,15.8195455 L14.9563636,15.8195455 C16.6581818,14.2527273 17.64,11.9454545 17.64,9.20454545 L17.64,9.20454545 Z" id="Shape" fill="#4285F4"></path>
-                <path d="M9,18 C11.43,18 13.4672727,17.1940909 14.9563636,15.8195455 L12.0477273,13.5613636 C11.2418182,14.1013636 10.2109091,14.4204545 9,14.4204545 C6.65590909,14.4204545 4.67181818,12.8372727 3.96409091,10.71 L0.957272727,10.71 L0.957272727,13.0418182 C2.43818182,15.9831818 5.48181818,18 9,18 L9,18 Z" id="Shape" fill="#34A853"></path>
-                <path d="M3.96409091,10.71 C3.78409091,10.17 3.68181818,9.59318182 3.68181818,9 C3.68181818,8.40681818 3.78409091,7.83 3.96409091,7.29 L3.96409091,4.95818182 L0.957272727,4.95818182 C0.347727273,6.17318182 0,7.54772727 0,9 C0,10.4522727 0.347727273,11.8268182 0.957272727,13.0418182 L3.96409091,10.71 L3.96409091,10.71 Z" id="Shape" fill="#FBBC05"></path>
-                <path d="M9,3.57954545 C10.3213636,3.57954545 11.5077273,4.03363636 12.4404545,4.92545455 L15.0218182,2.34409091 C13.4631818,0.891818182 11.4259091,0 9,0 C5.48181818,0 2.43818182,2.01681818 0.957272727,4.95818182 L3.96409091,7.29 C4.67181818,5.16272727 6.65590909,3.57954545 9,3.57954545 L9,3.57954545 Z" id="Shape" fill="#EA4335"></path>
-                <polygon id="Shape" points="0 0 18 0 18 18 0 18"></polygon>
-            </g>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="12.9″-iPad-Pro" transform="translate(-15.000000, -15.000000)">
+            <path d="M32.64,24.2045455 C32.64,23.5663636 32.5827273,22.9527273 32.4763636,22.3636364 L24,22.3636364 L24,25.845 L28.8436364,25.845 C28.635,26.97 28.0009091,27.9231818 27.0477273,28.5613636 L27.0477273,30.8195455 L29.9563636,30.8195455 C31.6581818,29.2527273 32.64,26.9454545 32.64,24.2045455 L32.64,24.2045455 Z" id="Shape" fill="#4285F4"></path>
+            <path d="M24,33 C26.43,33 28.4672727,32.1940909 29.9563636,30.8195455 L27.0477273,28.5613636 C26.2418182,29.1013636 25.2109091,29.4204545 24,29.4204545 C21.6559091,29.4204545 19.6718182,27.8372727 18.9640909,25.71 L15.9572727,25.71 L15.9572727,28.0418182 C17.4381818,30.9831818 20.4818182,33 24,33 L24,33 Z" id="Shape" fill="#34A853"></path>
+            <path d="M18.9640909,25.71 C18.7840909,25.17 18.6818182,24.5931818 18.6818182,24 C18.6818182,23.4068182 18.7840909,22.83 18.9640909,22.29 L18.9640909,19.9581818 L15.9572727,19.9581818 C15.3477273,21.1731818 15,22.5477273 15,24 C15,25.4522727 15.3477273,26.8268182 15.9572727,28.0418182 L18.9640909,25.71 L18.9640909,25.71 Z" id="Shape" fill="#FBBC05"></path>
+            <path d="M24,18.5795455 C25.3213636,18.5795455 26.5077273,19.0336364 27.4404545,19.9254545 L30.0218182,17.3440909 C28.4631818,15.8918182 26.4259091,15 24,15 C20.4818182,15 17.4381818,17.0168182 15.9572727,19.9581818 L18.9640909,22.29 C19.6718182,20.1627273 21.6559091,18.5795455 24,18.5795455 L24,18.5795455 Z" id="Shape" fill="#EA4335"></path>
+            <polygon id="Shape" points="15 15 33 15 33 33 15 33"></polygon>
         </g>
     </g>
 </svg>

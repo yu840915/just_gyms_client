@@ -1,6 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:where_gym/configs.dart';
 import 'package:where_gym/gen/assets.gen.dart';
 import 'package:where_gym/login/authenticators.dart';
 import 'package:where_gym/shared_appearances.dart';
@@ -9,6 +12,14 @@ class LoginPage extends StatelessWidget {
   void _performSignIn(Future<UserCredential> task) async {
     try {
       await task;
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  void _openLink(String link) async {
+    try {
+      await launch(link);
     } catch (e) {
       print(e);
     }
@@ -33,6 +44,8 @@ class LoginPage extends StatelessWidget {
                 _buildFBButton(context),
                 SizedBox(height: 12),
                 _buildGoogleButton(context),
+                SizedBox(height: 24),
+                _buildPolicy(context),
               ],
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -50,7 +63,7 @@ class LoginPage extends StatelessWidget {
         textStyle: TextStyles.large.action,
         side: BorderSide(color: color),
         primary: color,
-        minimumSize: Size(double.infinity, 40),
+        minimumSize: Size(double.infinity, 44),
       ),
       onPressed: () {
         _performSignIn(Authenticators.signInWithFacebook());
@@ -61,6 +74,7 @@ class LoginPage extends StatelessWidget {
           SizedBox(width: 24),
           Text('使用 Facebook 登入')
         ],
+        mainAxisAlignment: MainAxisAlignment.center,
       ),
     );
   }
@@ -72,7 +86,7 @@ class LoginPage extends StatelessWidget {
         textStyle: TextStyles.large.action,
         side: BorderSide(color: color),
         primary: color,
-        minimumSize: Size(double.infinity, 40),
+        minimumSize: Size(double.infinity, 44),
       ),
       onPressed: () async {
         _performSignIn(Authenticators.signInWithGoogle());
@@ -83,6 +97,7 @@ class LoginPage extends StatelessWidget {
           SizedBox(width: 24),
           Text('使用 Google 登入')
         ],
+        mainAxisAlignment: MainAxisAlignment.center,
       ),
     );
   }
@@ -94,7 +109,7 @@ class LoginPage extends StatelessWidget {
         textStyle: TextStyles.large.action,
         side: BorderSide(color: color),
         primary: color,
-        minimumSize: Size(double.infinity, 40),
+        minimumSize: Size(double.infinity, 44),
       ),
       onPressed: () async {
         _performSignIn(Authenticators.signInWithApple());
@@ -105,7 +120,44 @@ class LoginPage extends StatelessWidget {
           SizedBox(width: 24),
           Text('使用 Apple 登入')
         ],
+        mainAxisAlignment: MainAxisAlignment.center,
       ),
+    );
+  }
+
+  Widget _buildPolicy(BuildContext context) {
+    final normal = TextStyle(
+      fontSize: 12,
+      color: Colors.black54,
+      fontWeight: FontWeight.w300,
+    );
+    final link = normal.copyWith(
+      color: Colors.black,
+      fontWeight: FontWeight.w500,
+    );
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 40),
+      child: RichText(
+          textAlign: TextAlign.center,
+          text: TextSpan(children: [
+            TextSpan(text: '請先詳細閱讀', style: normal),
+            TextSpan(
+                text: '服務條款',
+                style: link,
+                recognizer: TapGestureRecognizer()
+                  ..onTap = () {
+                    _openLink(Configs.instance.tosLink);
+                  }),
+            TextSpan(text: '及', style: normal),
+            TextSpan(
+                text: '隱私權政策',
+                style: link,
+                recognizer: TapGestureRecognizer()
+                  ..onTap = () {
+                    _openLink(Configs.instance.ppLink);
+                  }),
+            TextSpan(text: '。開始使用即代表閣下已同意上述政策。', style: normal),
+          ])),
     );
   }
 }
