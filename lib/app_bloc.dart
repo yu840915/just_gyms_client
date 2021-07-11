@@ -29,7 +29,7 @@ class AppBloc extends Bloc<dynamic, AppPhase> {
   DocumentReference get userRef => _userRefSubject.valueWrapper?.value;
   Stream<DocumentReference> get onUserRefChange => _userRefSubject;
   AppBloc(initialState, {@required InitializedProducts initializedProducts})
-      : _firebaseUser = initializedProducts.userCredential.user,
+      : _firebaseUser = initializedProducts.user,
         _localFavoriteGymList = initializedProducts.favoriteGymList,
         location = initializedProducts.location,
         super(initialState) {
@@ -63,10 +63,10 @@ class AppBloc extends Bloc<dynamic, AppPhase> {
     }
     _firebaseUser = user;
     if (!user.isAnonymous) {
-      _cloudFavoriteGymList = CloudFavoriteGymList(this);
-      _userRefSubject.add(FirebaseFirestore.instance
-          .collection('users')
-          .doc(_firebaseUser.uid));
+      _cloudFavoriteGymList = CloudFavoriteGymList(this, user);
+      _userRefSubject.add(
+        FirebaseFirestore.instance.collection('users').doc(user.uid),
+      );
     }
   }
 

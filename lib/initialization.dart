@@ -10,7 +10,11 @@ import 'package:where_gym/me/local_favorites.dart';
 class Initialization {
   static Future<InitializedProducts> initialize() async {
     final firebaseApp = await Firebase.initializeApp();
-    final cred = await FirebaseAuth.instance.signInAnonymously();
+    User user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      final cred = await FirebaseAuth.instance.signInAnonymously();
+      user = cred.user;
+    }
     final dir = await getApplicationDocumentsDirectory();
     Hive
       ..init(dir.path)
@@ -21,7 +25,7 @@ class Initialization {
     final location = await CurrentLocation.create();
     return InitializedProducts(
         firebaseApp: firebaseApp,
-        userCredential: cred,
+        user: user,
         favoriteGymList: favorites,
         location: location);
   }
@@ -29,12 +33,12 @@ class Initialization {
 
 class InitializedProducts {
   final FirebaseApp firebaseApp;
-  final UserCredential userCredential;
+  final User user;
   final LocalFavoriteGymList favoriteGymList;
   final CurrentLocation location;
   InitializedProducts({
     @required this.firebaseApp,
-    @required this.userCredential,
+    @required this.user,
     @required this.favoriteGymList,
     @required this.location,
   });

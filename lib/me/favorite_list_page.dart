@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
@@ -22,13 +25,26 @@ class FavoriteListPage extends StatefulWidget {
 
 class _FavoriteListPageState extends State<FavoriteListPage> {
   FavoriteDetailList list;
+  StreamSubscription _subscription;
 
   @override
   void initState() {
     super.initState();
     AppBloc bloc = BlocProvider.of(context);
+    _subscription = bloc.onUserRefChange.listen((event) {
+      setState(() {
+        list.dispose();
+        list = FavoriteDetailList(bloc.favoriteGymList, bloc.location);
+      });
+    });
     list = FavoriteDetailList(bloc.favoriteGymList, bloc.location);
-    
+  }
+
+  @override
+  void dispose() {
+    _subscription.cancel();
+    list.dispose();
+    super.dispose();
   }
 
   void _syncWithLocalIfLoggedIn(BuildContext context) async {
@@ -68,15 +84,22 @@ class _FavoriteListPageState extends State<FavoriteListPage> {
           style: TextStyles.large.title,
         ),
         actions: [
-          if (!bloc.isLoggedIn)
-            TextButton(
-                onPressed: () {
-                  _syncWithLocalIfLoggedIn(context);
-                },
-                child: Text(
-                  '同步',
-                  style: TextStyles.large.title,
-                ))
+          StreamBuilder<DocumentReference>(
+            stream: bloc.onUserRefChange,
+            builder: (context, snapshot) {
+              if (bloc.isLoggedIn) {
+                return SizedBox();
+              }
+              return TextButton(
+                  onPressed: () {
+                    _syncWithLocalIfLoggedIn(context);
+                  },
+                  child: Text(
+                    '同步',
+                    style: TextStyles.large.title,
+                  ));
+            },
+          )
         ],
       ),
       body: StreamBuilder<List<FavoriteGymDetail>>(
