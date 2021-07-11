@@ -100,11 +100,14 @@ class CurrentLocation {
   }
 
   void _recordLocation(Position pos) {
-    dataStore.putValue(
-        _lastLocationKey,
-        LocationRecord()
-          ..latitude = pos.latitude
-          ..longitude = pos.longitude);
+    LocationRecord loc = dataStore.getValue(_lastLocationKey);
+    if (loc == null) {
+      loc = LocationRecord();
+    }
+    loc
+      ..latitude = pos.latitude
+      ..longitude = pos.longitude;
+    dataStore.putValue(_lastLocationKey, loc);
   }
 
   num metersFrom(Gym gym) {

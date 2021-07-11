@@ -1,25 +1,73 @@
+import 'dart:async';
+import 'dart:ffi';
+
 import 'package:bloc/bloc.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:rxdart/subjects.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:where_gym/current_location.dart';
 import 'package:where_gym/initialization.dart';
 import 'package:where_gym/intro/permission_checker.dart';
+import 'package:where_gym/me/cloud_favorites.dart';
 import 'package:where_gym/me/favorites.dart';
+import 'package:where_gym/me/local_favorites.dart';
 
 class AppBloc extends Bloc<dynamic, AppPhase> {
   final _hasFinishedIntroKey = 'hasFinishedIntro';
   final permissionChecker = PermissionChecker();
-  final UserCredential _userCredential;
-  final FavoriteGymList favoriteGymList;
+  User _firebaseUser;
+  FavoriteGymList get favoriteGymList =>
+      _cloudFavoriteGymList ?? _localFavoriteGymList;
+  final LocalFavoriteGymList _localFavoriteGymList;
+  CloudFavoriteGymList _cloudFavoriteGymList;
   final CurrentLocation location;
+  final _subscriptions = List<StreamSubscription>.empty(growable: true);
+  final _userRefSubject = BehaviorSubject<DocumentReference>();
+  DocumentReference get userRef => _userRefSubject.valueWrapper?.value;
+  Stream<DocumentReference> get onUserRefChange => _userRefSubject;
   AppBloc(initialState, {@required InitializedProducts initializedProducts})
-      : _userCredential = initializedProducts.userCredential,
-        favoriteGymList = initializedProducts.favoriteGymList,
+      : _firebaseUser = initializedProducts.user,
+        _localFavoriteGymList = initializedProducts.favoriteGymList,
         location = initializedProducts.location,
         super(initialState) {
     _checkPermission();
+    _subscribeEvents();
+  }
+
+  void dispose() {
+    _userRefSubject.close();
+    _subscriptions.forEach((element) {
+      element.cancel();
+    });
+  }
+
+  bool get isLoggedIn =>
+      _firebaseUser == null ? false : !_firebaseUser.isAnonymous;
+
+  void _subscribeEvents() {
+    _subscriptions.add(FirebaseAuth.instance.authStateChanges().listen((event) {
+      _handleUserUpdate(event);
+    }));
+  }
+
+  void _handleUserUpdate(User user) {
+    if (user == null) {
+      _firebaseUser = null;
+      _cloudFavoriteGymList?.dispose();
+      _cloudFavoriteGymList = null;
+      _userRefSubject.add(null);
+      return;
+    }
+    _firebaseUser = user;
+    if (!user.isAnonymous) {
+      _cloudFavoriteGymList = CloudFavoriteGymList(this, user);
+      _userRefSubject.add(
+        FirebaseFirestore.instance.collection('users').doc(user.uid),
+      );
+    }
   }
 
   void _checkPermission() async {
@@ -42,7 +90,11 @@ class AppBloc extends Bloc<dynamic, AppPhase> {
     });
   }
 
-  Future<String> getIdToken() => _userCredential.user.getIdToken();
+  Future<String> getIdToken() => _firebaseUser?.getIdToken();
+
+  Future syncFavoriteGyms() async {
+    await _cloudFavoriteGymList?.syncWithLocalList(_localFavoriteGymList);
+  }
 
   @override
   Stream<AppPhase> mapEventToState(event) async* {

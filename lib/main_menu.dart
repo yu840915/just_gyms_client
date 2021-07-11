@@ -1,12 +1,46 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:where_gym/alert_factory.dart';
+import 'package:where_gym/app_bloc.dart';
 import 'package:where_gym/configs.dart';
+import 'package:where_gym/login/authenticators.dart';
 import 'package:where_gym/me/favorite_list_page.dart';
 import 'package:where_gym/shared_appearances.dart';
 
 class MainMenu extends StatelessWidget {
+  void _logout(BuildContext context) async {
+    try {
+      final logout = await showDialog(
+        context: context,
+        builder: (context) => AlertFactory.actionAlert(
+          context,  
+          title: '是否要登出？',
+          actions: [
+            PlatformDialogAction(
+              child: Text('登出'),
+              onPressed: () {
+                Navigator.pop(context, true);
+              },
+            )
+          ],
+        ),
+      );
+      if (logout != null && logout) {
+        await Authenticators.logOut();
+      }
+    } catch (e) {
+      showDialog(
+        context: context,
+        builder: (builder) => AlertFactory.errorAlert(context, error: e),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    AppBloc bloc = BlocProvider.of(context);
     return PopupMenuButton<_MenuItem>(
       itemBuilder: (context) {
         return [
@@ -14,6 +48,7 @@ class MainMenu extends StatelessWidget {
           _buildItem('服務條款', _MenuItem.tos),
           _buildItem('隱私權政策', _MenuItem.pp),
           _buildItem('聯絡我們', _MenuItem.contactUs),
+          if (bloc.isLoggedIn) _buildItem('登出', _MenuItem.logOut),
         ];
       },
       icon: Container(
@@ -30,7 +65,7 @@ class MainMenu extends StatelessWidget {
         height: 40,
       ),
       iconSize: 40,
-      onSelected: (item) {
+      onSelected: (item) async {
         switch (item) {
           case _MenuItem.favorites:
             _showFavorites(context);
@@ -43,6 +78,9 @@ class MainMenu extends StatelessWidget {
             break;
           case _MenuItem.contactUs:
             launch(Configs.instance.contactLink, forceWebView: false);
+            break;
+          case _MenuItem.logOut:
+            _logout(context);
             break;
         }
       },
@@ -67,4 +105,5 @@ enum _MenuItem {
   tos,
   pp,
   contactUs,
+  logOut,
 }

@@ -9,6 +9,9 @@ import 'package:flutter/widgets.dart';
 class $AssetsImagesGen {
   const $AssetsImagesGen();
 
+  String get appleLogo => 'assets/images/apple_logo.svg';
+  String get facebookLogo => 'assets/images/facebook_logo.svg';
+  String get googleLogo => 'assets/images/google_logo.svg';
   AssetGenImage get wait => const AssetGenImage('assets/images/wait.jpg');
 }
 

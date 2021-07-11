@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
@@ -7,9 +10,9 @@ import 'package:where_gym/app_bloc.dart';
 import 'package:where_gym/distance_format.dart';
 import 'package:where_gym/gym.dart';
 import 'package:where_gym/gym_detail_page.dart';
+import 'package:where_gym/login/loginCheckFlow.dart';
 import 'package:where_gym/map_view/open_hour_indicator.dart';
 import 'package:where_gym/me/favorite_detail_list.dart';
-import 'package:where_gym/me/favorites.dart';
 import 'package:where_gym/price_format.dart';
 import 'package:where_gym/shared_appearances.dart';
 import 'package:where_gym/tracking/event_names.dart';
@@ -22,22 +25,83 @@ class FavoriteListPage extends StatefulWidget {
 
 class _FavoriteListPageState extends State<FavoriteListPage> {
   FavoriteDetailList list;
+  StreamSubscription _subscription;
 
   @override
   void initState() {
     super.initState();
     AppBloc bloc = BlocProvider.of(context);
+    _subscription = bloc.onUserRefChange.listen((event) {
+      setState(() {
+        list.dispose();
+        list = FavoriteDetailList(bloc.favoriteGymList, bloc.location);
+      });
+    });
     list = FavoriteDetailList(bloc.favoriteGymList, bloc.location);
   }
 
   @override
+  void dispose() {
+    _subscription.cancel();
+    list.dispose();
+    super.dispose();
+  }
+
+  void _syncWithLocalIfLoggedIn(BuildContext context) async {
+    final isLoggedIn =
+        await LoginCheckFlow.check(context, where: 'syncFavoriteGyms');
+    if (isLoggedIn == null || !isLoggedIn) {
+      return;
+    }
+    await Future.delayed(Duration.zero, () {
+      _syncWithLocal(context);
+    });
+  }
+
+  void _syncWithLocal(BuildContext context) async {
+    try {
+      AppBloc bloc = BlocProvider.of(context);
+      await bloc.syncFavoriteGyms();
+    } catch (e) {
+      showDialog(
+        context: context,
+        builder: (context) => AlertFactory.actionAlert(
+          context,
+          message: e.toString(),
+          actions: null,
+        ),
+      );
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    AppBloc bloc = BlocProvider.of(context);
     return Scaffold(
       appBar: AppBarFactory.appBar(
-          title: Text(
-        '收藏',
-        style: TextStyles.large.title,
-      )),
+        title: Text(
+          '收藏',
+          style: TextStyles.large.title,
+        ),
+        actions: [
+          StreamBuilder<DocumentReference>(
+            stream: bloc.onUserRefChange,
+            builder: (context, snapshot) {
+              if (bloc.isLoggedIn) {
+                return SizedBox();
+              }
+              return TextButton(
+                  onPressed: () {
+                    _syncWithLocalIfLoggedIn(context);
+                  },
+                  child: Text(
+                    '同步',
+                    style: TextStyles.large.title,
+                  ));
+            },
+          )
+        ],
+      ),
       body: StreamBuilder<List<FavoriteGymDetail>>(
           stream: list.onUpdate,
           builder: (context, snapshot) {
