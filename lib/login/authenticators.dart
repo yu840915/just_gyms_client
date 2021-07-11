@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'dart:math';
 
 import 'package:crypto/crypto.dart';
@@ -8,8 +9,13 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 class Authenticators {
-  static Future<bool> get isAppleLoginAvailable =>
-      SignInWithApple.isAvailable();
+  static Future<bool> get isAppleLoginAvailable async {
+    if (Platform.isIOS) {
+      return SignInWithApple.isAvailable();
+    }
+    return false;
+  }
+
   static Future<UserCredential> signInWithFacebook() async {
     final AccessToken result = await FacebookAuth.instance.login();
     if (result == null) {
