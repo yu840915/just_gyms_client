@@ -44,8 +44,17 @@ class LoginPage extends StatelessWidget {
                     color: Colors.black, decoration: TextDecoration.none),
               ),
               SizedBox(height: 24),
-              _buildAppleButton(context),
-              SizedBox(height: 12),
+              FutureBuilder(
+                future: Authenticators.isAppleLoginAvailable,
+                builder: (context, snap) => snap.hasData && snap.data
+                    ? Column(
+                        children: [
+                          _buildAppleButton(context),
+                          SizedBox(height: 12),
+                        ],
+                      )
+                    : SizedBox(),
+              ),
               _buildFBButton(context),
               SizedBox(height: 12),
               _buildGoogleButton(context),
@@ -136,10 +145,9 @@ class LoginPage extends StatelessWidget {
       fontWeight: FontWeight.w300,
     );
     final link = normal.copyWith(
-      color: Colors.black,
-      fontWeight: FontWeight.w500,
-      decoration: TextDecoration.underline
-    );
+        color: Colors.black,
+        fontWeight: FontWeight.w500,
+        decoration: TextDecoration.underline);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 40),
       child: RichText(
