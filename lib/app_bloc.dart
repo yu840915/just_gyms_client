@@ -1,9 +1,11 @@
 import 'dart:async';
+import 'dart:ffi';
 
 import 'package:bloc/bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:rxdart/subjects.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:where_gym/current_location.dart';
@@ -23,9 +25,9 @@ class AppBloc extends Bloc<dynamic, AppPhase> {
   CloudFavoriteGymList _cloudFavoriteGymList;
   final CurrentLocation location;
   final _subscriptions = List<StreamSubscription>.empty(growable: true);
-  DocumentReference get userRef => isLoggedIn
-      ? FirebaseFirestore.instance.collection('users').doc(_firebaseUser.uid)
-      : null;
+  final _userRefSubject = BehaviorSubject<DocumentReference>();
+  DocumentReference get userRef => _userRefSubject.valueWrapper?.value;
+  Stream<DocumentReference> get onUserRefChange => _userRefSubject;
   AppBloc(initialState, {@required InitializedProducts initializedProducts})
       : _firebaseUser = initializedProducts.userCredential.user,
         _localFavoriteGymList = initializedProducts.favoriteGymList,
@@ -33,6 +35,13 @@ class AppBloc extends Bloc<dynamic, AppPhase> {
         super(initialState) {
     _checkPermission();
     _subscribeEvents();
+  }
+
+  void dispose() {
+    _userRefSubject.close();
+    _subscriptions.forEach((element) {
+      element.cancel();
+    });
   }
 
   bool get isLoggedIn =>
@@ -49,11 +58,15 @@ class AppBloc extends Bloc<dynamic, AppPhase> {
       _firebaseUser = null;
       _cloudFavoriteGymList?.dispose();
       _cloudFavoriteGymList = null;
+      _userRefSubject.add(null);
       return;
     }
     _firebaseUser = user;
     if (!user.isAnonymous) {
       _cloudFavoriteGymList = CloudFavoriteGymList(this);
+      _userRefSubject.add(FirebaseFirestore.instance
+          .collection('users')
+          .doc(_firebaseUser.uid));
     }
   }
 

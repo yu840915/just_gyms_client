@@ -65,14 +65,10 @@ class Authenticators {
     return await FirebaseAuth.instance.signInWithCredential(oauthCredential);
   }
 
-  Future<void> logOut() async {
-    try {
-      await FirebaseAuth.instance.signOut();
-      await FirebaseAuth.instance.signInAnonymously();
-    } catch (e) {
-      print(e);
-    }
+  static Future<void> logOut() async {
+    await FirebaseAuth.instance.signOut();
+    await FirebaseAuth.instance.signInAnonymously();
   }
 
-  Future<void> disableAndLogOut() async {}
+  static Future<void> disableAndLogOut() async {}
 }

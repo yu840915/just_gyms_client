@@ -3,25 +3,33 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:where_gym/alert_factory.dart';
 import 'package:where_gym/configs.dart';
 import 'package:where_gym/gen/assets.gen.dart';
 import 'package:where_gym/login/authenticators.dart';
 import 'package:where_gym/shared_appearances.dart';
 
 class LoginPage extends StatelessWidget {
-  void _performSignIn(Future<UserCredential> task) async {
+  void _performSignIn(BuildContext context, Future<UserCredential> task) async {
     try {
       await task;
+      Navigator.pop(context);
     } catch (e) {
-      print(e);
+      showDialog(
+        context: context,
+        builder: (context) => AlertFactory.errorAlert(context, error: e),
+      );
     }
   }
 
-  void _openLink(String link) async {
+  void _openLink(BuildContext context, String link) async {
     try {
       await launch(link);
     } catch (e) {
-      print(e);
+      showDialog(
+        context: context,
+        builder: (context) => AlertFactory.errorAlert(context, error: e),
+      );
     }
   }
 
@@ -79,7 +87,7 @@ class LoginPage extends StatelessWidget {
         minimumSize: Size(double.infinity, 44),
       ),
       onPressed: () {
-        _performSignIn(Authenticators.signInWithFacebook());
+        _performSignIn(context, Authenticators.signInWithFacebook());
       },
       child: Row(
         children: [
@@ -102,7 +110,7 @@ class LoginPage extends StatelessWidget {
         minimumSize: Size(double.infinity, 44),
       ),
       onPressed: () async {
-        _performSignIn(Authenticators.signInWithGoogle());
+        _performSignIn(context, Authenticators.signInWithGoogle());
       },
       child: Row(
         children: [
@@ -125,7 +133,7 @@ class LoginPage extends StatelessWidget {
         minimumSize: Size(double.infinity, 44),
       ),
       onPressed: () async {
-        _performSignIn(Authenticators.signInWithApple());
+        _performSignIn(context, Authenticators.signInWithApple());
       },
       child: Row(
         children: [
@@ -159,7 +167,7 @@ class LoginPage extends StatelessWidget {
                 style: link,
                 recognizer: TapGestureRecognizer()
                   ..onTap = () {
-                    _openLink(Configs.instance.tosLink);
+                    _openLink(context, Configs.instance.tosLink);
                   }),
             TextSpan(text: '及', style: normal),
             TextSpan(
@@ -167,7 +175,7 @@ class LoginPage extends StatelessWidget {
                 style: link,
                 recognizer: TapGestureRecognizer()
                   ..onTap = () {
-                    _openLink(Configs.instance.ppLink);
+                    _openLink(context, Configs.instance.ppLink);
                   }),
             TextSpan(text: '。開始使用即代表閣下已同意上述政策。', style: normal),
           ])),
