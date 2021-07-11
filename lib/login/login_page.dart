@@ -27,29 +27,33 @@ class LoginPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Center(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-          child: Container(
-            padding: EdgeInsets.symmetric(vertical: 20, horizontal: 40),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Column(
-              children: [
-                _buildAppleButton(context),
-                SizedBox(height: 12),
-                _buildFBButton(context),
-                SizedBox(height: 12),
-                _buildGoogleButton(context),
-                SizedBox(height: 24),
-                _buildPolicy(context),
-              ],
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.center,
-            ),
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24),
+        child: Container(
+          padding: EdgeInsets.symmetric(vertical: 20, horizontal: 40),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Column(
+            children: [
+              Text(
+                '使用者登入',
+                style: TextStyles.large.header.copyWith(
+                    color: Colors.black, decoration: TextDecoration.none),
+              ),
+              SizedBox(height: 24),
+              _buildAppleButton(context),
+              SizedBox(height: 12),
+              _buildFBButton(context),
+              SizedBox(height: 12),
+              _buildGoogleButton(context),
+              SizedBox(height: 24),
+              _buildPolicy(context),
+            ],
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
           ),
         ),
       ),
@@ -134,6 +138,7 @@ class LoginPage extends StatelessWidget {
     final link = normal.copyWith(
       color: Colors.black,
       fontWeight: FontWeight.w500,
+      decoration: TextDecoration.underline
     );
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 40),
