@@ -38,6 +38,9 @@ class Authenticators {
 
   static Future<UserCredential> signInWithGoogle() async {
     final GoogleSignInAccount googleUser = await GoogleSignIn().signIn();
+    if (googleUser == null) {
+      return null;
+    }
     final GoogleSignInAuthentication googleAuth =
         await googleUser.authentication;
     final credential = GoogleAuthProvider.credential(
