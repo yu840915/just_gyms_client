@@ -17,14 +17,23 @@ class Authenticators {
   }
 
   static Future<UserCredential> signInWithFacebook() async {
-    final AccessToken result = await FacebookAuth.instance.login();
-    if (result == null) {
-      return null;
+    try {
+      final AccessToken result = await FacebookAuth.instance.login();
+      if (result == null) {
+        return null;
+      }
+      final facebookAuthCredential =
+          FacebookAuthProvider.credential(result.token);
+      return await FirebaseAuth.instance
+          .signInWithCredential(facebookAuthCredential);
+    } catch (e) {
+      if (e is FacebookAuthException) {
+        if (e.errorCode == 'CANCELLED') {
+          return null;
+        }
+      }
+      throw e;
     }
-    final facebookAuthCredential =
-        FacebookAuthProvider.credential(result.token);
-    return await FirebaseAuth.instance
-        .signInWithCredential(facebookAuthCredential);
   }
 
   static Future<UserCredential> signInWithGoogle() async {
