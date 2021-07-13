@@ -26,10 +26,9 @@ class CloudFavoriteGymList implements FavoriteGymList {
         .snapshots()
         .map((event) => !event.exists
             ? []
-            : CloudFavorites.fromMap(event.data())
+            : List<FavoriteGymMixin>.from(CloudFavorites.fromMap(event.data())
                 .gyms
-                .map((e) => CloudFavoriteGym(e))
-                .toList())
+                .map((e) => CloudFavoriteGym(e))))
         .listen(_gymListSubject.add);
   }
 

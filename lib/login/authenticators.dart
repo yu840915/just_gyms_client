@@ -65,22 +65,31 @@ class Authenticators {
   }
 
   static Future<UserCredential> signInWithApple() async {
-    final rawNonce = _generateNonce();
-    final nonce = _sha256ofString(rawNonce);
+    try {
+      final rawNonce = _generateNonce();
+      final nonce = _sha256ofString(rawNonce);
 
-    final appleCredential = await SignInWithApple.getAppleIDCredential(
-      scopes: [
-        AppleIDAuthorizationScopes.email,
-        AppleIDAuthorizationScopes.fullName,
-      ],
-      nonce: nonce,
-    );
+      final appleCredential = await SignInWithApple.getAppleIDCredential(
+        scopes: [
+          AppleIDAuthorizationScopes.email,
+          AppleIDAuthorizationScopes.fullName,
+        ],
+        nonce: nonce,
+      );
 
-    final oauthCredential = OAuthProvider("apple.com").credential(
-      idToken: appleCredential.identityToken,
-      rawNonce: rawNonce,
-    );
-    return await FirebaseAuth.instance.signInWithCredential(oauthCredential);
+      final oauthCredential = OAuthProvider("apple.com").credential(
+        idToken: appleCredential.identityToken,
+        rawNonce: rawNonce,
+      );
+      return await FirebaseAuth.instance.signInWithCredential(oauthCredential);
+    } catch (e) {
+      if (e is SignInWithAppleAuthorizationException) {
+        if (e.code == AuthorizationErrorCode.canceled) {
+          return null;
+        }
+      }
+      throw e;
+    }
   }
 
   static Future<void> logOut() async {
