@@ -17,9 +17,9 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>where_gym</string>
+	<string>Just Gyms</string>
 	<key>CFBundleDisplayName</key>
-	<string>Just Gym</string>
+	<string>Just Gyms</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
@@ -54,5 +54,33 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.835416512364-nlcbu4lsksqq2mbb4cuoodbgbcg5t9pt</string>
+			</array>
+		</dict>
+		<dict>
+		<key>CFBundleURLSchemes</key>
+		<array>
+			<string>fb1116385582204088</string>
+		</array>
+		</dict>
+	</array>
+	<key>FacebookAppID</key>
+	<string>1116385582204088</string>
+	<key>FacebookDisplayName</key>
+	<string>Just Gyms</string>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>fbapi</string>
+		<string>fb-messenger-api</string>
+		<string>fbauth2</string>
+		<string>fbshareextension</string>
+	</array>
 </dict>
 </plist>
