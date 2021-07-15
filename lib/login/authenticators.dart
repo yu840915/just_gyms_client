@@ -17,18 +17,30 @@ class Authenticators {
   }
 
   static Future<UserCredential> signInWithFacebook() async {
-    final AccessToken result = await FacebookAuth.instance.login();
-    if (result == null) {
-      return null;
+    try {
+      final AccessToken result = await FacebookAuth.instance.login();
+      if (result == null) {
+        return null;
+      }
+      final facebookAuthCredential =
+          FacebookAuthProvider.credential(result.token);
+      return await FirebaseAuth.instance
+          .signInWithCredential(facebookAuthCredential);
+    } catch (e) {
+      if (e is FacebookAuthException) {
+        if (e.errorCode == 'CANCELLED') {
+          return null;
+        }
+      }
+      throw e;
     }
-    final facebookAuthCredential =
-        FacebookAuthProvider.credential(result.token);
-    return await FirebaseAuth.instance
-        .signInWithCredential(facebookAuthCredential);
   }
 
   static Future<UserCredential> signInWithGoogle() async {
     final GoogleSignInAccount googleUser = await GoogleSignIn().signIn();
+    if (googleUser == null) {
+      return null;
+    }
     final GoogleSignInAuthentication googleAuth =
         await googleUser.authentication;
     final credential = GoogleAuthProvider.credential(
@@ -53,22 +65,31 @@ class Authenticators {
   }
 
   static Future<UserCredential> signInWithApple() async {
-    final rawNonce = _generateNonce();
-    final nonce = _sha256ofString(rawNonce);
+    try {
+      final rawNonce = _generateNonce();
+      final nonce = _sha256ofString(rawNonce);
 
-    final appleCredential = await SignInWithApple.getAppleIDCredential(
-      scopes: [
-        AppleIDAuthorizationScopes.email,
-        AppleIDAuthorizationScopes.fullName,
-      ],
-      nonce: nonce,
-    );
+      final appleCredential = await SignInWithApple.getAppleIDCredential(
+        scopes: [
+          AppleIDAuthorizationScopes.email,
+          AppleIDAuthorizationScopes.fullName,
+        ],
+        nonce: nonce,
+      );
 
-    final oauthCredential = OAuthProvider("apple.com").credential(
-      idToken: appleCredential.identityToken,
-      rawNonce: rawNonce,
-    );
-    return await FirebaseAuth.instance.signInWithCredential(oauthCredential);
+      final oauthCredential = OAuthProvider("apple.com").credential(
+        idToken: appleCredential.identityToken,
+        rawNonce: rawNonce,
+      );
+      return await FirebaseAuth.instance.signInWithCredential(oauthCredential);
+    } catch (e) {
+      if (e is SignInWithAppleAuthorizationException) {
+        if (e.code == AuthorizationErrorCode.canceled) {
+          return null;
+        }
+      }
+      throw e;
+    }
   }
 
   static Future<void> logOut() async {
