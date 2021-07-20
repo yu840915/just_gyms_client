@@ -22,7 +22,12 @@ class FCMInitialization {
     if (!Platform.isIOS) {
       return;
     }
-    await _messaging.requestPermission(provisional: true);
+    await _messaging.requestPermission(
+      provisional: true,
+      badge: true,
+      sound: true,
+      alert: true,
+    );
   }
 
   Future<void> _updateToken() async {
