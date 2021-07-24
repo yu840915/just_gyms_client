@@ -8,6 +8,7 @@ import 'package:where_gym/configs.dart';
 import 'package:where_gym/login/authenticators.dart';
 import 'package:where_gym/me/favorite_list_page.dart';
 import 'package:where_gym/shared_appearances.dart';
+import 'package:where_gym/user_verifications/phone_verification_page.dart';
 
 class MainMenu extends StatelessWidget {
   void _logout(BuildContext context) async {
@@ -15,7 +16,7 @@ class MainMenu extends StatelessWidget {
       final logout = await showDialog(
         context: context,
         builder: (context) => AlertFactory.actionAlert(
-          context,  
+          context,
           title: '是否要登出？',
           actions: [
             PlatformDialogAction(
@@ -48,6 +49,7 @@ class MainMenu extends StatelessWidget {
           _buildItem('服務條款', _MenuItem.tos),
           _buildItem('隱私權政策', _MenuItem.pp),
           _buildItem('聯絡我們', _MenuItem.contactUs),
+          if (bloc.isLoggedIn) _buildItem('Phone', _MenuItem.phone),
           if (bloc.isLoggedIn) _buildItem('登出', _MenuItem.logOut),
         ];
       },
@@ -82,6 +84,12 @@ class MainMenu extends StatelessWidget {
           case _MenuItem.logOut:
             _logout(context);
             break;
+          case _MenuItem.phone:
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => PhoneVerificationPage()));
+            break;
         }
       },
     );
@@ -106,4 +114,5 @@ enum _MenuItem {
   pp,
   contactUs,
   logOut,
+  phone,
 }

@@ -116,3 +116,8 @@ class ServiceError extends Error {
   final dynamic info;
   ServiceError(this.info);
 }
+
+class LocalError extends Error {
+  final String message;
+  LocalError(this.message);
+}
