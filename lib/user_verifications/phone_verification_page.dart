@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:where_gym/alert_factory.dart';
 import 'package:where_gym/app_bar_factory.dart';
 import 'package:where_gym/shared_appearances.dart';
@@ -12,29 +13,35 @@ class PhoneVerificationPage extends StatefulWidget {
 class _PhoneVerificationPageState extends State<PhoneVerificationPage> {
   TextEditingController _editingController;
   PhoneVerification _verification;
+  Future _sendSmsTask;
 
   void _sendSmsCode(BuildContext context) async {
+    if (_sendSmsTask != null) {
+      return;
+    }
     try {
-      await _verification.sendSMS(_editingController.text);
+      _sendSmsTask = _verification.sendSMS(_editingController.text);
+      await _sendSmsTask;
     } catch (e) {
       showDialog(
         context: context,
         builder: (context) => AlertFactory.errorAlert(context, error: e),
       );
+    } finally {
+      _sendSmsTask = null;
     }
   }
 
   @override
   void initState() {
     super.initState();
-    _verification = PhoneVerification();
+    _verification = PhoneVerification(BlocProvider.of(context));
     _editingController = TextEditingController();
   }
 
   @override
   void dispose() {
     _editingController.dispose();
-
     super.dispose();
   }
 

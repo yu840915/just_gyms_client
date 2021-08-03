@@ -1,10 +1,16 @@
 import 'dart:async';
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:rxdart/subjects.dart';
 import 'package:where_gym/api_services/api_services.dart';
 import 'package:where_gym/app_bloc.dart';
 
 class PhoneVerification {
+  String _verificationId;
+  final AppBloc appBloc;
+  final _isPhoneVerified = BehaviorSubject<bool>();
+  PhoneVerification(this.appBloc);
+
   Future<void> sendSMS(String phoneNum) async {
     phoneNum = phoneNum.replaceAll(' ', '');
     if (phoneNum.length == 10 && phoneNum.startsWith('0')) {
@@ -18,25 +24,55 @@ class PhoneVerification {
     FirebaseAuth.instance.verifyPhoneNumber(
         phoneNumber: phoneNum,
         verificationCompleted: (cred) {
-          _onComplete(cred, task);
+          _onComplete(cred);
         },
         verificationFailed: (err) {
           _onFail(err, task);
         },
         codeSent: (id, token) {
-          _onCodeSent(id, token);
+          _onCodeSent(id, task, token);
         },
         codeAutoRetrievalTimeout: (id) {
-          _onTimeout(id, task);
+          _onTimeout(id);
         });
-    return task;
+    return task.future;
   }
 
-  void _onComplete(PhoneAuthCredential cred, Completer completer) {}
+  void _onComplete(PhoneAuthCredential cred) async {
+    try {
+      await _linkPhoneCredential(cred);
+    } catch (e) {
+      print(e);
+    }
+  }
 
-  void _onFail(FirebaseAuthException error, Completer completer) {}
+  void _onFail(FirebaseAuthException error, Completer completer) {
+    completer.completeError(error);
+  }
 
-  void _onCodeSent(String id, [int forceResendingToken]) {}
+  void _onCodeSent(String id, Completer completer, [int forceResendingToken]) {
+    _verificationId = id;
+    completer.complete();
+  }
 
-  void _onTimeout(String id, Completer completer) {}
+  void _onTimeout(String id) {
+    _verificationId = id;
+  }
+
+  Future<void> submitSmsCode(String code) async {
+    if (_verificationId == null) {
+      throw LocalError('請確認驗證碼已發送');
+    }
+    await _linkPhoneCredential(
+      PhoneAuthProvider.credential(
+        verificationId: _verificationId,
+        smsCode: code,
+      ),
+    );
+  }
+
+  Future _linkPhoneCredential(AuthCredential credential) async {
+    await appBloc.firebaseUser.linkWithCredential(credential);
+    _isPhoneVerified.add(true);
+  }
 }

@@ -18,6 +18,7 @@ class AppBloc extends Bloc<dynamic, AppPhase> {
   final _hasFinishedIntroKey = 'hasFinishedIntro';
   final permissionChecker = PermissionChecker();
   User _firebaseUser;
+  User get firebaseUser => isLoggedIn ? _firebaseUser : null;
   FavoriteGymList get favoriteGymList =>
       _cloudFavoriteGymList ?? _localFavoriteGymList;
   final LocalFavoriteGymList _localFavoriteGymList;
