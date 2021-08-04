@@ -1,51 +1,54 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:where_gym/alert_factory.dart';
 import 'package:where_gym/app_bar_factory.dart';
 import 'package:where_gym/shared_appearances.dart';
 import 'package:where_gym/user_verifications/phone_verification.dart';
-import 'package:where_gym/user_verifications/sms_code_page.dart';
 
-class PhoneVerificationPage extends StatefulWidget {
+class SMSCodePage extends StatefulWidget {
+  final PhoneVerification phoneVerification;
+  SMSCodePage(this.phoneVerification);
+
   @override
-  _PhoneVerificationPageState createState() => _PhoneVerificationPageState();
+  _SMSCodePageState createState() => _SMSCodePageState();
 }
 
-class _PhoneVerificationPageState extends State<PhoneVerificationPage> {
+class _SMSCodePageState extends State<SMSCodePage> {
+  PhoneVerification get phoneVerification => widget.phoneVerification;
   TextEditingController _editingController;
-  PhoneVerification _verification;
-  Future _sendSmsTask;
+  StreamSubscription _subscription;
+  Future _task;
 
-  void _sendSmsCode(BuildContext context) async {
-    if (_sendSmsTask != null) {
+  void _submitSmsCode(BuildContext context) async {
+    if (_task != null) {
       return;
     }
     try {
-      _sendSmsTask = _verification.sendSMS(_editingController.text);
-      await _sendSmsTask;
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => SMSCodePage(_verification)),
-      );
+      _task = phoneVerification.submitSmsCode(_editingController.text);
+      await _task;
     } catch (e) {
       showDialog(
         context: context,
         builder: (context) => AlertFactory.errorAlert(context, error: e),
       );
     } finally {
-      _sendSmsTask = null;
+      _task = null;
     }
   }
 
   @override
   void initState() {
     super.initState();
-    _verification = PhoneVerification(BlocProvider.of(context));
     _editingController = TextEditingController();
+    _subscription = phoneVerification.onPhoneVerified.listen((event) {
+      Navigator.popUntil(context, (route) => route.isFirst);
+    });
   }
 
   @override
   void dispose() {
+    _subscription.cancel();
     _editingController.dispose();
     super.dispose();
   }
@@ -55,7 +58,7 @@ class _PhoneVerificationPageState extends State<PhoneVerificationPage> {
     return Scaffold(
       appBar: AppBarFactory.appBar(
           title: Text(
-        '手機驗證',
+        '驗證碼已送出',
         style: TextStyles.large.header,
       )),
       body: _buildBody(context),
@@ -80,7 +83,7 @@ class _PhoneVerificationPageState extends State<PhoneVerificationPage> {
   Widget _buildInputField(BuildContext context) {
     return TextField(
       decoration: InputDecoration(
-        labelText: '請輸入手機號碼',
+        labelText: '請輸入驗證碼',
         labelStyle: TextStyles.large.title.copyWith(color: Colors.black),
         isDense: false,
         focusedBorder: OutlineInputBorder(
@@ -89,7 +92,6 @@ class _PhoneVerificationPageState extends State<PhoneVerificationPage> {
         border: OutlineInputBorder(
           borderSide: BorderSide(color: Colors.black),
         ),
-        hintText: '+886 000 000 000',
       ),
       controller: _editingController,
     );
@@ -98,9 +100,9 @@ class _PhoneVerificationPageState extends State<PhoneVerificationPage> {
   Widget _buildButton(BuildContext context) {
     return TextButton(
       onPressed: () {
-        _sendSmsCode(context);
+        _submitSmsCode(context);
       },
-      child: Text('發送驗證碼'),
+      child: Text('驗證'),
       style: TextButton.styleFrom(
         textStyle: TextStyles.large.action,
         primary: AppColors.theme,

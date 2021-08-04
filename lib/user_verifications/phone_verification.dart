@@ -9,6 +9,7 @@ class PhoneVerification {
   String _verificationId;
   final AppBloc appBloc;
   final _isPhoneVerified = BehaviorSubject<bool>();
+  Stream<bool> get onPhoneVerified => _isPhoneVerified;
   PhoneVerification(this.appBloc);
 
   Future<void> sendSMS(String phoneNum) async {
