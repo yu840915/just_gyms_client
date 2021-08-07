@@ -10,9 +10,11 @@ class PhoneVerification {
   final AppBloc appBloc;
   final _isPhoneVerified = BehaviorSubject<bool>();
   Stream<bool> get onPhoneVerified => _isPhoneVerified;
+  String _lastPhoneNum;
   PhoneVerification(this.appBloc);
 
   Future<void> sendSMS(String phoneNum) async {
+    assert(phoneNum != null);
     phoneNum = phoneNum.replaceAll(' ', '');
     if (phoneNum.length == 10 && phoneNum.startsWith('0')) {
       phoneNum = '+886${phoneNum.substring(1)}';
@@ -31,7 +33,7 @@ class PhoneVerification {
           _onFail(err, task);
         },
         codeSent: (id, token) {
-          _onCodeSent(id, task, token);
+          _onCodeSent(id, task, phoneNum, token);
         },
         codeAutoRetrievalTimeout: (id) {
           _onTimeout(id);
@@ -39,9 +41,14 @@ class PhoneVerification {
     return task.future;
   }
 
+  Future<void> resendSms() async {
+    await sendSMS(_lastPhoneNum);
+  }
+
   void _onComplete(PhoneAuthCredential cred) async {
     try {
       await _linkPhoneCredential(cred);
+      _lastPhoneNum = null;
     } catch (e) {
       print(e);
     }
@@ -51,8 +58,10 @@ class PhoneVerification {
     completer.completeError(error);
   }
 
-  void _onCodeSent(String id, Completer completer, [int forceResendingToken]) {
+  void _onCodeSent(String id, Completer completer, String phoneNum,
+      [int forceResendingToken]) {
     _verificationId = id;
+    _lastPhoneNum = phoneNum;
     completer.complete();
   }
 

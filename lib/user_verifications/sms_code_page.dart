@@ -28,7 +28,7 @@ class _SMSCodePageState extends State<SMSCodePage> {
       return;
     }
     try {
-      _task = phoneVerification.sendSMS();
+      _task = phoneVerification.resendSms();
       await _task;
     } catch (e) {
       showDialog(
