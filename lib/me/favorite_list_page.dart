@@ -10,7 +10,7 @@ import 'package:where_gym/app_bloc.dart';
 import 'package:where_gym/distance_format.dart';
 import 'package:where_gym/gym.dart';
 import 'package:where_gym/gym_detail_page.dart';
-import 'package:where_gym/login/loginCheckFlow.dart';
+import 'package:where_gym/login/login_check_flow.dart';
 import 'package:where_gym/map_view/open_hour_indicator.dart';
 import 'package:where_gym/me/favorite_detail_list.dart';
 import 'package:where_gym/price_format.dart';

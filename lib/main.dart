@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:where_gym/app_bloc.dart';
+import 'package:where_gym/named_routes.dart';
 import 'package:where_gym/tracking/tracking.dart';
 import 'package:where_gym/utils/error_view.dart';
 import 'package:where_gym/home_page.dart';
@@ -55,6 +56,7 @@ class _MyAppState extends State<MyApp> {
         ),
         debugShowCheckedModeBanner: false,
         home: BlocBuilder<AppBloc, AppPhase>(builder: _buildMainFlow),
+        routes: namedRoutes,
       ),
     );
   }

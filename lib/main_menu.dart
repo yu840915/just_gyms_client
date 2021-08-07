@@ -15,7 +15,7 @@ class MainMenu extends StatelessWidget {
       final logout = await showDialog(
         context: context,
         builder: (context) => AlertFactory.actionAlert(
-          context,  
+          context,
           title: '是否要登出？',
           actions: [
             PlatformDialogAction(
