@@ -11,6 +11,9 @@ class FCMInitialization {
   bool _hasIntialized = false;
 
   Future<void> initializeIfNeeded() async {
+    if (!bloc.isLoggedIn) {
+      return;
+    }
     if (_hasIntialized) {
       return;
     }
@@ -33,6 +36,7 @@ class FCMInitialization {
 
   Future<void> _updateToken() async {
     final token = await _messaging.getToken();
+    print('FCM token: $token');
     await APIServices.instances
         .post(
           '/me/fcm-tokens',
