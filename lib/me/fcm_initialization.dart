@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:where_gym/api_services/api_services.dart';
 import 'package:where_gym/app_bloc.dart';
 
 class FCMInitialization {
@@ -32,6 +33,12 @@ class FCMInitialization {
 
   Future<void> _updateToken() async {
     final token = await _messaging.getToken();
-    print(token);
+    await APIServices.instances
+        .post(
+          '/me/fcm-tokens',
+          body: {'token': token},
+          token: await bloc.getIdToken(),
+        )
+        .catchError(print);
   }
 }
