@@ -12,6 +12,7 @@ import 'package:where_gym/initialization.dart';
 import 'package:where_gym/intro/permission_checker.dart';
 import 'package:where_gym/me/cloud_favorites.dart';
 import 'package:where_gym/me/favorites.dart';
+import 'package:where_gym/me/fcm_initialization.dart';
 import 'package:where_gym/me/local_favorites.dart';
 
 class AppBloc extends Bloc<dynamic, AppPhase> {
@@ -67,6 +68,7 @@ class AppBloc extends Bloc<dynamic, AppPhase> {
       _userRefSubject.add(
         FirebaseFirestore.instance.collection('users').doc(user.uid),
       );
+      FCMInitialization.syncToken(this).catchError(print);
     }
   }
 

@@ -5,24 +5,12 @@ import 'package:where_gym/api_services/api_services.dart';
 import 'package:where_gym/app_bloc.dart';
 
 class FCMInitialization {
-  final AppBloc bloc;
-  FirebaseMessaging get _messaging => FirebaseMessaging.instance;
-  FCMInitialization(this.bloc);
-  bool _hasIntialized = false;
+  static FirebaseMessaging get _messaging => FirebaseMessaging.instance;
 
-  Future<void> initializeIfNeeded() async {
+  static Future<void> requestPermissionIfNeeded(AppBloc bloc) async {
     if (!bloc.isLoggedIn) {
       return;
     }
-    if (_hasIntialized) {
-      return;
-    }
-    await _requestPermission();
-    await _updateToken();
-    _hasIntialized = true;
-  }
-
-  Future<void> _requestPermission() async {
     if (!Platform.isIOS) {
       return;
     }
@@ -34,7 +22,7 @@ class FCMInitialization {
     );
   }
 
-  Future<void> _updateToken() async {
+  static Future<void> syncToken(AppBloc bloc) async {
     final token = await _messaging.getToken();
     print('FCM token: $token');
     await APIServices.instances
