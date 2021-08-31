@@ -165,18 +165,29 @@ class GymDetailPage extends StatelessWidget {
           children: [
             SafeArea(
               top: false,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Row(
-                  children: [
-                    if (gym.pageLink != null)
-                      Expanded(child: _buildPageButton(gym.pageLink)),
-                    if (gym.pageLink != null && gym.phone != null)
-                      SizedBox(width: 12),
-                    if (gym.phone != null)
-                      Expanded(child: _buildReserveButton(gym.phone)),
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Row(
+                      children: [
+                        if (gym.pageLink != null)
+                          Expanded(child: _buildPageButton(gym.pageLink)),
+                        if (gym.pageLink != null && gym.phone != null)
+                          SizedBox(width: 12),
+                        if (gym.phone != null)
+                          Expanded(child: _buildPhoneButton(gym.phone)),
+                      ],
+                    ),
+                  ),
+                  if (gym.supportsBooking) ...[
+                    SizedBox(height: 8),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: _buildBookButton(),
+                    ),
                   ],
-                ),
+                ],
               ),
             ),
             SizedBox(height: 12),
@@ -221,13 +232,23 @@ class GymDetailPage extends StatelessWidget {
     );
   }
 
-  Widget _buildReserveButton(String phone) {
+  Widget _buildPhoneButton(String phone) {
     return OutlinedButton(
       onPressed: () => _callGym(phone),
       child: Text(
-        '立即預約',
+        '撥打電話',
       ),
       style: ButtonStyles.action,
+    );
+  }
+
+  Widget _buildBookButton() {
+    return TextButton(
+      onPressed: () => {},
+      child: Text(
+        '我要預約',
+      ),
+      style: ButtonStyles.callToAction,
     );
   }
 }

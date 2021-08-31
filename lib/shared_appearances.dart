@@ -82,6 +82,15 @@ class ButtonStyles {
     ),
     primary: Colors.black,
   );
+  static final ButtonStyle callToAction = TextButton.styleFrom(
+    textStyle: TextStyles.large.action,
+    minimumSize: Size(double.infinity, 44),
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(8),
+    ),
+    primary: Colors.white,
+    backgroundColor: AppColors.theme,
+  );
 }
 
 class SharedIcons {

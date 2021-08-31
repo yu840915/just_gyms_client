@@ -33,6 +33,7 @@ Gym _$GymFromJson(Map<String, dynamic> json) {
         ?.toList(),
     pageLink: json['pageLink'] as String,
     images: (json['images'] as List)?.map((e) => e as String)?.toList(),
+    supportsBooking: json['supportsBooking'] as bool,
   );
 }
 
@@ -50,6 +51,7 @@ Map<String, dynamic> _$GymToJson(Gym instance) => <String, dynamic>{
       'lon': instance.lon,
       'facilities': instance.facilities,
       'images': instance.images,
+      'supportsBooking': instance.supportsBooking,
     };
 
 Equipments _$EquipmentsFromJson(Map<String, dynamic> json) {

@@ -27,6 +27,7 @@ class Gym {
   List<GymFacility> get gymFacilities => _gymFacilities;
   bool get hasContactInfos => phone != null || pageLink != null;
   String get phone => phones != null && phones.isNotEmpty ? phones.first : null;
+  final bool supportsBooking;
   Gym(
       {this.id,
       this.name,
@@ -40,7 +41,8 @@ class Gym {
       this.phones,
       this.pricing,
       this.pageLink,
-      this.images}) {
+      this.images,
+      this.supportsBooking}) {
     _weekdayBusinessHours = BusinessHours.fromDescriptors(businessHours);
     _gymFacilities = facilities != null
         ? facilities.map((e) => GymFacility.table[e]).toList()
