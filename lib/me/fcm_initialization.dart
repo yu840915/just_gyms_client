@@ -7,19 +7,14 @@ import 'package:where_gym/app_bloc.dart';
 class FCMInitialization {
   static FirebaseMessaging get _messaging => FirebaseMessaging.instance;
 
-  static Future<void> requestPermissionIfNeeded(AppBloc bloc) async {
-    if (!bloc.isLoggedIn) {
-      return;
-    }
-    if (!Platform.isIOS) {
-      return;
-    }
-    await _messaging.requestPermission(
+  static Future<AuthorizationStatus> requestPermissionIfNeeded() async {
+    final settings = await _messaging.requestPermission(
       provisional: true,
       badge: true,
       sound: true,
       alert: true,
     );
+    return settings.authorizationStatus;
   }
 
   static Future<void> syncToken(AppBloc bloc) async {

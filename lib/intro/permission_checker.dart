@@ -1,9 +1,12 @@
 import 'dart:async';
+import 'dart:io';
 
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:rxdart/subjects.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:where_gym/me/fcm_initialization.dart';
 
 class PermissionChecker {
   final _hasUnfinishedItemsSubject = BehaviorSubject<bool>();
@@ -39,6 +42,45 @@ abstract class PermissionItem {
   Widget get icon;
   Future<void> skipPermissionRequest();
   Future<bool> startPermissionRequest();
+}
+
+class NotificationPermissionItem implements PermissionItem {
+  final _key = 'permissionItem-Notification';
+  final _updateSubject = BehaviorSubject<dynamic>();
+  @override
+  Stream get onUpdate => _updateSubject;
+
+  @override
+  Future<bool> needsRequestPermission() async {
+    if (Platform.isAndroid) {
+      return false;
+    }
+    final prefs = await SharedPreferences.getInstance();
+    return !prefs.containsKey(_key);
+  }
+
+  @override
+  Future<void> skipPermissionRequest() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_key, false);
+    _updateSubject.add(null);
+  }
+
+  @override
+  Future<bool> startPermissionRequest() async {
+    final status = await FCMInitialization.requestPermissionIfNeeded();
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_key, true);
+    _updateSubject.add(null);
+    return status == AuthorizationStatus.authorized ||
+        status == AuthorizationStatus.provisional;
+  }
+
+  @override
+  Widget get icon => Icon(Icons.location_on, size: 44);
+
+  @override
+  String message = '為了能讓我們幫您找尋附近的場租，需要您授權定位服務。';
 }
 
 class LocationPermissionItem implements PermissionItem {
