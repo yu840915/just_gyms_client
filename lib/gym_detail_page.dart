@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:where_gym/app_bar_factory.dart';
 import 'package:where_gym/app_bloc.dart';
+import 'package:where_gym/appointment_preflight_checks/appointment_preflight_checks.dart';
 import 'package:where_gym/gym.dart';
 import 'package:where_gym/map_view/open_hour_indicator.dart';
 import 'package:where_gym/photo_gallery_view.dart';
@@ -14,6 +15,14 @@ import 'package:where_gym/tracking/tracking.dart';
 class GymDetailPage extends StatelessWidget {
   final Gym gym;
   GymDetailPage({@required this.gym});
+
+  void _book(BuildContext context) async {
+    if ((await AppointmentPreflightCheckFlow.check(context,
+            where: 'gym detail')) ==
+        false) {
+      return;
+    }
+  }
 
   void _callGym(String phone) {
     track(EventName.contactGym, gym.trackingProps);
@@ -184,7 +193,7 @@ class GymDetailPage extends StatelessWidget {
                     SizedBox(height: 8),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: _buildBookButton(),
+                      child: _buildBookButton(context),
                     ),
                   ],
                 ],
@@ -242,9 +251,11 @@ class GymDetailPage extends StatelessWidget {
     );
   }
 
-  Widget _buildBookButton() {
+  Widget _buildBookButton(BuildContext context) {
     return TextButton(
-      onPressed: () => {},
+      onPressed: () {
+        _book(context);
+      },
       child: Text(
         '我要預約',
       ),

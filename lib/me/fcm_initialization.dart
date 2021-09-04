@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:where_gym/api_services/api_services.dart';
 import 'package:where_gym/app_bloc.dart';

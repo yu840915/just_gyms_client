@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:where_gym/app_bloc.dart';
+import 'package:where_gym/appointment_preflight_checks/appointment_preflight_setup_page.dart';
 import 'package:where_gym/intro/permission_checker.dart';
 import 'package:where_gym/login/login_check_flow.dart';
 
@@ -16,8 +17,14 @@ class AppointmentPreflightCheckFlow {
     if (result.passed) {
       return true;
     }
-    //Show
-    return true;
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => AppointmentPreflightSetupPage(result),
+        fullscreenDialog: true,
+      ),
+    );
+    return (await AppointmentPreflightCheck.check(context)).passed;
   }
 }
 
