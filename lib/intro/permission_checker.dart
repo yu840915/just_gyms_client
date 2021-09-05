@@ -80,7 +80,7 @@ class NotificationPermissionItem implements PermissionItem {
   Widget get icon => Icon(Icons.location_on, size: 44);
 
   @override
-  String message = '為了能讓我們幫您找尋附近的場租，需要您授權定位服務。';
+  String message = '為了能讓我們提醒您場租預約，需要您授權通知服務。';
 }
 
 class LocationPermissionItem implements PermissionItem {

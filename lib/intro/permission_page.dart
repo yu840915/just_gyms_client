@@ -24,15 +24,15 @@ class PermissionPage extends StatelessWidget {
     return ListView.separated(
         padding: EdgeInsets.symmetric(vertical: 40),
         itemBuilder: (context, idx) =>
-            _PermissionCheckerRow(permissionItems[idx]),
+            PermissionCheckerRow(permissionItems[idx]),
         separatorBuilder: (context, idx) => SizedBox(height: 12),
         itemCount: permissionItems.length);
   }
 }
 
-class _PermissionCheckerRow extends StatelessWidget {
+class PermissionCheckerRow extends StatelessWidget {
   final PermissionItem item;
-  _PermissionCheckerRow(this.item);
+  PermissionCheckerRow(this.item);
 
   void _permit(BuildContext context) async {
     await item.startPermissionRequest();
