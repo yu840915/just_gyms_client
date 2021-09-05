@@ -18,8 +18,11 @@ import 'package:where_gym/me/local_favorites.dart';
 class AppBloc extends Bloc<dynamic, AppPhase> {
   final _hasFinishedIntroKey = 'hasFinishedIntro';
   final permissionChecker = PermissionChecker();
-  User _firebaseUser;
-  User get firebaseUser => isLoggedIn ? _firebaseUser : null;
+
+  final _firebaseUserSubject = BehaviorSubject<User>();
+  Stream<User> get onFirebaseUserChange => _firebaseUserSubject;
+  User get firebaseUser =>
+      isLoggedIn ? _firebaseUserSubject.valueWrapper.value : null;
   FavoriteGymList get favoriteGymList =>
       _cloudFavoriteGymList ?? _localFavoriteGymList;
   final LocalFavoriteGymList _localFavoriteGymList;
@@ -30,10 +33,10 @@ class AppBloc extends Bloc<dynamic, AppPhase> {
   DocumentReference get userRef => _userRefSubject.valueWrapper?.value;
   Stream<DocumentReference> get onUserRefChange => _userRefSubject;
   AppBloc(initialState, {@required InitializedProducts initializedProducts})
-      : _firebaseUser = initializedProducts.user,
-        _localFavoriteGymList = initializedProducts.favoriteGymList,
+      : _localFavoriteGymList = initializedProducts.favoriteGymList,
         location = initializedProducts.location,
         super(initialState) {
+    _firebaseUserSubject.add(initializedProducts.user);
     _checkPermission();
     _subscribeEvents();
   }
@@ -45,8 +48,9 @@ class AppBloc extends Bloc<dynamic, AppPhase> {
     });
   }
 
-  bool get isLoggedIn =>
-      _firebaseUser == null ? false : !_firebaseUser.isAnonymous;
+  bool get isLoggedIn => _firebaseUserSubject.valueWrapper.value == null
+      ? false
+      : !_firebaseUserSubject.valueWrapper.value.isAnonymous;
 
   void _subscribeEvents() {
     _subscriptions.add(FirebaseAuth.instance.authStateChanges().listen((event) {
@@ -56,13 +60,13 @@ class AppBloc extends Bloc<dynamic, AppPhase> {
 
   void _handleUserUpdate(User user) {
     if (user == null) {
-      _firebaseUser = null;
+      _firebaseUserSubject.add(null);
       _cloudFavoriteGymList?.dispose();
       _cloudFavoriteGymList = null;
       _userRefSubject.add(null);
       return;
     }
-    _firebaseUser = user;
+    _firebaseUserSubject.add(user);
     if (!user.isAnonymous) {
       _cloudFavoriteGymList = CloudFavoriteGymList(this, user);
       _userRefSubject.add(
@@ -92,7 +96,7 @@ class AppBloc extends Bloc<dynamic, AppPhase> {
     });
   }
 
-  Future<String> getIdToken() => _firebaseUser?.getIdToken();
+  Future<String> getIdToken() => firebaseUser?.getIdToken();
 
   Future syncFavoriteGyms() async {
     await _cloudFavoriteGymList?.syncWithLocalList(_localFavoriteGymList);

@@ -35,7 +35,7 @@ class PermissionCheckerRow extends StatelessWidget {
   PermissionCheckerRow(this.item);
 
   void _permit(BuildContext context) async {
-    await item.startPermissionRequest();
+    await item.startPermissionRequest(context);
   }
 
   @override

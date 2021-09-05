@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:where_gym/app_bar_factory.dart';
 import 'package:where_gym/appointment_preflight_checks/appointment_preflight_checks.dart';
+import 'package:where_gym/intro/permission_checker.dart';
+import 'package:where_gym/intro/permission_page.dart';
 import 'package:where_gym/shared_appearances.dart';
 
 class AppointmentPreflightSetupPage extends StatelessWidget {
@@ -23,27 +26,22 @@ class AppointmentPreflightSetupPage extends StatelessWidget {
   Widget _buildBody(BuildContext context) {
     return Column(
       children: [
+        SizedBox(height: 40),
+        Text(
+          '在使用預約功能前，我們需要先進行以下設定',
+          style: TextStyles.large.header,
+        ),
+        SizedBox(height: 30),
         if (!preflightCheckResult.hasPhone) ...[
-          _LinkPhoneCell(),
-          SizedBox(height: 8),
+          PermissionCheckerRow(
+            LinkPhonePermissionItem(BlocProvider.of(context)),
+          ),
+          SizedBox(height: 20),
         ],
         if (!preflightCheckResult.hasAskedNotificationPermission)
-          _NotificationCell(),
+          PermissionCheckerRow(NotificationPermissionItem()),
       ],
+      crossAxisAlignment: CrossAxisAlignment.center,
     );
-  }
-}
-
-class _LinkPhoneCell extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Container();
-  }
-}
-
-class _NotificationCell extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Container();
   }
 }

@@ -6,7 +6,10 @@ import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:rxdart/subjects.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:where_gym/api_services/api_services.dart';
+import 'package:where_gym/app_bloc.dart';
 import 'package:where_gym/me/fcm_initialization.dart';
+import 'package:where_gym/named_routes.dart';
 
 class PermissionChecker {
   final _hasUnfinishedItemsSubject = BehaviorSubject<bool>();
@@ -38,10 +41,10 @@ class PermissionChecker {
 abstract class PermissionItem {
   Future<bool> needsRequestPermission();
   Stream<dynamic> get onUpdate;
-  String message;
+  String get message;
   Widget get icon;
   Future<void> skipPermissionRequest();
-  Future<bool> startPermissionRequest();
+  Future<bool> startPermissionRequest(BuildContext context);
 }
 
 class NotificationPermissionItem implements PermissionItem {
@@ -67,7 +70,7 @@ class NotificationPermissionItem implements PermissionItem {
   }
 
   @override
-  Future<bool> startPermissionRequest() async {
+  Future<bool> startPermissionRequest(BuildContext context) async {
     final status = await FCMInitialization.requestPermissionIfNeeded();
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_key, true);
@@ -77,7 +80,7 @@ class NotificationPermissionItem implements PermissionItem {
   }
 
   @override
-  Widget get icon => Icon(Icons.location_on, size: 44);
+  Widget get icon => Icon(Icons.alarm_on, size: 44);
 
   @override
   String message = '為了能讓我們提醒您場租預約，需要您授權通知服務。';
@@ -103,7 +106,7 @@ class LocationPermissionItem implements PermissionItem {
   }
 
   @override
-  Future<bool> startPermissionRequest() async {
+  Future<bool> startPermissionRequest(BuildContext context) async {
     final status = await Permission.locationWhenInUse.request();
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_key, true);
@@ -113,8 +116,37 @@ class LocationPermissionItem implements PermissionItem {
   }
 
   @override
-  Widget get icon => Icon(Icons.location_on, size: 44);
+  final Widget icon = Icon(Icons.location_on, size: 44);
 
   @override
-  String message = '為了能讓我們幫您找尋附近的場租，需要您授權定位服務。';
+  final String message = '為了能讓我們幫您找尋附近的場租，需要您授權定位服務。';
+}
+
+class LinkPhonePermissionItem implements PermissionItem {
+  AppBloc bloc;
+  LinkPhonePermissionItem(this.bloc);
+  @override
+  String message = '為了能在預約到期時可以連絡上您，需要您綁定聯絡電話號碼。';
+
+  @override
+  Widget icon = Icon(Icons.phone, size: 44);
+
+  @override
+  Future<bool> needsRequestPermission() async {
+    return bloc.firebaseUser.phoneNumber != null;
+  }
+
+  @override
+  Stream get onUpdate => bloc.onFirebaseUserChange;
+
+  @override
+  Future<void> skipPermissionRequest() {
+    throw LocalError('為避免濫用，預約功能將只開放給連結電話的用戶');
+  }
+
+  @override
+  Future<bool> startPermissionRequest(BuildContext context) async {
+    await Navigator.pushNamed(context, RouteNames.phoneVerification);
+    return needsRequestPermission();
+  }
 }
