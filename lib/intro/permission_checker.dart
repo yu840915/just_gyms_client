@@ -26,8 +26,7 @@ class PermissionChecker {
   }
 
   void _update() async {
-    final values =
-        await Future.wait(items.map((e) => e.needsRequestPermission()));
+    final values = await Future.wait(items.map((e) => e.getPermissionStatus()));
     _hasUnfinishedItemsSubject.add(values.contains(true));
   }
 
@@ -39,34 +38,49 @@ class PermissionChecker {
 }
 
 abstract class PermissionItem {
-  Future<bool> needsRequestPermission();
-  Stream<dynamic> get onUpdate;
+  Future<GrantStatus> getPermissionStatus();
+  Stream<GrantStatus> get onUpdate;
   String get message;
   Widget get icon;
   Future<void> skipPermissionRequest();
   Future<bool> startPermissionRequest(BuildContext context);
 }
 
+enum GrantStatus { undecided, denied, granted }
+
 class NotificationPermissionItem implements PermissionItem {
-  final _key = 'permissionItem-Notification';
-  final _updateSubject = BehaviorSubject<dynamic>();
-  @override
-  Stream get onUpdate => _updateSubject;
+  final _key = 'permissionItem--Notification';
+  final _statusSubject = BehaviorSubject<GrantStatus>()
+    ..add(GrantStatus.undecided);
+
+  NotificationPermissionItem() {
+    getPermissionStatus().then(_statusSubject.add);
+  }
 
   @override
-  Future<bool> needsRequestPermission() async {
+  Stream<GrantStatus> get onUpdate => _statusSubject;
+
+  @override
+  Future<GrantStatus> getPermissionStatus() async {
     if (Platform.isAndroid) {
-      return false;
+      return GrantStatus.granted;
     }
     final prefs = await SharedPreferences.getInstance();
-    return !prefs.containsKey(_key);
+    if (!prefs.containsKey(_key)) {
+      return GrantStatus.undecided;
+    }
+    final status = await FCMInitialization.requestPermissionIfNeeded();
+    return status == AuthorizationStatus.authorized ||
+            status == AuthorizationStatus.provisional
+        ? GrantStatus.granted
+        : GrantStatus.denied;
   }
 
   @override
   Future<void> skipPermissionRequest() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_key, false);
-    _updateSubject.add(null);
+    _statusSubject.add(GrantStatus.denied);
   }
 
   @override
@@ -74,7 +88,7 @@ class NotificationPermissionItem implements PermissionItem {
     final status = await FCMInitialization.requestPermissionIfNeeded();
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_key, true);
-    _updateSubject.add(null);
+    _statusSubject.add(null);
     return status == AuthorizationStatus.authorized ||
         status == AuthorizationStatus.provisional;
   }
@@ -88,21 +102,34 @@ class NotificationPermissionItem implements PermissionItem {
 
 class LocationPermissionItem implements PermissionItem {
   final _key = 'permissionItem-Location';
-  final _updateSubject = BehaviorSubject<dynamic>();
+  final _updateSubject = BehaviorSubject<GrantStatus>()
+    ..add(GrantStatus.undecided);
+
+  LocationPermissionItem() {
+    getPermissionStatus().then(_updateSubject.add);
+  }
+  
   @override
-  Stream get onUpdate => _updateSubject;
+  Stream<GrantStatus> get onUpdate => _updateSubject;
 
   @override
-  Future<bool> needsRequestPermission() async {
+  Future<GrantStatus> getPermissionStatus() async {
     final prefs = await SharedPreferences.getInstance();
-    return !prefs.containsKey(_key);
+    if (!prefs.containsKey(_key)) {
+      return GrantStatus.undecided;
+    }
+    final status = await Permission.locationWhenInUse.request();
+    return status == PermissionStatus.granted ||
+            status == PermissionStatus.limited
+        ? GrantStatus.granted
+        : GrantStatus.denied;
   }
 
   @override
   Future<void> skipPermissionRequest() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_key, false);
-    _updateSubject.add(null);
+    _updateSubject.add(GrantStatus.denied);
   }
 
   @override
@@ -110,9 +137,12 @@ class LocationPermissionItem implements PermissionItem {
     final status = await Permission.locationWhenInUse.request();
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_key, true);
-    _updateSubject.add(null);
-    return status == PermissionStatus.granted ||
-        status == PermissionStatus.limited;
+    final grantStatus =
+        status == PermissionStatus.granted || status == PermissionStatus.limited
+            ? GrantStatus.granted
+            : GrantStatus.denied;
+    _updateSubject.add(grantStatus);
+    return grantStatus == GrantStatus.granted;
   }
 
   @override
@@ -125,6 +155,7 @@ class LocationPermissionItem implements PermissionItem {
 class LinkPhonePermissionItem implements PermissionItem {
   AppBloc bloc;
   LinkPhonePermissionItem(this.bloc);
+
   @override
   String message = '為了能在預約到期時可以連絡上您，需要您綁定聯絡電話號碼。';
 
@@ -132,12 +163,15 @@ class LinkPhonePermissionItem implements PermissionItem {
   Widget icon = Icon(Icons.phone, size: 44);
 
   @override
-  Future<bool> needsRequestPermission() async {
-    return bloc.firebaseUser.phoneNumber != null;
+  Future<GrantStatus> getPermissionStatus() async {
+    return bloc.firebaseUser.phoneNumber != null
+        ? GrantStatus.granted
+        : GrantStatus.undecided;
   }
 
   @override
-  Stream get onUpdate => bloc.onFirebaseUserChange;
+  Stream<GrantStatus> get onUpdate => bloc.onFirebaseUserChange.map((event) =>
+      event.phoneNumber != null ? GrantStatus.undecided : GrantStatus.granted);
 
   @override
   Future<void> skipPermissionRequest() {
@@ -147,6 +181,6 @@ class LinkPhonePermissionItem implements PermissionItem {
   @override
   Future<bool> startPermissionRequest(BuildContext context) async {
     await Navigator.pushNamed(context, RouteNames.phoneVerification);
-    return needsRequestPermission();
+    return await getPermissionStatus() == GrantStatus.granted;
   }
 }

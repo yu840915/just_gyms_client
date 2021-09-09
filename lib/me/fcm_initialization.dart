@@ -5,7 +5,7 @@ import 'package:where_gym/app_bloc.dart';
 class FCMInitialization {
   static FirebaseMessaging get _messaging => FirebaseMessaging.instance;
 
-  static Future<AuthorizationStatus> requestPermissionIfNeeded() async {
+  static Future<AuthorizationStatus> requestPermissionIfNeeded() async {    
     final settings = await _messaging.requestPermission(
       provisional: true,
       badge: true,

@@ -35,7 +35,11 @@ class PermissionCheckerRow extends StatelessWidget {
   PermissionCheckerRow(this.item);
 
   void _permit(BuildContext context) async {
-    await item.startPermissionRequest(context);
+    try {
+      await item.startPermissionRequest(context);
+    } catch (e, s) {
+      print('$e, $s');
+    }
   }
 
   @override
@@ -51,14 +55,19 @@ class PermissionCheckerRow extends StatelessWidget {
             style: TextStyles.large.title,
           ),
           SizedBox(height: 8),
-          _buildPermitButton(context),
+          StreamBuilder<Object>(
+            stream: item.onUpdate,
+            builder: (context, snapshot) {
+              return _buildPermitButton(context);
+            }
+          ),
         ],
         crossAxisAlignment: CrossAxisAlignment.center,
       ),
     );
   }
 
-  Widget _buildPermitButton(BuildContext context) {
+  Widget _buildPermitButton(BuildContext context) {    
     return TextButton(
       onPressed: () => _permit(context),
       child: Text('設定'),
