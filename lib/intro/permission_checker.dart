@@ -49,7 +49,7 @@ abstract class PermissionItem {
 enum GrantStatus { undecided, denied, granted }
 
 class NotificationPermissionItem implements PermissionItem {
-  final _key = 'permissionItem--Notification';
+  final _key = 'permissionItem_Notification';
   final _statusSubject = BehaviorSubject<GrantStatus>()
     ..add(GrantStatus.undecided);
 
@@ -70,8 +70,8 @@ class NotificationPermissionItem implements PermissionItem {
       return GrantStatus.undecided;
     }
     final status = await FCMInitialization.requestPermissionIfNeeded();
-    return status == AuthorizationStatus.authorized ||
-            status == AuthorizationStatus.provisional
+    return (status == AuthorizationStatus.authorized ||
+            status == AuthorizationStatus.provisional)
         ? GrantStatus.granted
         : GrantStatus.denied;
   }
@@ -88,9 +88,12 @@ class NotificationPermissionItem implements PermissionItem {
     final status = await FCMInitialization.requestPermissionIfNeeded();
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_key, true);
-    _statusSubject.add(null);
-    return status == AuthorizationStatus.authorized ||
-        status == AuthorizationStatus.provisional;
+    final grantStatus = (status == AuthorizationStatus.authorized ||
+            status == AuthorizationStatus.provisional)
+        ? GrantStatus.granted
+        : GrantStatus.denied;
+    _statusSubject.add(grantStatus);
+    return grantStatus == GrantStatus.granted;
   }
 
   @override
@@ -108,7 +111,7 @@ class LocationPermissionItem implements PermissionItem {
   LocationPermissionItem() {
     getPermissionStatus().then(_updateSubject.add);
   }
-  
+
   @override
   Stream<GrantStatus> get onUpdate => _updateSubject;
 
@@ -171,7 +174,7 @@ class LinkPhonePermissionItem implements PermissionItem {
 
   @override
   Stream<GrantStatus> get onUpdate => bloc.onFirebaseUserChange.map((event) =>
-      event.phoneNumber != null ? GrantStatus.undecided : GrantStatus.granted);
+      event.phoneNumber == null ? GrantStatus.undecided : GrantStatus.granted);
 
   @override
   Future<void> skipPermissionRequest() {

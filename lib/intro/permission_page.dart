@@ -44,6 +44,18 @@ class PermissionCheckerRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return StreamBuilder<Object>(
+      stream: item.onUpdate,
+      builder: (context, snapshot) {
+        return _buildContent(context, snapshot.data);
+      },
+    );
+  }
+
+  Widget _buildContent(BuildContext context, GrantStatus status) {
+    if (status == GrantStatus.denied) {
+      return SizedBox.shrink();
+    }
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 24),
       child: Column(
@@ -55,25 +67,50 @@ class PermissionCheckerRow extends StatelessWidget {
             style: TextStyles.large.title,
           ),
           SizedBox(height: 8),
-          StreamBuilder<Object>(
-            stream: item.onUpdate,
-            builder: (context, snapshot) {
-              return _buildPermitButton(context);
-            }
-          ),
+          _buildAction(context, status),
         ],
         crossAxisAlignment: CrossAxisAlignment.center,
       ),
     );
   }
 
-  Widget _buildPermitButton(BuildContext context) {    
+  Widget _buildAction(BuildContext context, GrantStatus status) {
+    if (status == null) {
+      return Container(
+        height: 44,
+        child: Text(
+          '檢查中...',
+          style: TextStyles.large.action.copyWith(color: AppColors.progressing),
+        ),
+      );
+    }
+    switch (status) {
+      case GrantStatus.undecided:
+        return _buildPermitButton(context);
+      case GrantStatus.denied:
+        return SizedBox.shrink();
+      case GrantStatus.granted:
+        return Container(
+          height: 44,
+          child: Text(
+            '已完成',
+            style: TextStyles.large.action.copyWith(color: Colors.black),
+          ),
+        );
+    }
+    return SizedBox.shrink();
+  }
+
+  Widget _buildPermitButton(BuildContext context) {
     return TextButton(
       onPressed: () => _permit(context),
       child: Text('設定'),
       style: TextButton.styleFrom(
         primary: AppColors.theme,
         textStyle: TextStyles.large.action,
+        fixedSize: Size.fromHeight(44),
+        padding: EdgeInsets.zero,
+        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
       ),
     );
   }

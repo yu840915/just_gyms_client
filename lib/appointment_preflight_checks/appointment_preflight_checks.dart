@@ -36,7 +36,7 @@ class AppointmentPreflightCheck {
     return AppointmentPreflightCheckResult(
       hasPhone: bloc.firebaseUser.phoneNumber != null,
       hasAskedNotificationPermission:
-          (await item.getPermissionStatus()) == false,
+          (await item.getPermissionStatus()) != GrantStatus.undecided,
     );
   }
 }

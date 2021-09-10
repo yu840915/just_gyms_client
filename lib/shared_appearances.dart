@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 
 class AppColors {
   AppColors._();
-  static final theme = const Color(0xff019858);
+  static const theme = const Color(0xff019858);
+  static final progressing = Colors.grey.shade600;
 }
 
 class TextStyles {
