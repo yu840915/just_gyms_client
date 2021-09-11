@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:where_gym/app_bar_factory.dart';
 import 'package:where_gym/app_bloc.dart';
+import 'package:where_gym/appointment/appointment_creation_page.dart';
 import 'package:where_gym/appointment_preflight_checks/appointment_preflight_checks.dart';
 import 'package:where_gym/gym.dart';
 import 'package:where_gym/map_view/open_hour_indicator.dart';
@@ -22,6 +23,13 @@ class GymDetailPage extends StatelessWidget {
         false) {
       return;
     }
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => AppointmentCreatePage(),
+        fullscreenDialog: true,
+      ),
+    );
   }
 
   void _callGym(String phone) {
