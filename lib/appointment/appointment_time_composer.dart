@@ -8,7 +8,7 @@ class AppointmentTimeComposer {
   final _daySubject = BehaviorSubject<DateTime>();
   Stream<DateTime> get onDay => _daySubject;
   Stream<DateTimeRange> get onTimeRange => _timeRangeSubject;
-  final List<BusinessHours> businessHours;
+  final Map<Weekday, BusinessHours> businessHours;
 
   AppointmentTimeComposer({@required this.businessHours}) {
     setDay(DateTime.now().add(Duration(days: 1)));
@@ -28,7 +28,8 @@ class AppointmentTimeComposer {
 
   void setStart(DateTime start) {
     final mappedStart = _mapTime(start);
-    if (!businessHours[mappedStart.weekday].isOpenAt(mappedStart)) {
+    if (!businessHours[WeekdayMethods.fromInt(mappedStart.weekday)]
+        .isOpenAt(mappedStart)) {
       throw LocalError('開始時間必須在營業時間內');
     }
     final range = _timeRangeSubject.valueWrapper.value;
@@ -51,7 +52,8 @@ class AppointmentTimeComposer {
       throw LocalError('請先選擇開始時間');
     } else if (mappedEnd.microsecond <= range.start.microsecond) {
       throw LocalError('結束時間必須在開始時間以後');
-    } else if (!businessHours[mappedEnd.weekday].isOpenAt(mappedEnd)) {
+    } else if (!businessHours[WeekdayMethods.fromInt(mappedEnd.weekday)]
+        .isOpenAt(mappedEnd)) {
       throw LocalError('結束時間必須在營業時間內');
     }
     _updateRange(range.start, mappedEnd);

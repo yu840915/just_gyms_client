@@ -257,6 +257,30 @@ extension WeekdayMethods on Weekday {
     }
     throw 'Unexpected error';
   }
+
+  static Weekday fromInt(int val) {
+    if (val == null) {
+      return null;
+    }
+    switch (val) {
+      case 1:
+        return Weekday.mon;
+      case 2:
+        return Weekday.tue;
+      case 3:
+        return Weekday.wed;
+      case 4:
+        return Weekday.thu;
+      case 5:
+        return Weekday.fri;
+      case 6:
+        return Weekday.sat;
+      case 7:
+        return Weekday.sun;
+      default:
+        throw 'Invalid value $val';
+    }
+  }
 }
 
 class HourMin {

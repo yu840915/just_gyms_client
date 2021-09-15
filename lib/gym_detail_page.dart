@@ -26,7 +26,7 @@ class GymDetailPage extends StatelessWidget {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => AppointmentCreatePage(),
+        builder: (context) => AppointmentCreatePage(gym: gym),
         fullscreenDialog: true,
       ),
     );
