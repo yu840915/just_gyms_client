@@ -24,6 +24,12 @@ class _AppointmentCreatePageState extends State<AppointmentCreatePage> {
   }
 
   @override
+  void dispose() {
+    _composer.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBarFactory.appBar(),
@@ -41,10 +47,32 @@ class _AppointmentCreatePageState extends State<AppointmentCreatePage> {
           firstDay: tomorrow,
           lastDay: tomorrow.add(Duration(days: 14)),
           calendarFormat: CalendarFormat.week,
-        )
-        //Start Time (show picker)
-        //End Time (show picker)
+        ),
+        Spacer(),
+        StreamBuilder<DateTimeRange>(
+          stream: _composer.onTimeRange,
+          builder: (context, snapshot) {
+            return _buildTimeButtons(snapshot.data);
+          },
+        ),
       ],
     );
+  }
+
+  Widget _buildTimeButtons(DateTimeRange range) {
+    return Column(
+      children: [
+        TextButton(
+            onPressed: () {}, child: Text(_formatTime(range?.start, "開始時間"))),
+        TextButton(
+            onPressed: () {}, child: Text(_formatTime(range?.end, "結束時間"))),
+      ],
+    );
+  }
+
+  String _formatTime(DateTime time, String placeholder) {
+    return time != null
+        ? DateFormat(DateFormat.HOUR_MINUTE).format(time)
+        : placeholder;
   }
 }
