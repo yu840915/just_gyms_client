@@ -113,8 +113,8 @@ class Price {
 
 class BusinessHours {
   final Weekday weekday;
-  final HourMin start;
-  final HourMin end;
+  final TimeOfDay start;
+  final TimeOfDay end;
   bool get isOff => start.isZero && end.isZero;
   bool get isCrossing => !isOff && end.isBefore(start);
   BusinessHours({
@@ -195,15 +195,15 @@ class BusinessHoursDescriptor {
   final String start;
   final String end;
   Weekday _weekday;
-  HourMin _parsedStart;
-  HourMin _parsedEnd;
+  TimeOfDay _parsedStart;
+  TimeOfDay _parsedEnd;
   Weekday get weekday => _weekday;
-  HourMin get parsedStart => _parsedStart;
-  HourMin get parsedEnd => _parsedEnd;
+  TimeOfDay get parsedStart => _parsedStart;
+  TimeOfDay get parsedEnd => _parsedEnd;
   BusinessHoursDescriptor({this.dayOfWeek, this.start, this.end}) {
     _weekday = WeekdayMethods.fromString(dayOfWeek);
-    _parsedStart = HourMin.fromString(start);
-    _parsedEnd = HourMin.fromString(end);
+    _parsedStart = TimeOfDayMethods.fromString(start);
+    _parsedEnd = TimeOfDayMethods.fromString(end);
   }
 
   Map<String, dynamic> toJson() => _$BusinessHoursDescriptorToJson(this);
@@ -241,19 +241,19 @@ extension WeekdayMethods on Weekday {
   int get intValue {
     switch (this) {
       case Weekday.mon:
-        return 1;
+        return DateTime.monday;
       case Weekday.tue:
-        return 2;
+        return DateTime.tuesday;
       case Weekday.wed:
-        return 3;
+        return DateTime.wednesday;
       case Weekday.thu:
-        return 4;
+        return DateTime.thursday;
       case Weekday.fri:
-        return 5;
+        return DateTime.friday;
       case Weekday.sat:
-        return 6;
+        return DateTime.saturday;
       case Weekday.sun:
-        return 7;
+        return DateTime.sunday;
     }
     throw 'Unexpected error';
   }
@@ -263,19 +263,19 @@ extension WeekdayMethods on Weekday {
       return null;
     }
     switch (val) {
-      case 1:
+      case DateTime.monday:
         return Weekday.mon;
-      case 2:
+      case DateTime.tuesday:
         return Weekday.tue;
-      case 3:
+      case DateTime.wednesday:
         return Weekday.wed;
-      case 4:
+      case DateTime.thursday:
         return Weekday.thu;
-      case 5:
+      case DateTime.friday:
         return Weekday.fri;
-      case 6:
+      case DateTime.saturday:
         return Weekday.sat;
-      case 7:
+      case DateTime.sunday:
         return Weekday.sun;
       default:
         throw 'Invalid value $val';
@@ -283,33 +283,28 @@ extension WeekdayMethods on Weekday {
   }
 }
 
-class HourMin {
-  final int hour;
-  final int min;
-  final String stringValue;
-  HourMin({this.stringValue, this.hour, this.min});
-  static HourMin fromString(String str) {
+extension TimeOfDayMethods on TimeOfDay {
+  static TimeOfDay fromString(String str) {
     final components = str.split(':');
     if (components.length != 2) {
       throw 'Invalid format';
     }
-    return HourMin(
-      stringValue: str,
+    return TimeOfDay(
       hour: int.parse(components.first),
-      min: int.parse(components.last),
+      minute: int.parse(components.last),
     );
   }
 
-  bool get isZero => hour == 0 && min == 0;
+  bool get isZero => hour == 0 && minute == 0;
 
-  bool isBefore(HourMin time) {
+  bool isBefore(TimeOfDay time) {
     if (hour != time.hour) {
       return hour < time.hour;
     }
-    return min < time.min;
+    return minute < time.minute;
   }
 
-  bool isAfter(HourMin time) {
+  bool isAfter(TimeOfDay time) {
     return !isBefore(time);
   }
 
@@ -317,11 +312,21 @@ class HourMin {
     if (hour != time.hour) {
       return hour < time.hour;
     }
-    return min < time.minute;
+    return isBefore(TimeOfDay.fromDateTime(time));
   }
 
   bool isAfterDate(DateTime time) {
     return !isBeforeDate(time);
+  }
+
+  String get stringValue {
+    String _addLeadingZeroIfNeeded(int value) {
+      if (value < 10) return '0$value';
+      return value.toString();
+    }
+    final String hourLabel = _addLeadingZeroIfNeeded(hour);
+    final String minuteLabel = _addLeadingZeroIfNeeded(minute);
+    return "$hourLabel:$minuteLabel";
   }
 }
 

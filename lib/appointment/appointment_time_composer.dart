@@ -22,7 +22,7 @@ class AppointmentTimeComposer {
   void setDay(DateTime date) {
     final startOfDate = DateTime(date.year, date.month, date.day, 0, 0, 0);
     _daySubject.add(startOfDate);
-    final range = _timeRangeSubject.valueWrapper.value;
+    final range = _timeRangeSubject.valueWrapper?.value;
     _updateRange(range?.start, range?.end);
   }
 

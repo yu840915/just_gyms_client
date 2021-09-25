@@ -16,6 +16,17 @@ class AppointmentCreatePage extends StatefulWidget {
 class _AppointmentCreatePageState extends State<AppointmentCreatePage> {
   AppointmentTimeComposer _composer;
 
+  void _showStartTimePicker(BuildContext context) async {
+    final start =
+        await showTimePicker(context: context, initialTime: TimeOfDay.now());
+
+    print(start);
+  }
+
+  void _showEndTimePicker(BuildContext context) async {
+    showTimePicker(context: context, initialTime: TimeOfDay.now());
+  }
+
   @override
   void initState() {
     super.initState();
@@ -63,9 +74,17 @@ class _AppointmentCreatePageState extends State<AppointmentCreatePage> {
     return Column(
       children: [
         TextButton(
-            onPressed: () {}, child: Text(_formatTime(range?.start, "開始時間"))),
+          onPressed: () {
+            _showStartTimePicker(context);
+          },
+          child: Text(_formatTime(range?.start, "開始時間")),
+        ),
         TextButton(
-            onPressed: () {}, child: Text(_formatTime(range?.end, "結束時間"))),
+          onPressed: () {
+            _showEndTimePicker(context);
+          },
+          child: Text(_formatTime(range?.end, "結束時間")),
+        ),
       ],
     );
   }
