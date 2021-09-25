@@ -1,14 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:rxdart/rxdart.dart';
 import 'package:rxdart/subjects.dart';
 import 'package:where_gym/api_services/api_services.dart';
 import 'package:where_gym/gym.dart';
 
 class AppointmentTimeComposer {
-  final _timeRangeSubject = BehaviorSubject<DateTimeRange>();
+  final _timeRangeSubject = BehaviorSubject<TimeRange>();
   final _daySubject = BehaviorSubject<DateTime>();
   Stream<DateTime> get onDay => _daySubject;
-  Stream<DateTimeRange> get onTimeRange => _timeRangeSubject;
+  Stream<TimeRange> get onTimeRange => _timeRangeSubject;
   final Map<Weekday, BusinessHours> businessHours;
+
+  BusinessHours get businessHoursOnSelectedDay =>
+      _daySubject.valueWrapper != null
+          ? businessHours[
+              WeekdayMethods.fromInt(_daySubject.valueWrapper.value.weekday)]
+          : null;
 
   AppointmentTimeComposer({@required this.businessHours}) {
     setDay(DateTime.now().add(Duration(days: 1)));
@@ -22,51 +29,56 @@ class AppointmentTimeComposer {
   void setDay(DateTime date) {
     final startOfDate = DateTime(date.year, date.month, date.day, 0, 0, 0);
     _daySubject.add(startOfDate);
-    final range = _timeRangeSubject.valueWrapper?.value;
-    _updateRange(range?.start, range?.end);
   }
 
-  void setStart(DateTime start) {
-    final mappedStart = _mapTime(start);
-    if (!businessHours[WeekdayMethods.fromInt(mappedStart.weekday)]
-        .isOpenAt(mappedStart)) {
+  void setStart(TimeOfDay start) {
+    if (_daySubject.valueWrapper == null) {
+      throw LocalError('請先選擇日期');
+    }
+    if (!businessHoursOnSelectedDay.isOpenAtTime(start)) {
       throw LocalError('開始時間必須在營業時間內');
     }
-    final range = _timeRangeSubject.valueWrapper.value;
-    DateTime end = range.end;
-    if (end != null && mappedStart.millisecond > end.microsecond) {
+    TimeOfDay end = _timeRangeSubject.valueWrapper?.value?.end;
+    if (end != null && start.isAfter(end)) {
       end = null;
     }
-    _updateRange(mappedStart, end);
+    _updateRange(start, end);
   }
 
-  DateTime _mapTime(DateTime time) {
-    final date = _daySubject.valueWrapper.value;
-    return DateTime(date.year, date.month, date.day, time.hour, time.minute, 0);
-  }
-
-  void setEnd(DateTime end) {
-    final mappedEnd = _mapTime(end);
-    final range = _timeRangeSubject.valueWrapper.value;
+  void setEnd(TimeOfDay end) {
+    final range = _timeRangeSubject.valueWrapper?.value;
     if (range == null || range.start == null) {
       throw LocalError('請先選擇開始時間');
-    } else if (mappedEnd.microsecond <= range.start.microsecond) {
+    } else if (end.isBefore(range.start)) {
       throw LocalError('結束時間必須在開始時間以後');
-    } else if (!businessHours[WeekdayMethods.fromInt(mappedEnd.weekday)]
-        .isOpenAt(mappedEnd)) {
+    } else if (!businessHoursOnSelectedDay.isOpenAtTime(end)) {
       throw LocalError('結束時間必須在營業時間內');
     }
-    _updateRange(range.start, mappedEnd);
+    _updateRange(range.start, end);
   }
 
-  void _updateRange(DateTime start, DateTime end) {
+  void _updateRange(TimeOfDay start, TimeOfDay end) {
     if (start == null) {
       return _timeRangeSubject.add(null);
     }
-    final range = DateTimeRange(
-      start: _mapTime(start),
-      end: end != null ? _mapTime(end) : null,
-    );
-    _timeRangeSubject.add(range);
+    _timeRangeSubject.add(TimeRange(start: start, end: end));
   }
+
+  bool isDaySelected(DateTime date) {
+    final selection = _daySubject.valueWrapper?.value;
+    if (selection == null) {
+      return false;
+    }
+    return selection.day == date.day &&
+        selection.month == date.month &&
+        selection.year == date.year;
+  }
+}
+
+class TimeRange {
+  final TimeOfDay start;
+  final TimeOfDay end;
+  TimeRange({@required this.start, @required this.end})
+      : assert(start != null),
+        assert(end == null || !start.isAfter(end));
 }

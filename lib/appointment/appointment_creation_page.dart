@@ -17,14 +17,25 @@ class _AppointmentCreatePageState extends State<AppointmentCreatePage> {
   AppointmentTimeComposer _composer;
 
   void _showStartTimePicker(BuildContext context) async {
-    final start =
-        await showTimePicker(context: context, initialTime: TimeOfDay.now());
-
-    print(start);
+    final start = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+      initialEntryMode: TimePickerEntryMode.input,
+    );
+    if (start != null) {
+      _composer.setStart(start);
+    }
   }
 
   void _showEndTimePicker(BuildContext context) async {
-    showTimePicker(context: context, initialTime: TimeOfDay.now());
+    final end = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+      initialEntryMode: TimePickerEntryMode.input,
+    );
+    if (end != null) {
+      _composer.setEnd(end);
+    }
   }
 
   @override
@@ -44,7 +55,11 @@ class _AppointmentCreatePageState extends State<AppointmentCreatePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBarFactory.appBar(),
-      body: _buildBody(context),
+      body: StreamBuilder<void>(
+          stream: _composer.onDay,
+          builder: (context, snapshot) {
+            return _buildBody(context);
+          }),
     );
   }
 
@@ -58,19 +73,24 @@ class _AppointmentCreatePageState extends State<AppointmentCreatePage> {
           firstDay: tomorrow,
           lastDay: tomorrow.add(Duration(days: 14)),
           calendarFormat: CalendarFormat.week,
+          rangeSelectionMode: RangeSelectionMode.disabled,
+          onDaySelected: (date, _) => _composer.setDay(date),
+          selectedDayPredicate: (date) => _composer.isDaySelected(date),
         ),
         Spacer(),
-        StreamBuilder<DateTimeRange>(
-          stream: _composer.onTimeRange,
-          builder: (context, snapshot) {
-            return _buildTimeButtons(snapshot.data);
-          },
+        SafeArea(
+          child: StreamBuilder<TimeRange>(
+            stream: _composer.onTimeRange,
+            builder: (context, snapshot) {
+              return _buildTimeButtons(snapshot.data);
+            },
+          ),
         ),
       ],
     );
   }
 
-  Widget _buildTimeButtons(DateTimeRange range) {
+  Widget _buildTimeButtons(TimeRange range) {
     return Column(
       children: [
         TextButton(
@@ -84,14 +104,13 @@ class _AppointmentCreatePageState extends State<AppointmentCreatePage> {
             _showEndTimePicker(context);
           },
           child: Text(_formatTime(range?.end, "結束時間")),
+          style: TextButton.styleFrom(),
         ),
       ],
     );
   }
 
-  String _formatTime(DateTime time, String placeholder) {
-    return time != null
-        ? DateFormat(DateFormat.HOUR_MINUTE).format(time)
-        : placeholder;
+  String _formatTime(TimeOfDay time, String placeholder) {
+    return time != null ? time.stringValue : placeholder;
   }
 }

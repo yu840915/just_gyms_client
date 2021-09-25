@@ -137,6 +137,10 @@ class BusinessHours {
     return false;
   }
 
+  bool isOpenAtTime(TimeOfDay time) {
+    return start.isBefore(time) && end.isAfter(time);
+  }
+
   bool opensAfter(DateTime dateTime) {
     if (dateTime.weekday == 7 && weekday.intValue == 1) {
       return true;
@@ -324,6 +328,7 @@ extension TimeOfDayMethods on TimeOfDay {
       if (value < 10) return '0$value';
       return value.toString();
     }
+
     final String hourLabel = _addLeadingZeroIfNeeded(hour);
     final String minuteLabel = _addLeadingZeroIfNeeded(minute);
     return "$hourLabel:$minuteLabel";
