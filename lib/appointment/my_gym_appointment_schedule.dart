@@ -1,11 +1,17 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:rxdart/subjects.dart';
+import 'package:where_gym/gym.dart';
 
 class AppointmentSchedule {
   final DocumentReference userRef;
+  final Gym gym;
   final Stream<List<AppointmentInfo>> myAppointments;
-  AppointmentSchedule(this.userRef)
+  final _dateSubject = BehaviorSubject<DateTime>();
+  AppointmentSchedule({@required this.userRef, @required this.gym})
       : myAppointments = FirebaseFirestore.instance
+            .collection('gyms')
+            .doc(gym.id)
             .collection('gymAppointments')
             .where('user', isEqualTo: userRef)
             .where('status', isEqualTo: AppointmentStatus.scheduled.stringValue)
@@ -14,6 +20,10 @@ class AppointmentSchedule {
             .orderBy('startAt')
             .snapshots()
             .map((event) => event.docs.map((e) => AppointmentInfo(e)).toList());
+
+  void selectDate(DateTime date) {
+    _dateSubject.add(date);
+  }
 }
 
 class AppointmentInfo {

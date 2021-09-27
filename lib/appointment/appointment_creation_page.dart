@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:where_gym/app_bar_factory.dart';
+import 'package:where_gym/app_bloc.dart';
+import 'package:where_gym/appointment/my_gym_appointment_schedule.dart';
 import 'package:where_gym/appointment/appointment_time_composer.dart';
 import 'package:where_gym/gym.dart';
 import 'package:where_gym/shared_appearances.dart';
@@ -16,6 +19,7 @@ class AppointmentCreatePage extends StatefulWidget {
 
 class _AppointmentCreatePageState extends State<AppointmentCreatePage> {
   AppointmentTimeComposer _composer;
+  AppointmentSchedule _schedule;
 
   void _showStartTimePicker(BuildContext context) async {
     final start = await showTimePicker(
@@ -42,6 +46,15 @@ class _AppointmentCreatePageState extends State<AppointmentCreatePage> {
   @override
   void initState() {
     super.initState();
+    _schedule = AppointmentSchedule(
+      userRef: BlocProvider.of<AppBloc>(context).userRef,
+      gym: widget.gym,
+    );
+    _schedule.myAppointments.listen((event) {
+      print(event);
+    }).onError((error) {
+      print(error);
+    });
     _composer =
         AppointmentTimeComposer(businessHours: widget.gym.weekdayBusinessHours);
   }
@@ -65,30 +78,13 @@ class _AppointmentCreatePageState extends State<AppointmentCreatePage> {
   }
 
   Widget _buildBody(BuildContext context) {
-    final tomorrow = DateTime.now().add(Duration(days: 1));
     return Column(
       children: [
-        TableCalendar(
-          locale: Intl.systemLocale,
-          focusedDay: tomorrow,
-          firstDay: tomorrow,
-          headerStyle: HeaderStyle(
-            formatButtonVisible: false,
-            titleCentered: true,
-          ),
-          calendarStyle: CalendarStyle(            
-            selectedDecoration: BoxDecoration(
-              color: AppColors.theme,
-              shape: BoxShape.circle,
-            ),
-          ),
-          rowHeight: 80,
-          lastDay: tomorrow.add(Duration(days: 14)),
-          calendarFormat: CalendarFormat.week,
-          rangeSelectionMode: RangeSelectionMode.disabled,
-          onDaySelected: (date, _) => _composer.setDay(date),
-          selectedDayPredicate: (date) => _composer.isDaySelected(date),
-          eventLoader: null, //TODO: Add events
+        StreamBuilder<Object>(
+          stream: _schedule.myAppointments,
+          builder: (context, snapshot) {
+            return _buildCalender(snapshot.data ?? []);
+          },
         ),
         Container(
           color: Colors.grey.shade200,
@@ -101,6 +97,34 @@ class _AppointmentCreatePageState extends State<AppointmentCreatePage> {
         ),
         Spacer(),
       ],
+    );
+  }
+
+  Widget _buildCalender(List<AppointmentInfo> list) {
+    final tomorrow = DateTime.now().add(Duration(days: 1));
+    return TableCalendar(
+      locale: Intl.systemLocale,
+      focusedDay: tomorrow,
+      firstDay: tomorrow,
+      headerStyle: HeaderStyle(
+        formatButtonVisible: false,
+        titleCentered: true,
+      ),
+      calendarStyle: CalendarStyle(
+        selectedDecoration: BoxDecoration(
+          color: AppColors.theme,
+          shape: BoxShape.circle,
+        ),
+      ),
+      rowHeight: 80,
+      lastDay: tomorrow.add(Duration(days: 14)),
+      calendarFormat: CalendarFormat.week,
+      rangeSelectionMode: RangeSelectionMode.disabled,
+      onDaySelected: (date, _) => _composer.setDay(date),
+      selectedDayPredicate: (date) => _composer.isDaySelected(date),
+      eventLoader: (date) => list
+          .where((a) => DateUtils.isSameDay(date, a.timeRange.start))
+          .toList(),
     );
   }
 
