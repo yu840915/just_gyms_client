@@ -4,7 +4,8 @@ import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:where_gym/app_bar_factory.dart';
 import 'package:where_gym/app_bloc.dart';
-import 'package:where_gym/appointment/my_gym_appointment_schedule.dart';
+import 'package:where_gym/appointment/appointment_info.dart';
+import 'package:where_gym/appointment/gym_appointment_schedule.dart';
 import 'package:where_gym/appointment/appointment_time_composer.dart';
 import 'package:where_gym/gym.dart';
 import 'package:where_gym/shared_appearances.dart';
@@ -19,7 +20,7 @@ class AppointmentCreatePage extends StatefulWidget {
 
 class _AppointmentCreatePageState extends State<AppointmentCreatePage> {
   AppointmentTimeComposer _composer;
-  AppointmentSchedule _schedule;
+  GymAppointmentSchedule _schedule;
 
   void _showStartTimePicker(BuildContext context) async {
     final start = await showTimePicker(
@@ -46,7 +47,7 @@ class _AppointmentCreatePageState extends State<AppointmentCreatePage> {
   @override
   void initState() {
     super.initState();
-    _schedule = AppointmentSchedule(
+    _schedule = GymAppointmentSchedule(
       userRef: BlocProvider.of<AppBloc>(context).userRef,
       gym: widget.gym,
     );
