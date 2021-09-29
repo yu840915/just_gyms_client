@@ -287,6 +287,12 @@ extension WeekdayMethods on Weekday {
   }
 }
 
+extension DateTimeMethods on DateTime {
+  static DateTime onDayWithTime(DateTime day, TimeOfDay time) {
+    return DateTime(day.year, day.month, day.day, time.hour, time.minute);
+  }
+}
+
 extension TimeOfDayMethods on TimeOfDay {
   static TimeOfDay fromString(String str) {
     final components = str.split(':');

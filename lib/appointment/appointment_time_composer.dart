@@ -73,6 +73,22 @@ class AppointmentTimeComposer {
         selection.month == date.month &&
         selection.year == date.year;
   }
+
+  DateTimeRange getDateRange() {
+    final day = _daySubject.valueWrapper?.value;
+    final range = _timeRangeSubject.valueWrapper?.value;
+    if (_daySubject.valueWrapper == null) {
+      throw LocalError('請先選擇日期');
+    } else if (range == null || range.start == null) {
+      throw LocalError('請先選擇開始時間');
+    } else if (range.start == null) {
+      throw LocalError('請先選擇結束時間');
+    }
+    return DateTimeRange(
+      start: DateTimeMethods.onDayWithTime(day, range.start),
+      end: DateTimeMethods.onDayWithTime(day, range.end),
+    );
+  }
 }
 
 class TimeRange {

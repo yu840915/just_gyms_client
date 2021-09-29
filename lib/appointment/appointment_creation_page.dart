@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:where_gym/alert_factory.dart';
 import 'package:where_gym/app_bar_factory.dart';
 import 'package:where_gym/app_bloc.dart';
 import 'package:where_gym/appointment/appointment_info.dart';
@@ -44,12 +45,24 @@ class _AppointmentCreatePageState extends State<AppointmentCreatePage> {
     }
   }
 
+  void _book(BuildContext context) async {
+    try {
+      await _schedule.bookWithRange(_composer.getDateRange());
+    } catch (e) {
+      showDialog(
+        context: context,
+        builder: (context) => AlertFactory.errorAlert(context, error: e),
+      );
+    }
+  }
+
   @override
   void initState() {
     super.initState();
     _schedule = GymAppointmentSchedule(
       userRef: BlocProvider.of<AppBloc>(context).userRef,
       gym: widget.gym,
+      appBloc: BlocProvider.of(context),
     );
     _schedule.myAppointments.listen((event) {
       print(event);
@@ -96,6 +109,8 @@ class _AppointmentCreatePageState extends State<AppointmentCreatePage> {
             },
           ),
         ),
+        SizedBox(height: 8),
+        _buildBookButtons(context),
         Spacer(),
       ],
     );
@@ -164,5 +179,20 @@ class _AppointmentCreatePageState extends State<AppointmentCreatePage> {
       result = '$result ${time.stringValue}';
     }
     return result;
+  }
+
+  Widget _buildBookButtons(BuildContext context) {
+    return TextButton(
+      onPressed: () {
+        _book(context);
+      },
+      child: Text('預約'),
+      style: TextButton.styleFrom(
+        textStyle: TextStyles.large.action,
+        primary: Colors.white,
+        backgroundColor: AppColors.theme,
+        minimumSize: Size(120, 44),
+      ),
+    );
   }
 }

@@ -33,6 +33,8 @@ class AlertFactory {
   static String stringFromError(dynamic error) {
     if (error is ServiceError) {
       return error.info.toString();
+    } else if (error is LocalError) {
+      return error.message;
     }
     return error.toString();
   }
