@@ -138,7 +138,7 @@ class BusinessHours {
   }
 
   bool isOpenAtTime(TimeOfDay time) {
-    return start.isBefore(time) && end.isAfter(time);
+    return !start.isAfter(time) && !end.isBefore(time);
   }
 
   bool opensAfter(DateTime dateTime) {
@@ -285,12 +285,16 @@ extension WeekdayMethods on Weekday {
         throw 'Invalid value $val';
     }
   }
+
+  Weekday get next => fromInt(this == Weekday.sun ? 1 : intValue + 1);
 }
 
 extension DateTimeMethods on DateTime {
   static DateTime onDayWithTime(DateTime day, TimeOfDay time) {
     return DateTime(day.year, day.month, day.day, time.hour, time.minute);
   }
+
+  Weekday get dayOfWeek => WeekdayMethods.fromInt(weekday);
 }
 
 extension TimeOfDayMethods on TimeOfDay {
@@ -315,7 +319,11 @@ extension TimeOfDayMethods on TimeOfDay {
   }
 
   bool isAfter(TimeOfDay time) {
-    return !isBefore(time);
+    return !isBefore(time) && !isSame(time);
+  }
+
+  bool isSame(TimeOfDay time) {
+    return hour == time.hour && minute == time.minute;
   }
 
   bool isBeforeDate(DateTime time) {
@@ -326,7 +334,10 @@ extension TimeOfDayMethods on TimeOfDay {
   }
 
   bool isAfterDate(DateTime time) {
-    return !isBeforeDate(time);
+    if (hour != time.hour) {
+      return hour < time.hour;
+    }
+    return !isAfter(TimeOfDay.fromDateTime(time));
   }
 
   String get stringValue {

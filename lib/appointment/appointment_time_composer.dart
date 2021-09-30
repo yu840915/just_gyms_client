@@ -10,6 +10,15 @@ class AppointmentTimeComposer {
   Stream<DateTime> get onDay => _daySubject;
   Stream<TimeRange> get onTimeRange => _timeRangeSubject;
   final Map<Weekday, BusinessHours> businessHours;
+  List<Weekday> get openDays => [
+        Weekday.mon,
+        Weekday.tue,
+        Weekday.wed,
+        Weekday.thu,
+        Weekday.fri,
+        Weekday.sat,
+        Weekday.sun,
+      ].where((day) => !businessHours[day].isOff).toList();
 
   BusinessHours get businessHoursOnSelectedDay =>
       _daySubject.valueWrapper != null
@@ -18,7 +27,14 @@ class AppointmentTimeComposer {
           : null;
 
   AppointmentTimeComposer({@required this.businessHours}) {
-    setDay(DateTime.now().add(Duration(days: 1)));
+    DateTime date = DateTime.now().add(Duration(days: 1));
+    if (openDays.length > 0) {
+      while (businessHours[date.dayOfWeek].isOff) {
+        date = date.add(Duration(days: 1));
+      }
+    }
+    setDay(date);
+    setStart(businessHours[date.dayOfWeek].start);
   }
 
   void dispose() {
@@ -39,8 +55,11 @@ class AppointmentTimeComposer {
       throw LocalError('開始時間必須在營業時間內');
     }
     TimeOfDay end = _timeRangeSubject.valueWrapper?.value?.end;
-    if (end != null && start.isAfter(end)) {
-      end = null;
+    if (end == null || start.isAfter(end)) {
+      end = TimeOfDay(hour: start.hour + 1, minute: start.minute);
+      if (businessHoursOnSelectedDay.end.isBefore(end)) {
+        end = businessHoursOnSelectedDay.end;
+      }
     }
     _updateRange(start, end);
   }
