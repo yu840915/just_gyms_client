@@ -8,6 +8,7 @@ import 'package:where_gym/app_bloc.dart';
 import 'package:where_gym/appointment/appointment_info.dart';
 import 'package:where_gym/appointment/gym_appointment_schedule.dart';
 import 'package:where_gym/appointment/appointment_time_composer.dart';
+import 'package:where_gym/appointment/user_appointment_cell.dart';
 import 'package:where_gym/gym.dart';
 import 'package:where_gym/shared_appearances.dart';
 
@@ -82,7 +83,12 @@ class _AppointmentCreatePageState extends State<AppointmentCreatePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBarFactory.appBar(),
+      appBar: AppBarFactory.appBar(
+        title: Text(
+          widget.gym.name,
+          style: TextStyles.large.header,
+        ),
+      ),
       body: StreamBuilder<void>(
           stream: _composer.onDay,
           builder: (context, snapshot) {
@@ -111,7 +117,14 @@ class _AppointmentCreatePageState extends State<AppointmentCreatePage> {
         ),
         SizedBox(height: 8),
         _buildBookButtons(context),
-        Spacer(),
+        Expanded(
+          child: StreamBuilder<Object>(
+            stream: _schedule.myAppointments,
+            builder: (context, snapshot) {
+              return _buildAppointments(context, snapshot.data);
+            },
+          ),
+        )
       ],
     );
   }
@@ -193,6 +206,26 @@ class _AppointmentCreatePageState extends State<AppointmentCreatePage> {
         backgroundColor: AppColors.theme,
         minimumSize: Size(120, 44),
       ),
+    );
+  }
+
+  Widget _buildAppointments(
+    BuildContext context,
+    List<AppointmentInfo> appointments,
+  ) {
+    if (appointments == null || appointments.isEmpty) {
+      return Center(
+        child: Text(
+          '沒有預約',
+          style: TextStyles.large.title.copyWith(color: Colors.grey.shade300),
+        ),
+      );
+    }
+    return ListView.separated(
+      itemBuilder: (context, idx) =>
+          UserAppointmentCell(info: appointments[idx], schedule: _schedule),
+      separatorBuilder: (context, idx) => SizedBox(height: 8),
+      itemCount: appointments.length,
     );
   }
 }

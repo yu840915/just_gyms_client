@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class AppColors {
   AppColors._();
@@ -97,4 +98,8 @@ class ButtonStyles {
 class SharedIcons {
   static IconData get bookmark => Icons.star_border;
   static IconData get bookmarked => Icons.star;
+}
+
+class Formats {
+  static final time = DateFormat(DateFormat.HOUR_MINUTE);
 }

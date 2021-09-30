@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 class AppointmentInfo {
   final String id;
+  final String gymName;
   final DocumentReference gymRef;
   final AppointmentStatus status;
   final DocumentReference userRef;
@@ -11,6 +12,7 @@ class AppointmentInfo {
       : id = snap.id,
         gymRef = snap.data()['gym'],
         userRef = snap.data()['user'],
+        gymName = snap.data()['gymName'], 
         timeRange = DateTimeRange(
             start: (snap.data()['startAt'] as Timestamp).toDate(),
             end: (snap.data()['endAt'] as Timestamp).toDate()),
