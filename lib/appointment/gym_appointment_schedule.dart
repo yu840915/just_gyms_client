@@ -28,8 +28,8 @@ class GymAppointmentSchedule {
     final res = await APIServices.instances.post(
       '/gyms/${gym.id}/appointments',
       body: {
-        'startAt': range.start.toIso8601String(),
-        'endAt': range.end.toIso8601String(),
+        'startAt': range.start.toUtc().toIso8601String(),
+        'endAt': range.end.toUtc().toIso8601String(),
       },
       token: await appBloc.getIdToken(),
     );
