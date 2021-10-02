@@ -7,17 +7,17 @@ import 'package:where_gym/gym.dart';
 class AppointmentTimeComposer {
   final _timeRangeSubject = BehaviorSubject<TimeRange>();
   final _daySubject = BehaviorSubject<DateTime>();
-  Stream<DateTime> get onDay => _daySubject;
+  Stream<DateTime> get onDay => _daySubject.stream;
   Stream<TimeRange> get onTimeRange => _timeRangeSubject;
   final Map<Weekday, BusinessHours> businessHours;
   List<Weekday> get openDays => [
+        Weekday.sun,
         Weekday.mon,
         Weekday.tue,
         Weekday.wed,
         Weekday.thu,
         Weekday.fri,
         Weekday.sat,
-        Weekday.sun,
       ].where((day) => !businessHours[day].isOff).toList();
 
   BusinessHours get businessHoursOnSelectedDay =>

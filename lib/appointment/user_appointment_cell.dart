@@ -22,12 +22,19 @@ class UserAppointmentCell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      padding: EdgeInsets.all(12),
       child: Column(
         children: [
           _buildGymInfo(),
           _buildTimeRange(),
-          _buildCancelButton(context),
+          Row(
+            children: [
+              Spacer(),
+              _buildCancelButton(context),
+            ],
+          ),
         ],
+        crossAxisAlignment: CrossAxisAlignment.start,
       ),
       decoration: BoxDecoration(
         border: Border.all(
@@ -59,6 +66,7 @@ class UserAppointmentCell extends StatelessWidget {
       },
       child: Text('取消預約'),
       style: TextButton.styleFrom(
+        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
         textStyle: TextStyles.small.action,
         primary: Colors.grey.shade400,
       ),

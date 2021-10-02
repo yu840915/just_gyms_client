@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:rxdart/rxdart.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:where_gym/alert_factory.dart';
 import 'package:where_gym/app_bar_factory.dart';
@@ -89,15 +90,15 @@ class _AppointmentCreatePageState extends State<AppointmentCreatePage> {
           style: TextStyles.large.header,
         ),
       ),
-      body: StreamBuilder<void>(
+      body: StreamBuilder<DateTime>(
           stream: _composer.onDay,
           builder: (context, snapshot) {
-            return _buildBody(context);
+            return _buildBody(context, snapshot.data);
           }),
     );
   }
 
-  Widget _buildBody(BuildContext context) {
+  Widget _buildBody(BuildContext context, DateTime day) {
     return Column(
       children: [
         StreamBuilder<Object>(
@@ -118,10 +119,10 @@ class _AppointmentCreatePageState extends State<AppointmentCreatePage> {
         SizedBox(height: 8),
         _buildBookButtons(context),
         Expanded(
-          child: StreamBuilder<Object>(
+          child: StreamBuilder<List<AppointmentInfo>>(
             stream: _schedule.myAppointments,
             builder: (context, snapshot) {
-              return _buildAppointments(context, snapshot.data);
+              return _buildAppointments(context, snapshot.data ?? [], day);
             },
           ),
         )
@@ -210,9 +211,7 @@ class _AppointmentCreatePageState extends State<AppointmentCreatePage> {
   }
 
   Widget _buildAppointments(
-    BuildContext context,
-    List<AppointmentInfo> appointments,
-  ) {
+      BuildContext context, List<AppointmentInfo> appointments, DateTime day) {
     if (appointments == null || appointments.isEmpty) {
       return Center(
         child: Text(
@@ -221,7 +220,13 @@ class _AppointmentCreatePageState extends State<AppointmentCreatePage> {
         ),
       );
     }
+    appointments = appointments
+        .where((e) =>
+            day != null ? DateUtils.isSameDay(day, e.timeRange.start) : true)
+        .toList();
+
     return ListView.separated(
+      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 20),
       itemBuilder: (context, idx) =>
           UserAppointmentCell(info: appointments[idx], schedule: _schedule),
       separatorBuilder: (context, idx) => SizedBox(height: 8),
