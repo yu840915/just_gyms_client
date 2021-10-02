@@ -12,6 +12,7 @@ import 'package:where_gym/appointment/appointment_time_composer.dart';
 import 'package:where_gym/appointment/user_appointment_cell.dart';
 import 'package:where_gym/gym.dart';
 import 'package:where_gym/shared_appearances.dart';
+import 'package:where_gym/utils/loading_view.dart';
 
 class AppointmentCreatePage extends StatefulWidget {
   final Gym gym;
@@ -49,7 +50,8 @@ class _AppointmentCreatePageState extends State<AppointmentCreatePage> {
 
   void _book(BuildContext context) async {
     try {
-      await _schedule.bookWithRange(_composer.getDateRange());
+      await showLoadingOverlayOnTask(context,
+          task: _schedule.bookWithRange(_composer.getDateRange()));
     } catch (e) {
       showDialog(
         context: context,
