@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import 'package:rxdart/rxdart.dart';
+
 import 'package:table_calendar/table_calendar.dart';
 import 'package:where_gym/alert_factory.dart';
 import 'package:where_gym/app_bar_factory.dart';
@@ -130,7 +130,13 @@ class _AppointmentCreatePageState extends State<AppointmentCreatePage> {
           child: StreamBuilder<TimeRange>(
             stream: _composer.onTimeRange,
             builder: (context, snapshot) {
-              return _buildTimeButtons(snapshot.data);
+              return Column(
+                children: [
+                  SizedBox(height: 8),
+                  _buildBusinessHour(_composer.businessHoursOnSelectedDay),
+                  _buildTimeButtons(snapshot.data),
+                ],
+              );
             },
           ),
         ),
@@ -173,6 +179,16 @@ class _AppointmentCreatePageState extends State<AppointmentCreatePage> {
       eventLoader: (date) => list
           .where((a) => DateUtils.isSameDay(date, a.timeRange.start))
           .toList(),
+    );
+  }
+
+  Widget _buildBusinessHour(BusinessHours businessHours) {
+    if (businessHours == null) {
+      return SizedBox.shrink();
+    }
+    return Text(
+      '營業時間：${businessHours.start.stringValue} - ${businessHours.end.stringValue}',
+      style: TextStyles.large.title.copyWith(color: Colors.grey.shade500),
     );
   }
 
