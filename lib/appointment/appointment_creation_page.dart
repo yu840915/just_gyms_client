@@ -29,22 +29,38 @@ class _AppointmentCreatePageState extends State<AppointmentCreatePage> {
   void _showStartTimePicker(BuildContext context) async {
     final start = await showTimePicker(
       context: context,
-      initialTime: TimeOfDay.now(),
+      initialTime: _composer.startTime ?? TimeOfDay.now(),
       initialEntryMode: TimePickerEntryMode.input,
+      helpText: '選擇開始時間',
     );
     if (start != null) {
-      _composer.setStart(start);
+      try {
+        _composer.setStart(start);
+      } catch (e) {
+        showDialog(
+          context: context,
+          builder: (context) => AlertFactory.errorAlert(context, error: e),
+        );
+      }
     }
   }
 
   void _showEndTimePicker(BuildContext context) async {
     final end = await showTimePicker(
       context: context,
-      initialTime: TimeOfDay.now(),
+      initialTime: _composer.endTime ?? TimeOfDay.now(),
       initialEntryMode: TimePickerEntryMode.input,
+      helpText: '選擇結束時間',
     );
     if (end != null) {
-      _composer.setEnd(end);
+      try {
+        _composer.setEnd(end);
+      } catch (e) {
+        showDialog(
+          context: context,
+          builder: (context) => AlertFactory.errorAlert(context, error: e),
+        );
+      }
     }
   }
 

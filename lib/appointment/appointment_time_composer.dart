@@ -9,6 +9,8 @@ class AppointmentTimeComposer {
   final _daySubject = BehaviorSubject<DateTime>();
   Stream<DateTime> get onDay => _daySubject.stream;
   Stream<TimeRange> get onTimeRange => _timeRangeSubject;
+  TimeOfDay get startTime => _timeRangeSubject.valueWrapper?.value?.start;
+  TimeOfDay get endTime => _timeRangeSubject.valueWrapper?.value?.end;
   final Map<Weekday, BusinessHours> businessHours;
   List<Weekday> get openDays => [
         Weekday.sun,

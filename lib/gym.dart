@@ -291,6 +291,9 @@ extension WeekdayMethods on Weekday {
 
 extension DateTimeMethods on DateTime {
   static DateTime onDayWithTime(DateTime day, TimeOfDay time) {
+    if (day == null || time == null) {
+      return null;
+    }
     return DateTime(day.year, day.month, day.day, time.hour, time.minute);
   }
 
