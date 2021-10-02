@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:where_gym/api_services/api_services.dart';
+import 'package:where_gym/api_services/errors.dart';
 
 class AlertFactory {
   static Widget actionAlert(BuildContext context,
@@ -31,9 +32,7 @@ class AlertFactory {
   }
 
   static String stringFromError(dynamic error) {
-    if (error is ServiceError) {
-      return error.info.toString();
-    } else if (error is LocalError) {
+    if (error is ErrorDisplayable) {
       return error.message;
     }
     return error.toString();

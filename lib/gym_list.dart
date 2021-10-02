@@ -5,7 +5,6 @@ import 'package:where_gym/api_services/api_services.dart';
 import 'package:where_gym/current_location.dart';
 import 'package:where_gym/gym.dart';
 
-
 class GymList {
   final CurrentLocation location;
   final _listSubject = BehaviorSubject<List<Gym>>();
@@ -21,8 +20,6 @@ class GymList {
       final findLocation = location.getLocation();
       _task = findLocation;
       final pos = await findLocation;
-      print(pos.latitude);
-      print(pos.longitude);
       final task = APIServices.instances
           .get('/gyms?lat=${pos.latitude}&lon=${pos.longitude}');
       _task = task;

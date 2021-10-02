@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:where_gym/api_services/errors.dart';
 
 // final apiBaseUrl = 'http://localhost:5001/where-gym/us-central1/api';
 
@@ -107,17 +108,26 @@ class APIServices {
 
   void _checkResponse(http.Response response) {
     if (response.statusCode >= 500) {
+      jsonEncode(response.body);
+
       throw ServiceError(response.body ?? '伺服器錯誤，請稍候再試');
+    }
+  }
+
+  static void checkClientError(http.Response response) {
+    if (response.statusCode >= 400) {
+      throw ClientErrorMethods.fromErrorResponse(response);
     }
   }
 }
 
-class ServiceError extends Error {
+class ServiceError extends Error implements ErrorDisplayable {
   final dynamic info;
+  String get message => info.toString();
   ServiceError(this.info);
 }
 
-class LocalError extends Error {
+class LocalError extends Error implements ErrorDisplayable {
   final String message;
   LocalError(this.message);
 }

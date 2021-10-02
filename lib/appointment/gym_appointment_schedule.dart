@@ -25,7 +25,7 @@ class GymAppointmentSchedule {
             .map((event) => event.docs.map((e) => AppointmentInfo(e)).toList());
 
   Future<void> bookWithRange(DateTimeRange range) async {
-    await APIServices.instances.post(
+    final res = await APIServices.instances.post(
       '/gyms/${gym.id}/appointments',
       body: {
         'startAt': range.start.toIso8601String(),
@@ -33,12 +33,14 @@ class GymAppointmentSchedule {
       },
       token: await appBloc.getIdToken(),
     );
+    APIServices.checkClientError(res);
   }
 
   Future<void> cancel(AppointmentInfo appointment) async {
-    await APIServices.instances.delete(
+    final res = await APIServices.instances.delete(
       '/gyms/${appointment.gymRef.id}/appointments/${appointment.id}',
       token: await appBloc.getIdToken(),
     );
+    APIServices.checkClientError(res);
   }
 }
