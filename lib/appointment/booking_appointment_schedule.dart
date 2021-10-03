@@ -3,20 +3,19 @@ import 'package:flutter/material.dart';
 import 'package:where_gym/api_services/api_services.dart';
 import 'package:where_gym/app_bloc.dart';
 import 'package:where_gym/appointment/appointment_info.dart';
+import 'package:where_gym/appointment/appointment_schedule.dart';
 import 'package:where_gym/gym.dart';
 
-class GymAppointmentSchedule {
+class BookingAppointmentSchedule implements AppointmentSchedule {
   final DocumentReference userRef;
   final Gym gym;
   final AppBloc appBloc;
-  final Stream<List<AppointmentInfo>> myAppointments;
+  final Stream<List<AppointmentInfo>> onAppointments;
 
-  GymAppointmentSchedule(
+  BookingAppointmentSchedule(
       {@required this.userRef, @required this.gym, @required this.appBloc})
-      : myAppointments = FirebaseFirestore.instance
-            .collection('gyms')
-            .doc(gym.id)
-            .collection('gymAppointments')
+      : onAppointments = FirebaseFirestore.instance
+            .collectionGroup('gymAppointments')
             .where('user', isEqualTo: userRef)
             .where('status', isEqualTo: AppointmentStatus.scheduled.stringValue)
             .where('startAt', isGreaterThan: DateUtils.dateOnly(DateTime.now()))

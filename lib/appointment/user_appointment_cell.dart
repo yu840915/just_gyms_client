@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:where_gym/alert_factory.dart';
 import 'package:where_gym/appointment/appointment_info.dart';
-import 'package:where_gym/appointment/gym_appointment_schedule.dart';
+import 'package:where_gym/appointment/appointment_schedule.dart';
 import 'package:where_gym/shared_appearances.dart';
 
 class UserAppointmentCell extends StatelessWidget {
   final AppointmentInfo info;
-  final GymAppointmentSchedule schedule;
+  final AppointmentSchedule schedule;
   UserAppointmentCell({@required this.info, @required this.schedule});
 
   void _cancel(BuildContext context) async {

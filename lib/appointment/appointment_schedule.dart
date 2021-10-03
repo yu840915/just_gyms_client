@@ -4,13 +4,18 @@ import 'package:where_gym/api_services/api_services.dart';
 import 'package:where_gym/app_bloc.dart';
 import 'package:where_gym/appointment/appointment_info.dart';
 
-class AppointmentSchedule {
+abstract class AppointmentSchedule {
+  Stream<List<AppointmentInfo>> get onAppointments;
+  Future<void> cancel(AppointmentInfo appointment);
+}
+
+class MyAppointmentSchedule implements AppointmentSchedule {
   final DocumentReference userRef;
   final AppBloc appBloc;
-  final Stream<List<AppointmentInfo>> myAppointments;
+  final Stream<List<AppointmentInfo>> onAppointments;
 
-  AppointmentSchedule({@required this.userRef, @required this.appBloc})
-      : myAppointments = FirebaseFirestore.instance
+  MyAppointmentSchedule({@required this.userRef, @required this.appBloc})
+      : onAppointments = FirebaseFirestore.instance
             .collectionGroup('gymAppointments')
             .where('user', isEqualTo: userRef)
             .where('status', isEqualTo: AppointmentStatus.scheduled.stringValue)

@@ -7,7 +7,7 @@ import 'package:where_gym/alert_factory.dart';
 import 'package:where_gym/app_bar_factory.dart';
 import 'package:where_gym/app_bloc.dart';
 import 'package:where_gym/appointment/appointment_info.dart';
-import 'package:where_gym/appointment/gym_appointment_schedule.dart';
+import 'package:where_gym/appointment/booking_appointment_schedule.dart';
 import 'package:where_gym/appointment/appointment_time_composer.dart';
 import 'package:where_gym/appointment/user_appointment_cell.dart';
 import 'package:where_gym/gym.dart';
@@ -24,7 +24,30 @@ class AppointmentCreatePage extends StatefulWidget {
 
 class _AppointmentCreatePageState extends State<AppointmentCreatePage> {
   AppointmentTimeComposer _composer;
-  GymAppointmentSchedule _schedule;
+  BookingAppointmentSchedule _schedule;
+
+  @override
+  void initState() {
+    super.initState();
+    _schedule = BookingAppointmentSchedule(
+      userRef: BlocProvider.of<AppBloc>(context).userRef,
+      gym: widget.gym,
+      appBloc: BlocProvider.of(context),
+    );
+    _schedule.onAppointments.listen((event) {
+      print(event);
+    }).onError((error) {
+      print(error);
+    });
+    _composer =
+        AppointmentTimeComposer(businessHours: widget.gym.weekdayBusinessHours);
+  }
+
+  @override
+  void dispose() {
+    _composer.dispose();
+    super.dispose();
+  }
 
   void _showStartTimePicker(BuildContext context) async {
     final start = await showTimePicker(
@@ -77,29 +100,6 @@ class _AppointmentCreatePageState extends State<AppointmentCreatePage> {
   }
 
   @override
-  void initState() {
-    super.initState();
-    _schedule = GymAppointmentSchedule(
-      userRef: BlocProvider.of<AppBloc>(context).userRef,
-      gym: widget.gym,
-      appBloc: BlocProvider.of(context),
-    );
-    _schedule.myAppointments.listen((event) {
-      print(event);
-    }).onError((error) {
-      print(error);
-    });
-    _composer =
-        AppointmentTimeComposer(businessHours: widget.gym.weekdayBusinessHours);
-  }
-
-  @override
-  void dispose() {
-    _composer.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBarFactory.appBar(
@@ -120,7 +120,7 @@ class _AppointmentCreatePageState extends State<AppointmentCreatePage> {
     return Column(
       children: [
         StreamBuilder<Object>(
-          stream: _schedule.myAppointments,
+          stream: _schedule.onAppointments,
           builder: (context, snapshot) {
             return _buildCalender(snapshot.data ?? []);
           },
@@ -144,7 +144,7 @@ class _AppointmentCreatePageState extends State<AppointmentCreatePage> {
         _buildBookButtons(context),
         Expanded(
           child: StreamBuilder<List<AppointmentInfo>>(
-            stream: _schedule.myAppointments,
+            stream: _schedule.onAppointments,
             builder: (context, snapshot) {
               return _buildAppointments(context, snapshot.data ?? [], day);
             },
@@ -159,7 +159,7 @@ class _AppointmentCreatePageState extends State<AppointmentCreatePage> {
     return TableCalendar(
       locale: Intl.systemLocale,
       focusedDay: tomorrow,
-      firstDay: tomorrow,
+      firstDay: DateTime.now(),
       headerStyle: HeaderStyle(
         formatButtonVisible: false,
         titleCentered: true,
