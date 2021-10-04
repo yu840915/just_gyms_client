@@ -5,7 +5,7 @@ import 'package:table_calendar/table_calendar.dart';
 import 'package:where_gym/app_bar_factory.dart';
 import 'package:where_gym/app_bloc.dart';
 import 'package:where_gym/appointment/appointment_info.dart';
-import 'package:where_gym/appointment/appointment_schedule.dart';
+import 'package:where_gym/appointment/my_appointment_schedule.dart';
 import 'package:where_gym/appointment/user_appointment_cell.dart';
 import 'package:where_gym/shared_appearances.dart';
 
