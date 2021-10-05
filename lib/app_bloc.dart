@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:rxdart/subjects.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:where_gym/admin_gym_list.dart';
 import 'package:where_gym/current_location.dart';
 import 'package:where_gym/initialization.dart';
 import 'package:where_gym/intro/permission_checker.dart';
@@ -27,6 +28,8 @@ class AppBloc extends Bloc<dynamic, AppPhase> {
       _cloudFavoriteGymList ?? _localFavoriteGymList;
   final LocalFavoriteGymList _localFavoriteGymList;
   CloudFavoriteGymList _cloudFavoriteGymList;
+  AdminGymList get adminGymList => _adminGymList;
+  AdminGymList _adminGymList;
   final CurrentLocation location;
   final _subscriptions = List<StreamSubscription>.empty(growable: true);
   final _userRefSubject = BehaviorSubject<DocumentReference>();
@@ -64,6 +67,7 @@ class AppBloc extends Bloc<dynamic, AppPhase> {
       _cloudFavoriteGymList?.dispose();
       _cloudFavoriteGymList = null;
       _userRefSubject.add(null);
+      _adminGymList = null;
       return;
     }
     _firebaseUserSubject.add(user);
@@ -72,6 +76,7 @@ class AppBloc extends Bloc<dynamic, AppPhase> {
       _userRefSubject.add(
         FirebaseFirestore.instance.collection('users').doc(user.uid),
       );
+      _adminGymList = AdminGymList(userRef);
       FCMInitialization.syncToken(this).catchError(print);
     }
   }
