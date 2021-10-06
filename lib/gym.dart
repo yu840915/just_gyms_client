@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:where_gym/gym_facility.dart';
@@ -79,6 +80,11 @@ class Gym {
 
   Map<String, dynamic> toJson() => _$GymToJson(this);
   factory Gym.fromJson(Map<String, dynamic> json) => _$GymFromJson(json);
+  factory Gym.fromSnap(DocumentSnapshot snap) {
+    final Map<String, dynamic> json = snap.data();
+    json['id'] = snap.id;
+    return _$GymFromJson(json);
+  }
 
   Map<String, dynamic> get trackingProps => {
         EventProperties.gymId: id,

@@ -6,7 +6,7 @@ class AppBarFactory {
   static Widget appBar({Widget leading, Widget title, List<Widget> actions}) {
     return PreferredSize(
       preferredSize: Size.fromHeight(42),
-      child: AppBar(
+      child: AppBar(        
         leading: leading,
         title: title,
         actions: actions,

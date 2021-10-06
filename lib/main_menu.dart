@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:where_gym/admin_gym_list_page.dart';
 import 'package:where_gym/alert_factory.dart';
 import 'package:where_gym/app_bloc.dart';
 import 'package:where_gym/appointment/user_appointments_page.dart';
@@ -97,7 +98,7 @@ class MainMenu extends StatelessWidget {
                   launch(Configs.instance.contactLink, forceWebView: false);
                   break;
                 case _MenuItem.adminGyms:
-                  //TODO show admin gym list
+                  _showAdminGymList(context);
                   break;
                 case _MenuItem.logIn:
                   _logIn(context);
@@ -124,6 +125,16 @@ class MainMenu extends StatelessWidget {
     }
     Navigator.push(context,
         MaterialPageRoute(builder: (context) => UserAppointmentsPage()));
+  }
+
+  void _showAdminGymList(BuildContext context) {
+    AppBloc bloc = BlocProvider.of(context);
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => AdminGymListPage(bloc.adminGymList),
+      ),
+    );
   }
 
   PopupMenuItem<_MenuItem> _buildItem(String title, _MenuItem value) {
