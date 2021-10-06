@@ -8,5 +8,6 @@ class AdminGymList {
             .collection('gyms')
             .where('admins', arrayContains: userRef)
             .snapshots()
-            .map((event) => event.docs.map((e) => Gym.fromJson(e.data())));
+            .map((event) => event.docs.map((e) => Gym.fromJson(e.data())).toList())
+            .handleError(print);
 }

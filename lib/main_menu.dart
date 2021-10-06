@@ -8,10 +8,15 @@ import 'package:where_gym/appointment/user_appointments_page.dart';
 import 'package:where_gym/configs.dart';
 import 'package:where_gym/gym.dart';
 import 'package:where_gym/login/authenticators.dart';
+import 'package:where_gym/login/login_check_flow.dart';
 import 'package:where_gym/me/favorite_list_page.dart';
 import 'package:where_gym/shared_appearances.dart';
 
 class MainMenu extends StatelessWidget {
+  void _logIn(BuildContext context) async {
+    await LoginCheckFlow.check(context, where: 'menuLogin');
+  }
+
   void _logout(BuildContext context) async {
     try {
       final logout = await showDialog(
@@ -44,7 +49,7 @@ class MainMenu extends StatelessWidget {
   Widget build(BuildContext context) {
     AppBloc bloc = BlocProvider.of(context);
     return StreamBuilder<List<Gym>>(
-        stream: bloc.adminGymList.onGyms,
+        stream: bloc.adminGymList?.onGyms,
         builder: (context, snapshot) {
           return PopupMenuButton<_MenuItem>(
             itemBuilder: (context) {
@@ -57,6 +62,7 @@ class MainMenu extends StatelessWidget {
                 _buildItem('隱私權政策', _MenuItem.pp),
                 _buildItem('聯絡我們', _MenuItem.contactUs),
                 if (bloc.isLoggedIn) _buildItem('登出', _MenuItem.logOut),
+                if (!bloc.isLoggedIn) _buildItem('登入', _MenuItem.logIn),
               ];
             },
             icon: Container(
@@ -93,6 +99,9 @@ class MainMenu extends StatelessWidget {
                 case _MenuItem.adminGyms:
                   //TODO show admin gym list
                   break;
+                case _MenuItem.logIn:
+                  _logIn(context);
+                  break;
                 case _MenuItem.logOut:
                   _logout(context);
                   break;
@@ -107,7 +116,12 @@ class MainMenu extends StatelessWidget {
         context, MaterialPageRoute(builder: (context) => FavoriteListPage()));
   }
 
-  void _showMyAppointments(BuildContext context) {
+  void _showMyAppointments(BuildContext context) async {
+    final isLoggedIn =
+        await LoginCheckFlow.check(context, where: 'menuMyAppointment');
+    if (isLoggedIn == null || !isLoggedIn) {
+      return;
+    }
     Navigator.push(context,
         MaterialPageRoute(builder: (context) => UserAppointmentsPage()));
   }
@@ -128,4 +142,5 @@ enum _MenuItem {
   logOut,
   myAppointments,
   adminGyms,
+  logIn,
 }
