@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:where_gym/admin_gym_list.dart';
 import 'package:where_gym/app_bar_factory.dart';
+import 'package:where_gym/appointment/gym_appointments_page.dart';
 import 'package:where_gym/gen/assets.gen.dart';
 import 'package:where_gym/gym.dart';
 import 'package:where_gym/shared_appearances.dart';
+import 'package:where_gym/tracking/event_names.dart';
+import 'package:where_gym/tracking/tracking.dart';
 
 class AdminGymListPage extends StatelessWidget {
   final AdminGymList adminGymList;
   AdminGymListPage(this.adminGymList);
 
   @override
-  Widget build(BuildContext context) {    
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBarFactory.appBar(
           title: Text(
@@ -52,17 +55,16 @@ class _Row extends StatelessWidget {
   _Row(this.gym);
 
   void _showDetail(BuildContext context) {
-    // track(EventName.showGymDetail, {
-    //   ...gym.trackingProps,
-    //   EventProperties.distance: meters,
-    //   EventProperties.from: 'gym list',
-    // });
-    // Navigator.push(
-    //   context,
-    //   MaterialPageRoute(
-    //     builder: (context) => GymDetailPage(gym: gym),
-    //   ),
-    // );
+    track(EventName.showGymAppointmentList, {
+      ...gym.trackingProps,
+      EventProperties.from: 'admin gym list',
+    });
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => GymAppointmentsPage(gym: gym),
+      ),
+    );
   }
 
   @override

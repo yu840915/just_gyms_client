@@ -5,6 +5,7 @@ class EventName {
   static final finishIntro = EventName._('finish intro');
   static final refreshMap = EventName._('refresh map');
   static final showGymDetail = EventName._('show gym detail');
+  static final showGymAppointmentList = EventName._('show gym appointment list');
   static final contactGym = EventName._('contact gym');
   static final showGymList = EventName._('show gym detail');
   static final selectMarker = EventName._('select marker');

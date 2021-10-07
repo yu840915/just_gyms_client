@@ -7,14 +7,13 @@ import 'package:where_gym/appointment/appointment_schedule.dart';
 import 'package:where_gym/gym.dart';
 
 class GymAppointmentSchedule implements AppointmentSchedule {
-  final DocumentReference userRef;
   final Gym gym;
   final AppBloc appBloc;
   final Stream<List<AppointmentInfo>> onAppointments;
 
-  GymAppointmentSchedule(
-      {@required this.userRef, @required this.appBloc, @required this.gym})
+  GymAppointmentSchedule({@required this.appBloc, @required this.gym})
       : onAppointments = FirebaseFirestore.instance
+            .collection('gyms')
             .doc(gym.id)
             .collection('gymAppointments')
             .where('status', isEqualTo: AppointmentStatus.scheduled.stringValue)
