@@ -32,6 +32,8 @@ class GymDetailPage extends StatelessWidget {
     );
   }
 
+  void _showAdminSchedule(BuildContext context) {}
+
   void _callGym(String phone) {
     track(EventName.contactGym, gym.trackingProps);
     launch('tel://$phone');
@@ -266,6 +268,18 @@ class GymDetailPage extends StatelessWidget {
       },
       child: Text(
         '我要預約',
+      ),
+      style: ButtonStyles.callToAction,
+    );
+  }
+
+  Widget _buildAdminButton(BuildContext context) {
+    return TextButton(
+      onPressed: () {
+        _showAdminSchedule(context);
+      },
+      child: Text(
+        '預約管理',
       ),
       style: ButtonStyles.callToAction,
     );

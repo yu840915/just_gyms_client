@@ -67,6 +67,7 @@ class AppBloc extends Bloc<dynamic, AppPhase> {
       _cloudFavoriteGymList?.dispose();
       _cloudFavoriteGymList = null;
       _userRefSubject.add(null);
+      _adminGymList?.dispose();
       _adminGymList = null;
       return;
     }
