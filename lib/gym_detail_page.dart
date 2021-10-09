@@ -3,7 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:where_gym/app_bar_factory.dart';
 import 'package:where_gym/app_bloc.dart';
+import 'package:where_gym/appointment/appointment_badge.dart';
 import 'package:where_gym/appointment/appointment_creation_page.dart';
+import 'package:where_gym/appointment/gym_appointment_schedule.dart';
 import 'package:where_gym/appointment/gym_appointments_page.dart';
 import 'package:where_gym/appointment_preflight_checks/appointment_preflight_checks.dart';
 import 'package:where_gym/gym.dart';
@@ -29,15 +31,6 @@ class GymDetailPage extends StatelessWidget {
       MaterialPageRoute(
         builder: (context) => AppointmentCreatePage(gym: gym),
         fullscreenDialog: true,
-      ),
-    );
-  }
-
-  void _showAdminSchedule(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => GymAppointmentsPage(gym: gym),
       ),
     );
   }
@@ -212,7 +205,7 @@ class GymDetailPage extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20),
                       child: _shouldShowAdmin(context)
-                          ? _buildAdminButton(context)
+                          ? _AdminButton(gym: gym)
                           : _buildBookButton(context),
                     ),
                   ],
@@ -281,14 +274,50 @@ class GymDetailPage extends StatelessWidget {
       style: ButtonStyles.callToAction,
     );
   }
+}
 
-  Widget _buildAdminButton(BuildContext context) {
+class _AdminButton extends StatefulWidget {
+  final Gym gym;
+  _AdminButton({@required this.gym});
+
+  @override
+  State<_AdminButton> createState() => _AdminButtonState();
+}
+
+class _AdminButtonState extends State<_AdminButton> {
+  GymAppointmentSchedule _schedule;
+  @override
+  void initState() {
+    super.initState();
+    _schedule = GymAppointmentSchedule(
+        appBloc: BlocProvider.of(context), gym: widget.gym);
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return TextButton(
       onPressed: () {
         _showAdminSchedule(context);
       },
-      child: Text('預約管理'),
+      child: Row(
+        children: [
+          SizedBox(width: 8),
+          Text('預約管理'),
+          SizedBox(width: 8),
+          AppointmentBadge(schedule: _schedule),
+        ],
+        mainAxisAlignment: MainAxisAlignment.center,
+      ),
       style: ButtonStyles.callToAction,
+    );
+  }
+
+  void _showAdminSchedule(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => GymAppointmentsPage(gym: widget.gym),
+      ),
     );
   }
 }

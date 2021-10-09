@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:where_gym/admin_gym_list.dart';
 import 'package:where_gym/app_bar_factory.dart';
+import 'package:where_gym/appointment/appointment_badge.dart';
+import 'package:where_gym/appointment/gym_appointment_schedule.dart';
 import 'package:where_gym/appointment/gym_appointments_page.dart';
 import 'package:where_gym/gen/assets.gen.dart';
 import 'package:where_gym/gym.dart';
@@ -50,19 +53,33 @@ class AdminGymListPage extends StatelessWidget {
   }
 }
 
-class _Row extends StatelessWidget {
+class _Row extends StatefulWidget {
   final Gym gym;
   _Row(this.gym);
 
+  @override
+  State<_Row> createState() => _RowState();
+}
+
+class _RowState extends State<_Row> {
+  GymAppointmentSchedule _schedule;
+
+  @override
+  void initState() {
+    super.initState();
+    _schedule = GymAppointmentSchedule(
+        appBloc: BlocProvider.of(context), gym: widget.gym);
+  }
+
   void _showDetail(BuildContext context) {
     track(EventName.showGymAppointmentList, {
-      ...gym.trackingProps,
+      ...widget.gym.trackingProps,
       EventProperties.from: 'admin gym list',
     });
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => GymAppointmentsPage(gym: gym),
+        builder: (context) => GymAppointmentsPage(gym: widget.gym),
       ),
     );
   }
@@ -80,12 +97,14 @@ class _Row extends StatelessWidget {
               Container(
                 width: 70,
                 height: 50,
-                child: gym.cover == null ? Assets.images.wait.image() : null,
+                child: widget.gym.cover == null
+                    ? Assets.images.wait.image()
+                    : null,
                 decoration: BoxDecoration(
                     color: Colors.grey.shade100,
-                    image: gym.cover != null
+                    image: widget.gym.cover != null
                         ? DecorationImage(
-                            image: NetworkImage(gym.cover),
+                            image: NetworkImage(widget.gym.cover),
                             fit: BoxFit.cover,
                           )
                         : null),
@@ -95,13 +114,16 @@ class _Row extends StatelessWidget {
                 child: Column(
                   children: [
                     Text(
-                      gym.name,
+                      widget.gym.name,
                       style: TextStyles.small.header,
                     ),
                   ],
                   crossAxisAlignment: CrossAxisAlignment.start,
                 ),
               ),
+              SizedBox(width: 8),
+              AppointmentBadge(schedule: _schedule),
+              SizedBox(width: 8),
             ],
           ),
         ),

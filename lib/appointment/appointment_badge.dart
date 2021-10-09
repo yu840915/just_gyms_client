@@ -42,8 +42,8 @@ class _AppointmentBadgeState extends State<AppointmentBadge> {
       ),
       height: 20,
       decoration: BoxDecoration(
-        color: Colors.red.shade800,
-        borderRadius: BorderRadius.circular(10),
+        color: Colors.green.shade900,
+        borderRadius: BorderRadius.circular(4),
       ),
     );
   }
