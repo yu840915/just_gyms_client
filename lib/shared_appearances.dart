@@ -102,4 +102,5 @@ class SharedIcons {
 
 class Formats {
   static final time = DateFormat(DateFormat.HOUR_MINUTE);
+  static final integer = NumberFormat("#,###");
 }
