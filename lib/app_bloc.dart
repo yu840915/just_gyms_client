@@ -9,6 +9,7 @@ import 'package:rxdart/subjects.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:where_gym/admin_gym_list.dart';
 import 'package:where_gym/current_location.dart';
+import 'package:where_gym/gym.dart';
 import 'package:where_gym/initialization.dart';
 import 'package:where_gym/intro/permission_checker.dart';
 import 'package:where_gym/me/cloud_favorites.dart';
@@ -121,6 +122,13 @@ class AppBloc extends Bloc<dynamic, AppPhase> {
     } catch (e) {
       print(e);
     }
+  }
+
+  bool shouldShowAdminPageForGym(Gym gym) {
+    if (!isLoggedIn) {
+      return false;
+    }
+    return adminGymList.isAdminOfGym(gym);
   }
 }
 

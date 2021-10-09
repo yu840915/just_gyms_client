@@ -4,6 +4,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:where_gym/app_bar_factory.dart';
 import 'package:where_gym/app_bloc.dart';
 import 'package:where_gym/appointment/appointment_creation_page.dart';
+import 'package:where_gym/appointment/gym_appointments_page.dart';
 import 'package:where_gym/appointment_preflight_checks/appointment_preflight_checks.dart';
 import 'package:where_gym/gym.dart';
 import 'package:where_gym/map_view/open_hour_indicator.dart';
@@ -32,7 +33,14 @@ class GymDetailPage extends StatelessWidget {
     );
   }
 
-  void _showAdminSchedule(BuildContext context) {}
+  void _showAdminSchedule(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => GymAppointmentsPage(gym: gym),
+      ),
+    );
+  }
 
   void _callGym(String phone) {
     track(EventName.contactGym, gym.trackingProps);
@@ -203,7 +211,9 @@ class GymDetailPage extends StatelessWidget {
                     SizedBox(height: 8),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: _buildBookButton(context),
+                      child: _shouldShowAdmin(context)
+                          ? _buildAdminButton(context)
+                          : _buildBookButton(context),
                     ),
                   ],
                 ],
@@ -217,6 +227,9 @@ class GymDetailPage extends StatelessWidget {
       ),
     );
   }
+
+  bool _shouldShowAdmin(BuildContext context) =>
+      BlocProvider.of<AppBloc>(context).shouldShowAdminPageForGym(gym);
 
   Widget _buildEquipmentSection() {
     if (gym.equipments == null || gym.equipments.isEmpty) {
@@ -254,9 +267,7 @@ class GymDetailPage extends StatelessWidget {
   Widget _buildPhoneButton(String phone) {
     return OutlinedButton(
       onPressed: () => _callGym(phone),
-      child: Text(
-        '撥打電話',
-      ),
+      child: Text('撥打電話'),
       style: ButtonStyles.action,
     );
   }
@@ -266,9 +277,7 @@ class GymDetailPage extends StatelessWidget {
       onPressed: () {
         _book(context);
       },
-      child: Text(
-        '我要預約',
-      ),
+      child: Text('我要預約'),
       style: ButtonStyles.callToAction,
     );
   }
@@ -278,9 +287,7 @@ class GymDetailPage extends StatelessWidget {
       onPressed: () {
         _showAdminSchedule(context);
       },
-      child: Text(
-        '預約管理',
-      ),
+      child: Text('預約管理'),
       style: ButtonStyles.callToAction,
     );
   }
