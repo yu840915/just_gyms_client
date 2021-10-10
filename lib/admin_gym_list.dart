@@ -24,8 +24,9 @@ class AdminGymList {
     if (_gymSubject.valueWrapper == null) {
       return false;
     }
-    return _gymSubject.valueWrapper.value
-            .firstWhere((element) => element.id == gym.id) !=
+    return _gymSubject.valueWrapper.value.firstWhere(
+            (element) => element.id == gym.id,
+            orElse: () => null) !=
         null;
   }
 
