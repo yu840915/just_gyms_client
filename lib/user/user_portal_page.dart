@@ -87,17 +87,37 @@ class UserPortalPage extends StatelessWidget {
   Widget _buildBody(BuildContext context, {@required bool shouldShowAdminUi}) {
     return Column(
       children: [
-        _Row(title: '預約', action: () => _showMyAppointments(context)),
-        Divider(),
-        _Row(title: '收藏', action: () => _showFavorites(context)),
-        Divider(),
+        _Row(
+          title: '預約',
+          style: TextStyles.large.action,
+          action: () => _showMyAppointments(context),
+        ),
+        Divider(height: 1),
+        _Row(
+          title: '收藏',
+          style: TextStyles.large.action,
+          action: () => _showFavorites(context),
+        ),
+        Divider(height: 1),
         if (shouldShowAdminUi) ...[
-          _Row(title: '場租管理', action: () => _showAdminGymList(context)),
-          Divider(),
+          _Row(
+            title: '場租管理',
+            style: TextStyles.large.action,
+            action: () => _showAdminGymList(context),
+          ),
+          Divider(height: 1),
         ],
-        _Row(title: '要求刪除帳號', action: () => _requestAccountDeletion(context)),
-        Divider(),
-        _Row(title: '登出', action: () => _logout(context)),
+        _Row(
+          title: '登出',
+          style: TextStyles.large.action,
+          action: () => _logout(context),
+        ),
+        Divider(height: 1),
+        _Row(
+          title: '要求刪除帳號',
+          style: TextStyles.small.action.copyWith(color: Colors.redAccent),
+          action: () => _requestAccountDeletion(context),
+        ),
       ],
     );
   }
@@ -105,14 +125,20 @@ class UserPortalPage extends StatelessWidget {
 
 class _Row extends StatelessWidget {
   final String title;
+  final TextStyle style;
   final Function action;
-  _Row({@required this.title, @required this.action});
+  _Row({@required this.title, this.style, @required this.action});
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: action,
-      child: Text(title),
+      child: Container(
+        child: Text(title, style: style),
+        alignment: Alignment.centerLeft,
+        padding: EdgeInsets.symmetric(horizontal: 16),
+        height: 60,
+      ),
     );
   }
 }
