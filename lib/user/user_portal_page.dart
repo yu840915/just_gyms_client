@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
@@ -112,12 +114,14 @@ class UserPortalPage extends StatelessWidget {
           style: TextStyles.large.action,
           action: () => _logout(context),
         ),
-        Divider(height: 1),
-        _Row(
-          title: '要求刪除帳號',
-          style: TextStyles.small.action.copyWith(color: Colors.redAccent),
-          action: () => _requestAccountDeletion(context),
-        ),
+        if (Platform.isIOS) ...[
+          Divider(height: 1),
+          _Row(
+            title: '要求刪除帳號',
+            style: TextStyles.small.action.copyWith(color: Colors.redAccent),
+            action: () => _requestAccountDeletion(context),
+          ),
+        ],
       ],
     );
   }
