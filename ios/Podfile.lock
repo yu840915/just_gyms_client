@@ -460,6 +460,9 @@ PODS:
     - FBSDKCoreKit (~> 8.2.0)
     - FBSDKLoginKit (~> 8.2.0)
     - Flutter
+  - fluttertoast (0.0.2):
+    - Flutter
+    - Toast
   - geolocator (6.2.0):
     - Flutter
   - google_maps_flutter (0.0.1):
@@ -547,6 +550,7 @@ PODS:
     - Flutter
   - sign_in_with_apple (0.0.1):
     - Flutter
+  - Toast (4.0.0)
   - url_launcher (0.0.1):
     - Flutter
 
@@ -559,6 +563,7 @@ DEPENDENCIES:
   - firebase_remote_config (from `.symlinks/plugins/firebase_remote_config/ios`)
   - Flutter (from `Flutter`)
   - flutter_facebook_auth (from `.symlinks/plugins/flutter_facebook_auth/ios`)
+  - fluttertoast (from `.symlinks/plugins/fluttertoast/ios`)
   - geolocator (from `.symlinks/plugins/geolocator/ios`)
   - google_maps_flutter (from `.symlinks/plugins/google_maps_flutter/ios`)
   - google_sign_in (from `.symlinks/plugins/google_sign_in/ios`)
@@ -598,6 +603,7 @@ SPEC REPOS:
     - Mixpanel-swift
     - nanopb
     - PromisesObjC
+    - Toast
 
 EXTERNAL SOURCES:
   cloud_firestore:
@@ -616,6 +622,8 @@ EXTERNAL SOURCES:
     :path: Flutter
   flutter_facebook_auth:
     :path: ".symlinks/plugins/flutter_facebook_auth/ios"
+  fluttertoast:
+    :path: ".symlinks/plugins/fluttertoast/ios"
   geolocator:
     :path: ".symlinks/plugins/geolocator/ios"
   google_maps_flutter:
@@ -659,6 +667,7 @@ SPEC CHECKSUMS:
   FirebaseRemoteConfig: 9ee4672d4eacf646256e26cfac61021b3a390ea4
   Flutter: 50d75fe2f02b26cc09d224853bb45737f8b3214a
   flutter_facebook_auth: bad08a3d465e7b7ba9d8468a9dc7df3f69c136b8
+  fluttertoast: 6122fa75143e992b1d3470f61000f591a798cc58
   geolocator: f5e3de65e241caba7ce3e8a618803387bda73384
   google_maps_flutter: abdb8dee6c52d4be36ad131ee6ebfacd14417c5a
   google_sign_in: 6bd214b9c154f881422f5fe27b66aaa7bbd580cc
@@ -679,6 +688,7 @@ SPEC CHECKSUMS:
   PromisesObjC: 68159ce6952d93e17b2dfe273b8c40907db5ba58
   shared_preferences: af6bfa751691cdc24be3045c43ec037377ada40d
   sign_in_with_apple: f3bf75217ea4c2c8b91823f225d70230119b8440
+  Toast: 91b396c56ee72a5790816f40d3a94dd357abc196
   url_launcher: 6fef411d543ceb26efce54b05a0a40bfd74cbbef
 
 PODFILE CHECKSUM: fcbb351d9ebbf6514faa29f4f062d6f7f882bfa4
