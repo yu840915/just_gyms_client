@@ -9,7 +9,7 @@ class AppointmentPreflightCheckFlow {
   AppointmentPreflightCheckFlow._();
 
   static Future<bool> check(BuildContext context,
-      {@required String where}) async {
+      {required String where}) async {
     if (await LoginCheckFlow.check(context, where: where) == false) {
       return false;
     }
@@ -34,7 +34,7 @@ class AppointmentPreflightCheck {
     AppBloc bloc = BlocProvider.of(context);
     final item = NotificationPermissionItem();
     return AppointmentPreflightCheckResult(
-      hasPhone: bloc.firebaseUser.phoneNumber != null,
+      hasPhone: bloc.firebaseUser!.phoneNumber != null,
       hasAskedNotificationPermission:
           (await item.getPermissionStatus()) != GrantStatus.undecided,
     );
@@ -42,9 +42,9 @@ class AppointmentPreflightCheck {
 }
 
 class AppointmentPreflightCheckResult {
-  final bool hasPhone;
-  final bool hasAskedNotificationPermission;
-  bool get passed => hasPhone && hasAskedNotificationPermission;
+  final bool? hasPhone;
+  final bool? hasAskedNotificationPermission;
+  bool get passed => hasPhone! && hasAskedNotificationPermission!;
   AppointmentPreflightCheckResult(
       {this.hasPhone, this.hasAskedNotificationPermission});
 }

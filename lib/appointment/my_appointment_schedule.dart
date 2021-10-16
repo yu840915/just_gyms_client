@@ -6,11 +6,11 @@ import 'package:where_gym/appointment/appointment_info.dart';
 import 'package:where_gym/appointment/appointment_schedule.dart';
 
 class MyAppointmentSchedule implements AppointmentSchedule {
-  final DocumentReference userRef;
+  final DocumentReference? userRef;
   final AppBloc appBloc;
   final Stream<List<AppointmentInfo>> onAppointments;
 
-  MyAppointmentSchedule({@required this.userRef, @required this.appBloc})
+  MyAppointmentSchedule({required this.userRef, required this.appBloc})
       : onAppointments = FirebaseFirestore.instance
             .collectionGroup('gymAppointments')
             .where('user', isEqualTo: userRef)
@@ -22,7 +22,7 @@ class MyAppointmentSchedule implements AppointmentSchedule {
 
   Future<void> cancel(AppointmentInfo appointment) async {
     await APIServices.instances.delete(
-      '/gyms/${appointment.gymRef.id}/appointments/${appointment.id}',
+      '/gyms/${appointment.gymRef!.id}/appointments/${appointment.id}',
       token: await appBloc.getIdToken(),
     );
   }

@@ -15,8 +15,8 @@ class UserAppointmentsPage extends StatefulWidget {
 }
 
 class _UserAppointmentsPageState extends State<UserAppointmentsPage> {
-  MyAppointmentSchedule _schedule;
-  DateTime _date;
+  MyAppointmentSchedule? _schedule;
+  DateTime? _date;
 
   @override
   void initState() {
@@ -36,9 +36,9 @@ class _UserAppointmentsPageState extends State<UserAppointmentsPage> {
           '我的預約',
           style: TextStyles.large.header,
         ),
-      ),
+      ) as PreferredSizeWidget?,
       body: StreamBuilder<List<AppointmentInfo>>(
-          stream: _schedule.onAppointments,
+          stream: _schedule!.onAppointments,
           builder: (context, snapshot) {
             return _buildBody(context, snapshot.data ?? []);
           }),
@@ -92,7 +92,7 @@ class _UserAppointmentsPageState extends State<UserAppointmentsPage> {
       return Center(
         child: Text(
           '沒有預約',
-          style: TextStyles.large.title.copyWith(color: Colors.grey.shade300),
+          style: TextStyles.large.title!.copyWith(color: Colors.grey.shade300),
         ),
       );
     }

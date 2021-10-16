@@ -6,12 +6,12 @@ import 'package:where_gym/shared_appearances.dart';
 
 class GymAppointmentCell extends StatelessWidget {
   final AppointmentInfo info;
-  final AppointmentSchedule schedule;
-  GymAppointmentCell({@required this.info, @required this.schedule});
+  final AppointmentSchedule? schedule;
+  GymAppointmentCell({required this.info, required this.schedule});
 
   void _cancel(BuildContext context) async {
     try {
-      await schedule.cancel(info);
+      await schedule!.cancel(info);
     } catch (e) {
       showDialog(
           context: context,

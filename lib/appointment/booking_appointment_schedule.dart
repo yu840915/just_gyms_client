@@ -7,13 +7,13 @@ import 'package:where_gym/appointment/appointment_schedule.dart';
 import 'package:where_gym/gym.dart';
 
 class BookingAppointmentSchedule implements AppointmentSchedule {
-  final DocumentReference userRef;
-  final Gym gym;
+  final DocumentReference? userRef;
+  final Gym? gym;
   final AppBloc appBloc;
   final Stream<List<AppointmentInfo>> onAppointments;
 
   BookingAppointmentSchedule(
-      {@required this.userRef, @required this.gym, @required this.appBloc})
+      {required this.userRef, required this.gym, required this.appBloc})
       : onAppointments = FirebaseFirestore.instance
             .collectionGroup('gymAppointments')
             .where('user', isEqualTo: userRef)
@@ -25,7 +25,7 @@ class BookingAppointmentSchedule implements AppointmentSchedule {
 
   Future<void> bookWithRange(DateTimeRange range) async {
     final res = await APIServices.instances.post(
-      '/gyms/${gym.id}/appointments',
+      '/gyms/${gym!.id}/appointments',
       body: {
         'startAt': range.start.toUtc().toIso8601String(),
         'endAt': range.end.toUtc().toIso8601String(),
@@ -37,7 +37,7 @@ class BookingAppointmentSchedule implements AppointmentSchedule {
 
   Future<void> cancel(AppointmentInfo appointment) async {
     final res = await APIServices.instances.delete(
-      '/gyms/${appointment.gymRef.id}/appointments/${appointment.id}',
+      '/gyms/${appointment.gymRef!.id}/appointments/${appointment.id}',
       token: await appBloc.getIdToken(),
     );
     APIServices.checkClientError(res);

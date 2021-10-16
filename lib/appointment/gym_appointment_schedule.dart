@@ -11,7 +11,7 @@ class GymAppointmentSchedule implements AppointmentSchedule {
   final AppBloc appBloc;
   final Stream<List<AppointmentInfo>> onAppointments;
 
-  GymAppointmentSchedule({@required this.appBloc, @required this.gym})
+  GymAppointmentSchedule({required this.appBloc, required this.gym})
       : onAppointments = FirebaseFirestore.instance
             .collection('gyms')
             .doc(gym.id)
@@ -24,7 +24,7 @@ class GymAppointmentSchedule implements AppointmentSchedule {
 
   Future<void> cancel(AppointmentInfo appointment) async {
     await APIServices.instances.delete(
-      '/gyms/${appointment.gymRef.id}/appointments/${appointment.id}',
+      '/gyms/${appointment.gymRef!.id}/appointments/${appointment.id}',
       token: await appBloc.getIdToken(),
     );
   }

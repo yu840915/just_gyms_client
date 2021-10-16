@@ -9,15 +9,15 @@ class DataStore {
     return DataStore(box);
   }
 
-  getValue(String key) {
+  getValue(String? key) {
     return box.get(key);
   }
 
-  Future<void> deleteValue(String key) async {
+  Future<void> deleteValue(String? key) async {
     await box.delete(key);
   }
 
-  putValue(String key, HiveObject entry) {
+  putValue(String? key, HiveObject entry) {
     if (getValue(key) == null) {
       box.put(key, entry);
     } else {

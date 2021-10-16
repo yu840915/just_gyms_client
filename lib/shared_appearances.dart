@@ -8,11 +8,11 @@ class AppColors {
 }
 
 class TextStyles {
-  TextStyle header;
-  TextStyle title;
-  TextStyle detail;
-  TextStyle subscription;
-  TextStyle action;
+  TextStyle? header;
+  TextStyle? title;
+  TextStyle? detail;
+  TextStyle? subscription;
+  TextStyle? action;
   TextStyles._(
       {this.header, this.title, this.detail, this.action, this.subscription});
 

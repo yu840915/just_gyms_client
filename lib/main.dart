@@ -46,10 +46,10 @@ class _MyAppState extends State<MyApp> {
     );
   }
 
-  Widget _buildApp(BuildContext context, InitializedProducts products) {
+  Widget _buildApp(BuildContext context, InitializedProducts? products) {
     return GlobalLoaderOverlay(
       child: BlocProvider(
-        create: (context) => AppBloc(null, initializedProducts: products),
+        create: (context) => AppBloc(null, initializedProducts: products!),
         child: MaterialApp(
           title: 'Just Gyms',
           theme: ThemeData(

@@ -5,20 +5,20 @@ import 'package:where_gym/appointment/gym_appointment_schedule.dart';
 import 'package:where_gym/shared_appearances.dart';
 
 class AppointmentBadge extends StatefulWidget {
-  final GymAppointmentSchedule schedule;
-  AppointmentBadge({@required this.schedule});
+  final GymAppointmentSchedule? schedule;
+  AppointmentBadge({required this.schedule});
 
   @override
   State<AppointmentBadge> createState() => _AppointmentBadgeState();
 }
 
 class _AppointmentBadgeState extends State<AppointmentBadge> {
-  AppointmentBadgeSource source;
+  late AppointmentBadgeSource source;
 
   @override
   void initState() {
     super.initState();
-    source = AppointmentBadgeSource(widget.schedule);
+    source = AppointmentBadgeSource(widget.schedule!);
   }
 
   @override
@@ -31,7 +31,7 @@ class _AppointmentBadgeState extends State<AppointmentBadge> {
     );
   }
 
-  Widget _buildBadge(int count) {
+  Widget _buildBadge(int? count) {
     if (count == null || count == 0) {
       return SizedBox.shrink();
     }

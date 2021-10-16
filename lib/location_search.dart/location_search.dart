@@ -12,16 +12,16 @@ part 'location_search.g.dart';
 
 class LocationSearch {
   final _querySubject = BehaviorSubject<String>();
-  final _resultSubject = BehaviorSubject<AddressSearchResult>();
-  final _taskSubject = BehaviorSubject<Future>();
-  Stream<AddressSearchResult> get onResult => _resultSubject;
-  StreamSubscription _subscription;
-  Stream<Future> get onRunningTask => _taskSubject;
+  final _resultSubject = BehaviorSubject<AddressSearchResult?>();
+  final _taskSubject = BehaviorSubject<Future?>();
+  Stream<AddressSearchResult?> get onResult => _resultSubject;
+  late StreamSubscription _subscription;
+  Stream<Future?> get onRunningTask => _taskSubject;
   final Function(AddressSearchResultItem) _onSelectAddress;
   final AppBloc appBloc;
   LocationSearch(
-      {@required Function(AddressSearchResultItem) onSelectAddress,
-      @required this.appBloc})
+      {required Function(AddressSearchResultItem) onSelectAddress,
+      required this.appBloc})
       : _onSelectAddress = onSelectAddress {
     _subscription =
         _querySubject.debounceTime(Duration(milliseconds: 300)).listen((event) {
@@ -60,7 +60,8 @@ class LocationSearch {
       }
       final List<AddressSearchResultItem> items = res.statusCode == 200
           ? List<Map>.from(jsonDecode(res.body))
-              .map((e) => AddressSearchResultItem.fromJson(e))
+              .map((e) =>
+                  AddressSearchResultItem.fromJson(e as Map<String, dynamic>))
               .toList()
           : [];
       _resultSubject.add(AddressSearchResult(items: items, query: q));
@@ -73,47 +74,47 @@ class LocationSearch {
 class AddressSearchResult {
   final String query;
   final List<AddressSearchResultItem> items;
-  AddressSearchResult({@required this.items, @required this.query});
+  AddressSearchResult({required this.items, required this.query});
 }
 
 @JsonSerializable()
 class AddressSearchResultItem {
-  final String address;
-  final GMapGeometry geometry;
+  final String? address;
+  final GMapGeometry? geometry;
 
   AddressSearchResultItem({this.address, this.geometry});
-  factory AddressSearchResultItem.fromJson(Map<String, dynamic> json) =>
-      _$AddressSearchResultItemFromJson(json);
+  factory AddressSearchResultItem.fromJson(Map<String, dynamic> json) => 
+  _$AddressSearchResultItemFromJson(json);
 }
 
 @JsonSerializable()
 class GMapGeometry {
-  final GMapCoordinate location;
-  final String location_type;
-  final GMapViewport viewport;
+  final GMapCoordinate? location;
+  final String? location_type;
+  final GMapViewport? viewport;
 
   GMapGeometry({this.location, this.location_type, this.viewport});
 
-  factory GMapGeometry.fromJson(Map<String, dynamic> json) =>
-      _$GMapGeometryFromJson(json);
+  factory GMapGeometry.fromJson(Map<String, dynamic> json) => 
+  _$GMapGeometryFromJson(json);
 }
 
 @JsonSerializable()
 class GMapViewport {
-  final GMapCoordinate northeast;
-  final GMapCoordinate southwest;
+  final GMapCoordinate? northeast;
+  final GMapCoordinate? southwest;
 
   GMapViewport({this.northeast, this.southwest});
 
-  factory GMapViewport.fromJson(Map<String, dynamic> json) =>
-      _$GMapViewportFromJson(json);
+  factory GMapViewport.fromJson(Map<String, dynamic> json) => 
+  _$GMapViewportFromJson(json);
 }
 
 @JsonSerializable()
 class GMapCoordinate {
-  final num lat;
-  final num lng;
-  LatLng toLatLng() => LatLng(lat, lng);
+  final num? lat;
+  final num? lng;
+  LatLng toLatLng() => LatLng(lat as double, lng as double);
 
   GMapCoordinate({this.lat, this.lng});
   factory GMapCoordinate.fromJson(Map<String, dynamic> json) =>

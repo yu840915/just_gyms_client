@@ -9,17 +9,17 @@ class GymList {
   final CurrentLocation location;
   final _listSubject = BehaviorSubject<List<Gym>>();
   Stream<List<Gym>> get listStream => _listSubject;
-  Future _task;
+  Future? _task;
   GymList(this.location);
 
-  Future<void> refresh() async {
+  Future<void>? refresh() async {
     if (_task != null) {
       return _task;
     }
     try {
       final findLocation = location.getLocation();
       _task = findLocation;
-      final pos = await findLocation;
+      final pos = await findLocation!;
       final task = APIServices.instances
           .get('/gyms?lat=${pos.latitude}&lon=${pos.longitude}');
       _task = task;
@@ -29,7 +29,7 @@ class GymList {
         return;
       }
       final list = List<Map>.from(jsonDecode(res.body))
-          .map((e) => Gym.fromJson(e))
+          .map((e) => Gym.fromJson(e as Map<String, dynamic>))
           .toList();
       if (list.isEmpty) {
         _listSubject.add([]);
@@ -41,7 +41,7 @@ class GymList {
     }
   }
 
-  num metersFrom(Gym gym) {
+  num? metersFrom(Gym gym) {
     return location.metersFrom(gym);
   }
 

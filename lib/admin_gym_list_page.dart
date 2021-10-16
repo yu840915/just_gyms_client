@@ -12,7 +12,7 @@ import 'package:where_gym/tracking/event_names.dart';
 import 'package:where_gym/tracking/tracking.dart';
 
 class AdminGymListPage extends StatelessWidget {
-  final AdminGymList adminGymList;
+  final AdminGymList? adminGymList;
   AdminGymListPage(this.adminGymList);
 
   @override
@@ -22,19 +22,19 @@ class AdminGymListPage extends StatelessWidget {
           title: Text(
         '場租管理',
         style: TextStyles.large.title,
-      )),
+      )) as PreferredSizeWidget?,
       body: _buildBody(context),
     );
   }
 
   Widget _buildBody(BuildContext context) {
     return StreamBuilder<List<Gym>>(
-      stream: adminGymList.onGyms,
+      stream: adminGymList!.onGyms,
       builder: (context, snap) => _buildList(context, snap.data),
     );
   }
 
-  Widget _buildList(BuildContext context, List<Gym> gyms) {
+  Widget _buildList(BuildContext context, List<Gym>? gyms) {
     if (gyms == null) {
       return Container();
     }
@@ -62,7 +62,7 @@ class _Row extends StatefulWidget {
 }
 
 class _RowState extends State<_Row> {
-  GymAppointmentSchedule _schedule;
+  GymAppointmentSchedule? _schedule;
 
   @override
   void initState() {
@@ -104,7 +104,7 @@ class _RowState extends State<_Row> {
                     color: Colors.grey.shade100,
                     image: widget.gym.cover != null
                         ? DecorationImage(
-                            image: NetworkImage(widget.gym.cover),
+                            image: NetworkImage(widget.gym.cover!),
                             fit: BoxFit.cover,
                           )
                         : null),
@@ -114,7 +114,7 @@ class _RowState extends State<_Row> {
                 child: Column(
                   children: [
                     Text(
-                      widget.gym.name,
+                      widget.gym.name!,
                       style: TextStyles.small.header,
                     ),
                   ],

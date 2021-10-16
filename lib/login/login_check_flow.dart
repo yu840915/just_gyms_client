@@ -6,7 +6,7 @@ import 'package:where_gym/login/login_page.dart';
 class LoginCheckFlow {
   LoginCheckFlow._();
   static Future<bool> check(BuildContext context,
-      {@required String where}) async {
+      {required String where}) async {
     AppBloc bloc = BlocProvider.of(context);
     if (bloc.isLoggedIn) {
       return true;

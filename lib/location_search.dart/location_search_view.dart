@@ -6,16 +6,16 @@ import 'package:where_gym/shared_appearances.dart';
 
 class LocationSearchView extends StatefulWidget {
   final Function showList;
-  final LocationSearch locationSearch;
-  LocationSearchView({@required this.showList, @required this.locationSearch});
+  final LocationSearch? locationSearch;
+  LocationSearchView({required this.showList, required this.locationSearch});
 
   @override
   _LocationSearchViewState createState() => _LocationSearchViewState();
 }
 
 class _LocationSearchViewState extends State<LocationSearchView> {
-  FloatingSearchBarController controller;
-  LocationSearch get locationSearch => widget.locationSearch;
+  FloatingSearchBarController? controller;
+  LocationSearch? get locationSearch => widget.locationSearch;
 
   @override
   void initState() {
@@ -29,8 +29,8 @@ class _LocationSearchViewState extends State<LocationSearchView> {
   }
 
   void _onSelectItem(BuildContext context, AddressSearchResultItem item) {
-    controller.close();
-    locationSearch.selectAddress(item);
+    controller!.close();
+    locationSearch!.selectAddress(item);
   }
 
   @override
@@ -48,7 +48,7 @@ class _LocationSearchViewState extends State<LocationSearchView> {
       width: 600,
       debounceDelay: const Duration(milliseconds: 500),
       onQueryChanged: (query) {
-        locationSearch.updateQuery(query);
+        locationSearch!.updateQuery(query);
       },
       transition: CircularFloatingSearchBarTransition(),
       leadingActions: [
@@ -71,7 +71,7 @@ class _LocationSearchViewState extends State<LocationSearchView> {
                 textStyle: TextStyles.large.action,
                 primary: AppColors.theme,
                 padding: EdgeInsets.zero),
-            onPressed: widget.showList,
+            onPressed: widget.showList as void Function()?,
           ),
         ),
         FloatingSearchBarAction.searchToClear(
@@ -84,8 +84,8 @@ class _LocationSearchViewState extends State<LocationSearchView> {
           child: Material(
             color: Colors.white,
             elevation: 4.0,
-            child: StreamBuilder<AddressSearchResult>(
-              stream: locationSearch.onResult,
+            child: StreamBuilder<AddressSearchResult?>(
+              stream: locationSearch!.onResult,
               builder: (context, snapshot) {
                 return _buildResultView(context, snapshot.data);
               },
@@ -96,7 +96,7 @@ class _LocationSearchViewState extends State<LocationSearchView> {
     );
   }
 
-  Widget _buildResultView(BuildContext context, AddressSearchResult result) {
+  Widget _buildResultView(BuildContext context, AddressSearchResult? result) {
     if (result == null) {
       return SizedBox.shrink();
     } else if (result.items.isEmpty) {
@@ -105,7 +105,7 @@ class _LocationSearchViewState extends State<LocationSearchView> {
         alignment: Alignment.center,
         child: Text(
           '找不到與「${result.query}」相關的結果',
-          style: TextStyles.large.detail.copyWith(color: Colors.black),
+          style: TextStyles.large.detail!.copyWith(color: Colors.black),
           textAlign: TextAlign.center,
         ),
       );
@@ -126,7 +126,7 @@ class _LocationSearchViewState extends State<LocationSearchView> {
 class _Cell extends StatelessWidget {
   final AddressSearchResultItem item;
   final Function onSelect;
-  _Cell({@required this.item, @required this.onSelect});
+  _Cell({required this.item, required this.onSelect});
 
   @override
   Widget build(BuildContext context) {
@@ -134,13 +134,13 @@ class _Cell extends StatelessWidget {
       child: Row(
         children: [
           Text(
-            item.address,
+            item.address!,
             style: TextStyles.large.detail,
           ),
           Spacer()
         ],
       ),
-      onPressed: onSelect,
+      onPressed: onSelect as void Function()?,
       style: TextButton.styleFrom(
         minimumSize: Size(double.infinity, 50),
         alignment: Alignment.centerLeft,

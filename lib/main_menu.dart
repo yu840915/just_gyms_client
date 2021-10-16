@@ -56,13 +56,13 @@ class MainMenu extends StatelessWidget {
               _showFavorites(context);
               break;
             case _MenuItem.tos:
-              launch(Configs.instance.tosLink, forceWebView: true);
+              launch(Configs.instance!.tosLink, forceWebView: true);
               break;
             case _MenuItem.pp:
-              launch(Configs.instance.ppLink, forceWebView: true);
+              launch(Configs.instance!.ppLink, forceWebView: true);
               break;
             case _MenuItem.contactUs:
-              launch(Configs.instance.contactLink, forceWebView: false);
+              launch(Configs.instance!.contactLink, forceWebView: false);
               break;
             case _MenuItem.logIn:
               _logIn(context);

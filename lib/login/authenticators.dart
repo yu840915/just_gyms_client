@@ -16,28 +16,19 @@ class Authenticators {
     return false;
   }
 
-  static Future<UserCredential> signInWithFacebook() async {
-    try {
-      final AccessToken result = await FacebookAuth.instance.login();
-      if (result == null) {
-        return null;
-      }
-      final facebookAuthCredential =
-          FacebookAuthProvider.credential(result.token);
-      return await FirebaseAuth.instance
-          .signInWithCredential(facebookAuthCredential);
-    } catch (e) {
-      if (e is FacebookAuthException) {
-        if (e.errorCode == 'CANCELLED') {
-          return null;
-        }
-      }
-      throw e;
+  static Future<UserCredential?> signInWithFacebook() async {
+    final LoginResult result = await FacebookAuth.instance.login();
+    if (result == null || result.status != LoginStatus.success) {
+      return null;
     }
+    final facebookAuthCredential =
+        FacebookAuthProvider.credential(result.accessToken!.token);
+    return await FirebaseAuth.instance
+        .signInWithCredential(facebookAuthCredential);
   }
 
-  static Future<UserCredential> signInWithGoogle() async {
-    final GoogleSignInAccount googleUser = await GoogleSignIn().signIn();
+  static Future<UserCredential?> signInWithGoogle() async {
+    final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
     if (googleUser == null) {
       return null;
     }
@@ -64,7 +55,7 @@ class Authenticators {
     return digest.toString();
   }
 
-  static Future<UserCredential> signInWithApple() async {
+  static Future<UserCredential?> signInWithApple() async {
     try {
       final rawNonce = _generateNonce();
       final nonce = _sha256ofString(rawNonce);

@@ -1,3 +1,5 @@
+import 'dart:async';
+import 'dart:typed_data';
 import 'dart:ui';
 
 import 'package:after_layout/after_layout.dart';
@@ -11,7 +13,7 @@ import 'package:where_gym/price_format.dart';
 import 'package:where_gym/shared_appearances.dart';
 
 class GymMarkerImageMakerContainers extends StatelessWidget {
-  final GymMarkerList gymMarkerList;
+  final GymMarkerList? gymMarkerList;
   GymMarkerImageMakerContainers(this.gymMarkerList);
 
   @override
@@ -19,7 +21,7 @@ class GymMarkerImageMakerContainers extends StatelessWidget {
     return IgnorePointer(
       child: Material(
         child: StreamBuilder<List<GymMarker>>(
-          stream: gymMarkerList.onMarkersChange,
+          stream: gymMarkerList!.onMarkersChange,
           builder: (context, listSnapshot) {
             return _buildMarkerMakers(context, listSnapshot.data);
           },
@@ -29,7 +31,7 @@ class GymMarkerImageMakerContainers extends StatelessWidget {
     );
   }
 
-  Widget _buildMarkerMakers(BuildContext context, List<GymMarker> list) {
+  Widget _buildMarkerMakers(BuildContext context, List<GymMarker>? list) {
     if (list == null) {
       return Container();
     }
@@ -43,10 +45,10 @@ class GymMarkerImageMakerContainers extends StatelessWidget {
 }
 
 class GymMarkerImageMaker extends StatefulWidget {
-  final GymMarkerList gymMarkerList;
+  final GymMarkerList? gymMarkerList;
   final GymMarker gymMarker;
 
-  GymMarkerImageMaker({@required this.gymMarker, @required this.gymMarkerList})
+  GymMarkerImageMaker({required this.gymMarker, required this.gymMarkerList})
       : super(key: Key(gymMarker.id));
   @override
   _GymMarkerImageMakerState createState() => _GymMarkerImageMakerState();
@@ -54,10 +56,10 @@ class GymMarkerImageMaker extends StatefulWidget {
 
 class _GymMarkerImageMakerState extends State<GymMarkerImageMaker>
     with AfterLayoutMixin<GymMarkerImageMaker> {
-  ScreenshotController normalController;
-  ScreenshotController selectionController;
-  ScreenshotController markedSelectionController;
-  ScreenshotController markedNormalController;
+  late ScreenshotController normalController;
+  late ScreenshotController selectionController;
+  late ScreenshotController markedSelectionController;
+  late ScreenshotController markedNormalController;
   final normalStyle = TextStyle(
     color: Colors.white,
     fontSize: 12,
@@ -77,11 +79,11 @@ class _GymMarkerImageMakerState extends State<GymMarkerImageMaker>
 
   @override
   void afterFirstLayout(BuildContext context) async {
-    final normalIcon = await normalController.capture();
-    final selectionIcon = await selectionController.capture();
-    final markedNormalIcon = await markedNormalController.capture();
-    final markedSelectionIcon = await markedSelectionController.capture();
-    widget.gymMarkerList.insertDisplayableMarker(
+    final normalIcon = await (normalController.capture() as FutureOr<Uint8List>);
+    final selectionIcon = await (selectionController.capture() as FutureOr<Uint8List>);
+    final markedNormalIcon = await (markedNormalController.capture() as FutureOr<Uint8List>);
+    final markedSelectionIcon = await (markedSelectionController.capture() as FutureOr<Uint8List>);
+    widget.gymMarkerList!.insertDisplayableMarker(      
       DisplayableGymMarker(
         icon: BitmapDescriptor.fromBytes(normalIcon),
         selectionIcon: BitmapDescriptor.fromBytes(selectionIcon),
@@ -152,8 +154,8 @@ class _GymMarkerImageMakerState extends State<GymMarkerImageMaker>
 
   Widget _buildMarkerContentForGym(Gym gym, TextStyle textStyle, bool marked) {
     Text text = Text('請電洽', style: textStyle);
-    if (gym.pricing != null && gym.pricing.isNotEmpty) {
-      text = Text(PriceFormat.format(gym.hourlyRate), style: textStyle);
+    if (gym.pricing != null && gym.pricing!.isNotEmpty) {
+      text = Text(PriceFormat.format(gym.hourlyRate!), style: textStyle);
     }
     if (!marked) {
       return text;

@@ -3,7 +3,7 @@ import 'package:where_gym/shared_appearances.dart';
 
 class AppBarFactory {
   AppBarFactory._();
-  static Widget appBar({Widget leading, Widget title, List<Widget> actions}) {
+  static Widget appBar({Widget? leading, Widget? title, List<Widget>? actions}) {
     return PreferredSize(
       preferredSize: Size.fromHeight(42),
       child: AppBar(        
@@ -18,7 +18,7 @@ class AppBarFactory {
   }
 
   static Widget transparentAppBar(
-      {Widget leading, Widget title, List<Widget> actions}) {
+      {Widget? leading, Widget? title, List<Widget>? actions}) {
     return PreferredSize(
       preferredSize: Size.fromHeight(42),
       child: AppBar(

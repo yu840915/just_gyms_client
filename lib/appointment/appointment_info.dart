@@ -3,28 +3,28 @@ import 'package:flutter/material.dart';
 
 class AppointmentInfo {
   final String id;
-  final String gymName;
-  final String userName;
-  final DocumentReference gymRef;
+  final String? gymName;
+  final String? userName;
+  final DocumentReference? gymRef;
   final AppointmentStatus status;
-  final DocumentReference userRef;
+  final DocumentReference? userRef;
   final DateTimeRange timeRange;
   AppointmentInfo(DocumentSnapshot<Map> snap)
       : id = snap.id,
-        gymRef = snap.data()['gym'],
-        userRef = snap.data()['user'],
-        userName = snap.data()['userName'],
-        gymName = snap.data()['gymName'],
+        gymRef = snap.data()!['gym'],
+        userRef = snap.data()!['user'],
+        userName = snap.data()!['userName'],
+        gymName = snap.data()!['gymName'],
         timeRange = DateTimeRange(
-            start: (snap.data()['startAt'] as Timestamp).toDate(),
-            end: (snap.data()['endAt'] as Timestamp).toDate()),
-        status = AppointmentStatusMethods.fromString(snap.data()['status']);
+            start: (snap.data()!['startAt'] as Timestamp).toDate(),
+            end: (snap.data()!['endAt'] as Timestamp).toDate()),
+        status = AppointmentStatusMethods.fromString(snap.data()!['status']);
 }
 
 enum AppointmentStatus { scheduled, cancelled, fulfilled, missed, unkown }
 
 extension AppointmentStatusMethods on AppointmentStatus {
-  static AppointmentStatus fromString(String string) {
+  static AppointmentStatus fromString(String? string) {
     if (string == null) {
       return AppointmentStatus.unkown;
     }
@@ -42,7 +42,7 @@ extension AppointmentStatusMethods on AppointmentStatus {
     }
   }
 
-  String get stringValue {
+  String? get stringValue {
     switch (this) {
       case AppointmentStatus.scheduled:
         return 'scheduled';

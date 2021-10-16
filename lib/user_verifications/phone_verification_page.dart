@@ -12,16 +12,16 @@ class PhoneVerificationPage extends StatefulWidget {
 }
 
 class _PhoneVerificationPageState extends State<PhoneVerificationPage> {
-  TextEditingController _editingController;
-  PhoneVerification _verification;
-  Future _sendSmsTask;
+  TextEditingController? _editingController;
+  PhoneVerification? _verification;
+  Future? _sendSmsTask;
 
   void _sendSmsCode(BuildContext context) async {
     if (_sendSmsTask != null) {
       return;
     }
     try {
-      _sendSmsTask = _verification.sendSMS(_editingController.text);
+      _sendSmsTask = _verification!.sendSMS(_editingController!.text);
       await _sendSmsTask;
       Navigator.push(
         context,
@@ -46,7 +46,7 @@ class _PhoneVerificationPageState extends State<PhoneVerificationPage> {
 
   @override
   void dispose() {
-    _editingController.dispose();
+    _editingController!.dispose();
     super.dispose();
   }
 
@@ -57,7 +57,7 @@ class _PhoneVerificationPageState extends State<PhoneVerificationPage> {
           title: Text(
         '手機驗證',
         style: TextStyles.large.header,
-      )),
+      )) as PreferredSizeWidget?,
       body: _buildBody(context),
     );
   }
@@ -81,7 +81,7 @@ class _PhoneVerificationPageState extends State<PhoneVerificationPage> {
     return TextField(
       decoration: InputDecoration(
         labelText: '請輸入手機號碼',
-        labelStyle: TextStyles.large.title.copyWith(color: Colors.black),
+        labelStyle: TextStyles.large.title!.copyWith(color: Colors.black),
         isDense: false,
         focusedBorder: OutlineInputBorder(
           borderSide: BorderSide(color: Colors.black),

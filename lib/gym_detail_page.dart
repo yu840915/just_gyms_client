@@ -8,6 +8,7 @@ import 'package:where_gym/appointment/appointment_creation_page.dart';
 import 'package:where_gym/appointment/gym_appointment_schedule.dart';
 import 'package:where_gym/appointment/gym_appointments_page.dart';
 import 'package:where_gym/appointment_preflight_checks/appointment_preflight_checks.dart';
+import 'package:where_gym/business_hours.dart';
 import 'package:where_gym/gym.dart';
 import 'package:where_gym/map_view/open_hour_indicator.dart';
 import 'package:where_gym/photo_gallery_view.dart';
@@ -17,8 +18,8 @@ import 'package:where_gym/tracking/event_names.dart';
 import 'package:where_gym/tracking/tracking.dart';
 
 class GymDetailPage extends StatelessWidget {
-  final Gym gym;
-  GymDetailPage({@required this.gym});
+  final Gym? gym;
+  GymDetailPage({required this.gym});
 
   void _book(BuildContext context) async {
     if ((await AppointmentPreflightCheckFlow.check(context,
@@ -35,8 +36,8 @@ class GymDetailPage extends StatelessWidget {
     );
   }
 
-  void _callGym(String phone) {
-    track(EventName.contactGym, gym.trackingProps);
+  void _callGym(String? phone) {
+    track(EventName.contactGym, gym!.trackingProps);
     launch('tel://$phone');
   }
 
@@ -54,7 +55,7 @@ class GymDetailPage extends StatelessWidget {
             builder: (context, snapshot) {
               return _buildFavoriteButton(context);
             })
-      ]),
+      ]) as PreferredSizeWidget?,
       extendBodyBehindAppBar: true,
       body: _buildBody(context),
     );
@@ -62,19 +63,19 @@ class GymDetailPage extends StatelessWidget {
 
   Widget _buildFavoriteButton(BuildContext context) {
     AppBloc bloc = BlocProvider.of(context);
-    final isFavorite = bloc.favoriteGymList.isFavorite(gym.id);
+    final isFavorite = bloc.favoriteGymList.isFavorite(gym!.id);
     return IconButton(
       onPressed: () {
         if (isFavorite) {
-          bloc.favoriteGymList.delete(gym.id);
+          bloc.favoriteGymList.delete(gym!.id);
           track(EventName.removeBookmark, {
-            ...gym.trackingProps,
+            ...gym!.trackingProps,
             EventProperties.from: 'gym detail page',
           });
         } else {
-          bloc.favoriteGymList.add(gym.id);
+          bloc.favoriteGymList.add(gym!.id);
           track(EventName.addBookmark, {
-            ...gym.trackingProps,
+            ...gym!.trackingProps,
             EventProperties.from: 'gym detail page',
           });
         }
@@ -98,7 +99,7 @@ class GymDetailPage extends StatelessWidget {
             ],
           ),
         ),
-        if (gym.hasContactInfos) _buildActions(context),
+        if (gym!.hasContactInfos) _buildActions(context),
       ],
     );
   }
@@ -108,7 +109,7 @@ class GymDetailPage extends StatelessWidget {
       children: [
         SizedBox(height: 20),
         Text(
-          gym.name,
+          gym!.name!,
           style: TextStyles.large.header,
         ),
         SizedBox(height: 20),
@@ -119,7 +120,7 @@ class GymDetailPage extends StatelessWidget {
         _buildBusinessHourRow(),
         SizedBox(height: 12),
         Text('地址', style: TextStyles.large.title),
-        Text(gym.address, style: TextStyles.large.detail),
+        Text(gym!.address!, style: TextStyles.large.detail),
         SizedBox(height: 20),
         Text('器材', style: TextStyles.large.title),
         _buildEquipmentSection(),
@@ -132,15 +133,15 @@ class GymDetailPage extends StatelessWidget {
   }
 
   Widget _buildPricingRow() {
-    if (gym.pricing == null || gym.pricing.isEmpty) {
+    if (gym!.pricing == null || gym!.pricing!.isEmpty) {
       return Text('請電洽');
     }
-    if (gym.pricing.length == 1) {
-      return _buildFareRow(null, gym.pricing.first);
+    if (gym!.pricing!.length == 1) {
+      return _buildFareRow(null, gym!.pricing!.first);
     }
     final rows = List<Widget>.empty(growable: true);
-    for (var i = 0; i < gym.pricing.length; i++) {
-      rows.add(_buildFareRow(i + 1, gym.pricing[i]));
+    for (var i = 0; i < gym!.pricing!.length; i++) {
+      rows.add(_buildFareRow(i + 1, gym!.pricing![i]));
       rows.add(SizedBox(height: 4));
     }
     return Column(
@@ -148,7 +149,7 @@ class GymDetailPage extends StatelessWidget {
     );
   }
 
-  Widget _buildFareRow(int bullet, Fare fare) {
+  Widget _buildFareRow(int? bullet, Fare fare) {
     return Text(
       (bullet != null ? '$bullet. ' : '') + FareFormat.format(fare),
       style: TextStyles.large.detail,
@@ -159,7 +160,7 @@ class GymDetailPage extends StatelessWidget {
     return Row(
       children: [
         OpenHourIndicator(gym: gym, styles: TextStyles.large),
-        if (gym.isOpenNow() != null) ...[
+        if (gym!.isOpenNow() != null) ...[
           SizedBox(width: 8),
           _buildBusinessHourDetail(),
         ]
@@ -168,12 +169,12 @@ class GymDetailPage extends StatelessWidget {
   }
 
   Widget _buildBusinessHourDetail() {
-    final today = gym.businessHoursOfToday();
+    final today = gym!.businessHoursOfToday();
     return Text(
-      (gym.isOpenNow()
-          ? '營業至 ${today.end.stringValue}'
-          : '將於 ${today.start.stringValue} 開始營業'),
-      style: TextStyles.large.detail.copyWith(color: Colors.grey),
+      (gym!.isOpenNow()!
+          ? '營業至 ${today!.end!.stringValue}'
+          : '將於 ${today!.start!.stringValue} 開始營業'),
+      style: TextStyles.large.detail!.copyWith(color: Colors.grey),
     );
   }
 
@@ -191,16 +192,16 @@ class GymDetailPage extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: Row(
                       children: [
-                        if (gym.pageLink != null)
-                          Expanded(child: _buildPageButton(gym.pageLink)),
-                        if (gym.pageLink != null && gym.phone != null)
+                        if (gym!.pageLink != null)
+                          Expanded(child: _buildPageButton(gym!.pageLink)),
+                        if (gym!.pageLink != null && gym!.phone != null)
                           SizedBox(width: 12),
-                        if (gym.phone != null)
-                          Expanded(child: _buildPhoneButton(gym.phone)),
+                        if (gym!.phone != null)
+                          Expanded(child: _buildPhoneButton(gym!.phone)),
                       ],
                     ),
                   ),
-                  if (gym.supportsBooking) ...[
+                  if (gym!.supportsBooking!) ...[
                     SizedBox(height: 8),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -225,28 +226,28 @@ class GymDetailPage extends StatelessWidget {
       BlocProvider.of<AppBloc>(context).shouldShowAdminPageForGym(gym);
 
   Widget _buildEquipmentSection() {
-    if (gym.equipments == null || gym.equipments.isEmpty) {
+    if (gym!.equipments == null || gym!.equipments!.isEmpty) {
       return Text('待加入', style: TextStyles.large.subscription);
     }
     return Text(
-      gym.equipments.map((e) => '${e.name} * ${e.number}').join('、'),
+      gym!.equipments!.map((e) => '${e.name} * ${e.number}').join('、'),
       style: TextStyles.large.detail,
     );
   }
 
   Widget _buildFacilitySection() {
-    if (gym.gymFacilities == null || gym.gymFacilities.isEmpty) {
+    if (gym!.gymFacilities == null || gym!.gymFacilities!.isEmpty) {
       return Text('未提供', style: TextStyles.large.subscription);
     }
     return Text(
-      gym.gymFacilities.map((e) => e.displayName).join('、'),
+      gym!.gymFacilities!.map((e) => e!.displayName).join('、'),
       style: TextStyles.large.detail,
     );
   }
 
-  Widget _buildPageButton(String link) {
+  Widget _buildPageButton(String? link) {
     return TextButton(
-      onPressed: () => _openPage(link),
+      onPressed: () => _openPage(link!),
       child: Text(
         '商家網頁',
       ),
@@ -257,7 +258,7 @@ class GymDetailPage extends StatelessWidget {
     );
   }
 
-  Widget _buildPhoneButton(String phone) {
+  Widget _buildPhoneButton(String? phone) {
     return OutlinedButton(
       onPressed: () => _callGym(phone),
       child: Text('撥打電話'),
@@ -277,20 +278,20 @@ class GymDetailPage extends StatelessWidget {
 }
 
 class _AdminButton extends StatefulWidget {
-  final Gym gym;
-  _AdminButton({@required this.gym});
+  final Gym? gym;
+  _AdminButton({required this.gym});
 
   @override
   State<_AdminButton> createState() => _AdminButtonState();
 }
 
 class _AdminButtonState extends State<_AdminButton> {
-  GymAppointmentSchedule _schedule;
+  GymAppointmentSchedule? _schedule;
   @override
   void initState() {
     super.initState();
     _schedule = GymAppointmentSchedule(
-        appBloc: BlocProvider.of(context), gym: widget.gym);
+        appBloc: BlocProvider.of(context), gym: widget.gym!);
   }
 
   @override

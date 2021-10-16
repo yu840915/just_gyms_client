@@ -38,7 +38,7 @@ class UserPortalPage extends StatelessWidget {
 
   void _copyId(BuildContext context) async {
     AppBloc bloc = BlocProvider.of(context);
-    await Clipboard.setData(ClipboardData(text: bloc.userRef.id));
+    await Clipboard.setData(ClipboardData(text: bloc.userRef!.id));
     await Fluttertoast.showToast(msg: '已複製使用者ID');
   }
 
@@ -82,24 +82,24 @@ class UserPortalPage extends StatelessWidget {
           '我的',
           style: TextStyles.large.title,
         ),
-      ),
+      ) as PreferredSizeWidget?,
       body: StreamBuilder<List<Gym>>(
           stream: bloc.adminGymList?.onGyms,
           builder: (context, snapshot) {
             return _buildBody(
               context,
-              shouldShowAdminUi: snapshot.hasData && snapshot.data.isNotEmpty,
+              shouldShowAdminUi: snapshot.hasData && snapshot.data!.isNotEmpty,
             );
           }),
     );
   }
 
-  Widget _buildBody(BuildContext context, {@required bool shouldShowAdminUi}) {
+  Widget _buildBody(BuildContext context, {required bool shouldShowAdminUi}) {
     AppBloc bloc = BlocProvider.of(context);
     return Column(
       children: [
         _Row(
-          title: '使用者ID： ${bloc.userRef.id}',
+          title: '使用者ID： ${bloc.userRef!.id}',
           style: TextStyles.large.action,
           action: () => _copyId(context),
         ),
@@ -136,7 +136,7 @@ class UserPortalPage extends StatelessWidget {
           Divider(height: 1),
           _Row(
             title: '刪除帳號',
-            style: TextStyles.small.action.copyWith(color: Colors.redAccent),
+            style: TextStyles.small.action!.copyWith(color: Colors.redAccent),
             action: () => _requestAccountDeletion(context),
           ),
         ],
@@ -147,19 +147,19 @@ class UserPortalPage extends StatelessWidget {
 
 class _Row extends StatelessWidget {
   final String title;
-  final TextStyle style;
+  final TextStyle? style;
   final Function action;
   final bool hasDetail;
   _Row(
-      {@required this.title,
+      {required this.title,
       this.style,
-      @required this.action,
+      required this.action,
       this.hasDetail = false});
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: action,
+      onTap: action as void Function()?,
       child: Container(
         child: Row(
           children: [

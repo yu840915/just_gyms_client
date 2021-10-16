@@ -10,21 +10,22 @@ import 'package:where_gym/appointment/appointment_info.dart';
 import 'package:where_gym/appointment/booking_appointment_schedule.dart';
 import 'package:where_gym/appointment/appointment_time_composer.dart';
 import 'package:where_gym/appointment/user_appointment_cell.dart';
+import 'package:where_gym/business_hours.dart';
 import 'package:where_gym/gym.dart';
 import 'package:where_gym/shared_appearances.dart';
 import 'package:where_gym/utils/loading_view.dart';
 
 class AppointmentCreatePage extends StatefulWidget {
-  final Gym gym;
-  AppointmentCreatePage({@required this.gym});
+  final Gym? gym;
+  AppointmentCreatePage({required this.gym});
 
   @override
   _AppointmentCreatePageState createState() => _AppointmentCreatePageState();
 }
 
 class _AppointmentCreatePageState extends State<AppointmentCreatePage> {
-  AppointmentTimeComposer _composer;
-  BookingAppointmentSchedule _schedule;
+  late AppointmentTimeComposer _composer;
+  BookingAppointmentSchedule? _schedule;
 
   @override
   void initState() {
@@ -34,13 +35,13 @@ class _AppointmentCreatePageState extends State<AppointmentCreatePage> {
       gym: widget.gym,
       appBloc: BlocProvider.of(context),
     );
-    _schedule.onAppointments.listen((event) {
+    _schedule!.onAppointments.listen((event) {
       print(event);
     }).onError((error) {
       print(error);
     });
     _composer =
-        AppointmentTimeComposer(businessHours: widget.gym.weekdayBusinessHours);
+        AppointmentTimeComposer(businessHours: widget.gym!.weekdayBusinessHours!);
   }
 
   @override
@@ -90,7 +91,7 @@ class _AppointmentCreatePageState extends State<AppointmentCreatePage> {
   void _book(BuildContext context) async {
     try {
       await showLoadingOverlayOnTask(context,
-          task: _schedule.bookWithRange(_composer.getDateRange()));
+          task: _schedule!.bookWithRange(_composer.getDateRange()));
     } catch (e) {
       showDialog(
         context: context,
@@ -104,10 +105,10 @@ class _AppointmentCreatePageState extends State<AppointmentCreatePage> {
     return Scaffold(
       appBar: AppBarFactory.appBar(
         title: Text(
-          widget.gym.name,
+          widget.gym!.name!,
           style: TextStyles.large.header,
         ),
-      ),
+      ) as PreferredSizeWidget?,
       body: StreamBuilder<DateTime>(
           stream: _composer.onDay,
           builder: (context, snapshot) {
@@ -116,18 +117,18 @@ class _AppointmentCreatePageState extends State<AppointmentCreatePage> {
     );
   }
 
-  Widget _buildBody(BuildContext context, DateTime day) {
+  Widget _buildBody(BuildContext context, DateTime? day) {
     return Column(
       children: [
         StreamBuilder<Object>(
-          stream: _schedule.onAppointments,
+          stream: _schedule!.onAppointments,
           builder: (context, snapshot) {
-            return _buildCalender(snapshot.data ?? []);
+            return _buildCalender(snapshot.data as List<AppointmentInfo>? ?? []);
           },
         ),
         Container(
           color: Colors.grey.shade200,
-          child: StreamBuilder<TimeRange>(
+          child: StreamBuilder<TimeRange?>(
             stream: _composer.onTimeRange,
             builder: (context, snapshot) {
               return Column(
@@ -144,7 +145,7 @@ class _AppointmentCreatePageState extends State<AppointmentCreatePage> {
         _buildBookButtons(context),
         Expanded(
           child: StreamBuilder<List<AppointmentInfo>>(
-            stream: _schedule.onAppointments,
+            stream: _schedule!.onAppointments,
             builder: (context, snapshot) {
               return _buildAppointments(context, snapshot.data ?? [], day);
             },
@@ -182,17 +183,17 @@ class _AppointmentCreatePageState extends State<AppointmentCreatePage> {
     );
   }
 
-  Widget _buildBusinessHour(BusinessHours businessHours) {
+  Widget _buildBusinessHour(BusinessHours? businessHours) {
     if (businessHours == null) {
       return SizedBox.shrink();
     }
     return Text(
-      '營業時間：${businessHours.start.stringValue} - ${businessHours.end.stringValue}',
-      style: TextStyles.large.title.copyWith(color: Colors.grey.shade500),
+      '營業時間：${businessHours.start!.stringValue} - ${businessHours.end!.stringValue}',
+      style: TextStyles.large.title!.copyWith(color: Colors.grey.shade500),
     );
   }
 
-  Widget _buildTimeButtons(TimeRange range) {
+  Widget _buildTimeButtons(TimeRange? range) {
     return Row(
       children: [
         TextButton(
@@ -221,7 +222,7 @@ class _AppointmentCreatePageState extends State<AppointmentCreatePage> {
     );
   }
 
-  String _formatTime(TimeOfDay time, String placeholder) {
+  String _formatTime(TimeOfDay? time, String placeholder) {
     String result = placeholder;
     if (time != null) {
       result = '$result ${time.stringValue}';
@@ -245,12 +246,12 @@ class _AppointmentCreatePageState extends State<AppointmentCreatePage> {
   }
 
   Widget _buildAppointments(
-      BuildContext context, List<AppointmentInfo> appointments, DateTime day) {
+      BuildContext context, List<AppointmentInfo> appointments, DateTime? day) {
     if (appointments == null || appointments.isEmpty) {
       return Center(
         child: Text(
           '沒有預約',
-          style: TextStyles.large.title.copyWith(color: Colors.grey.shade300),
+          style: TextStyles.large.title!.copyWith(color: Colors.grey.shade300),
         ),
       );
     }

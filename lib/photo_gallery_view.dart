@@ -11,12 +11,12 @@ class PhotoGalleryView extends StatefulWidget {
 }
 
 class _PhotoGalleryViewState extends State<PhotoGalleryView> {
-  PageController pageController;
+  PageController? pageController;
   List<String> get urls => widget.urls;
-  BehaviorSubject<_PageInfo> _pageInfoSubject;
+  BehaviorSubject<_PageInfo>? _pageInfoSubject;
 
   void _handlePageChanged(int idx) {
-    _pageInfoSubject.add(_PageInfo(idx, urls.length));
+    _pageInfoSubject!.add(_PageInfo(idx, urls.length));
   }
 
   @override
@@ -29,8 +29,8 @@ class _PhotoGalleryViewState extends State<PhotoGalleryView> {
 
   @override
   void dispose() {
-    pageController.dispose();
-    _pageInfoSubject.close();
+    pageController!.dispose();
+    _pageInfoSubject!.close();
     super.dispose();
   }
 
@@ -72,7 +72,7 @@ class _PhotoGalleryViewState extends State<PhotoGalleryView> {
     );
   }
 
-  Widget _buildPageIndicator(_PageInfo info) {
+  Widget _buildPageIndicator(_PageInfo? info) {
     if (info == null) {
       return Container();
     }
@@ -84,7 +84,7 @@ class _PhotoGalleryViewState extends State<PhotoGalleryView> {
       ),
       child: Text(
         '${info.current + 1}/${info.total}',
-        style: TextStyles.small.detail.copyWith(color: Colors.white),
+        style: TextStyles.small.detail!.copyWith(color: Colors.white),
       ),
     );
   }

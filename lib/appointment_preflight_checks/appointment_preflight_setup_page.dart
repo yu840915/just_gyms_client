@@ -33,7 +33,7 @@ class AppointmentPreflightSetupPage extends StatelessWidget {
           '歡迎使用預約功能',
           style: TextStyles.large.title,
         ),
-      ),
+      ) as PreferredSizeWidget?,
       body: _buildBody(context),
     );
   }
@@ -47,13 +47,13 @@ class AppointmentPreflightSetupPage extends StatelessWidget {
           style: TextStyles.large.header,
         ),
         SizedBox(height: 30),
-        if (!preflightCheckResult.hasPhone) ...[
+        if (!preflightCheckResult.hasPhone!) ...[
           PermissionCheckerRow(
             LinkPhonePermissionItem(BlocProvider.of(context)),
           ),
           SizedBox(height: 20),
         ],
-        if (!preflightCheckResult.hasAskedNotificationPermission)
+        if (!preflightCheckResult.hasAskedNotificationPermission!)
           PermissionCheckerRow(NotificationPermissionItem()),
         SizedBox(height: 20),
         _buildPolicy(context),
@@ -83,7 +83,7 @@ class AppointmentPreflightSetupPage extends StatelessWidget {
                 style: link,
                 recognizer: TapGestureRecognizer()
                   ..onTap = () {
-                    _openLink(context, Configs.instance.tosLink);
+                    _openLink(context, Configs.instance!.tosLink);
                   }),
             TextSpan(text: '及', style: normal),
             TextSpan(
@@ -91,7 +91,7 @@ class AppointmentPreflightSetupPage extends StatelessWidget {
                 style: link,
                 recognizer: TapGestureRecognizer()
                   ..onTap = () {
-                    _openLink(context, Configs.instance.ppLink);
+                    _openLink(context, Configs.instance!.ppLink);
                   }),
             TextSpan(text: '。繼續使用代表閣下同意我們的政策。', style: normal),
           ])),

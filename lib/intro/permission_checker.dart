@@ -15,7 +15,7 @@ class PermissionChecker {
   final _hasUnfinishedItemsSubject = BehaviorSubject<bool>();
   Stream<bool> get onHasUnfinishedItems => _hasUnfinishedItemsSubject;
   final List<PermissionItem> items = [LocationPermissionItem()];
-  List<StreamSubscription> _subscriptions;
+  late List<StreamSubscription> _subscriptions;
   PermissionChecker() {
     _subscriptions = items
         .map((e) => e.onUpdate.listen((event) {
@@ -167,14 +167,14 @@ class LinkPhonePermissionItem implements PermissionItem {
 
   @override
   Future<GrantStatus> getPermissionStatus() async {
-    return bloc.firebaseUser.phoneNumber != null
+    return bloc.firebaseUser!.phoneNumber != null
         ? GrantStatus.granted
         : GrantStatus.undecided;
   }
 
   @override
   Stream<GrantStatus> get onUpdate => bloc.onFirebaseUserChange.map((event) =>
-      event.phoneNumber == null ? GrantStatus.undecided : GrantStatus.granted);
+      event!.phoneNumber == null ? GrantStatus.undecided : GrantStatus.granted);
 
   @override
   Future<void> skipPermissionRequest() {

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:collection/collection.dart' show IterableExtension;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:rxdart/subjects.dart';
 import 'package:where_gym/api_services/api_services.dart';
@@ -18,7 +19,7 @@ class CloudFavoriteGym implements FavoriteGymMixin {
 class CloudFavoriteGymList implements FavoriteGymList {
   final AppBloc bloc;
   final _gymListSubject = BehaviorSubject<List<FavoriteGymMixin>>();
-  StreamSubscription _subscription;
+  late StreamSubscription _subscription;
   CloudFavoriteGymList(this.bloc, User user) {
     _subscription = FirebaseFirestore.instance
         .collection('favorites')
@@ -26,10 +27,10 @@ class CloudFavoriteGymList implements FavoriteGymList {
         .snapshots()
         .map((event) => !event.exists
             ? []
-            : List<FavoriteGymMixin>.from(CloudFavorites.fromMap(event.data())
+            : List<FavoriteGymMixin>.from(CloudFavorites.fromMap(event.data()!)
                 .gyms
                 .map((e) => CloudFavoriteGym(e))))
-        .listen(_gymListSubject.add);
+        .listen(_gymListSubject.add as void Function(List<dynamic>)?);
   }
 
   @override
@@ -39,7 +40,7 @@ class CloudFavoriteGymList implements FavoriteGymList {
   }
 
   @override
-  Future<void> add(String gymId) async {
+  Future<void> add(String? gymId) async {
     await APIServices.instances.patch(
       '/me/favorites/gyms',
       body: {
@@ -50,7 +51,7 @@ class CloudFavoriteGymList implements FavoriteGymList {
   }
 
   @override
-  Future<void> delete(String gymId) async {
+  Future<void> delete(String? gymId) async {
     await APIServices.instances.delete(
       '/me/favorites/gyms/$gymId',
       token: await bloc.getIdToken(),
@@ -58,16 +59,16 @@ class CloudFavoriteGymList implements FavoriteGymList {
   }
 
   @override
-  FavoriteGymMixin getGym(String gymId) {
-    if (_gymListSubject.valueWrapper == null) {
+  FavoriteGymMixin? getGym(String? gymId) {
+    if (_gymListSubject.valueOrNull == null) {
       return null;
     }
-    return _gymListSubject.valueWrapper.value
-        .firstWhere((e) => e.id == gymId, orElse: () => null);
+    return _gymListSubject.value
+        .firstWhereOrNull((e) => e.id == gymId);
   }
 
   @override
-  bool isFavorite(String gymId) {
+  bool isFavorite(String? gymId) {
     return getGym(gymId) != null;
   }
 

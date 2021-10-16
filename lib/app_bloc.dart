@@ -21,22 +21,21 @@ class AppBloc extends Bloc<dynamic, AppPhase> {
   final _hasFinishedIntroKey = 'hasFinishedIntro';
   final permissionChecker = PermissionChecker();
 
-  final _firebaseUserSubject = BehaviorSubject<User>();
-  Stream<User> get onFirebaseUserChange => _firebaseUserSubject;
-  User get firebaseUser =>
-      isLoggedIn ? _firebaseUserSubject.valueWrapper.value : null;
+  final _firebaseUserSubject = BehaviorSubject<User?>();
+  Stream<User?> get onFirebaseUserChange => _firebaseUserSubject;
+  User? get firebaseUser => isLoggedIn ? _firebaseUserSubject.value : null;
   FavoriteGymList get favoriteGymList =>
       _cloudFavoriteGymList ?? _localFavoriteGymList;
   final LocalFavoriteGymList _localFavoriteGymList;
-  CloudFavoriteGymList _cloudFavoriteGymList;
-  AdminGymList get adminGymList => _adminGymList;
-  AdminGymList _adminGymList;
+  CloudFavoriteGymList? _cloudFavoriteGymList;
+  AdminGymList? get adminGymList => _adminGymList;
+  AdminGymList? _adminGymList;
   final CurrentLocation location;
   final _subscriptions = List<StreamSubscription>.empty(growable: true);
-  final _userRefSubject = BehaviorSubject<DocumentReference>();
-  DocumentReference get userRef => _userRefSubject.valueWrapper?.value;
-  Stream<DocumentReference> get onUserRefChange => _userRefSubject;
-  AppBloc(initialState, {@required InitializedProducts initializedProducts})
+  final _userRefSubject = BehaviorSubject<DocumentReference?>();
+  DocumentReference? get userRef => _userRefSubject.valueOrNull;
+  Stream<DocumentReference?> get onUserRefChange => _userRefSubject;
+  AppBloc(initialState, {required InitializedProducts initializedProducts})
       : _localFavoriteGymList = initializedProducts.favoriteGymList,
         location = initializedProducts.location,
         super(initialState) {
@@ -52,9 +51,9 @@ class AppBloc extends Bloc<dynamic, AppPhase> {
     });
   }
 
-  bool get isLoggedIn => _firebaseUserSubject.valueWrapper.value == null
+  bool get isLoggedIn => _firebaseUserSubject.valueOrNull == null
       ? false
-      : !_firebaseUserSubject.valueWrapper.value.isAnonymous;
+      : !_firebaseUserSubject.value!.isAnonymous;
 
   void _subscribeEvents() {
     _subscriptions.add(FirebaseAuth.instance.authStateChanges().listen((event) {
@@ -62,7 +61,7 @@ class AppBloc extends Bloc<dynamic, AppPhase> {
     }));
   }
 
-  void _handleUserUpdate(User user) {
+  void _handleUserUpdate(User? user) {
     if (user == null) {
       _firebaseUserSubject.add(null);
       _cloudFavoriteGymList?.dispose();
@@ -86,7 +85,7 @@ class AppBloc extends Bloc<dynamic, AppPhase> {
   void _checkPermission() async {
     final prefs = await SharedPreferences.getInstance();
     if (!prefs.containsKey(_hasFinishedIntroKey) ||
-        !prefs.getBool(_hasFinishedIntroKey)) {
+        !prefs.getBool(_hasFinishedIntroKey)!) {
       add(AppPhase.intro);
     } else {
       _setUpPermission();
@@ -103,7 +102,7 @@ class AppBloc extends Bloc<dynamic, AppPhase> {
     });
   }
 
-  Future<String> getIdToken() => firebaseUser?.getIdToken();
+  Future<String>? getIdToken() => firebaseUser?.getIdToken();
 
   Future syncFavoriteGyms() async {
     await _cloudFavoriteGymList?.syncWithLocalList(_localFavoriteGymList);
@@ -111,7 +110,7 @@ class AppBloc extends Bloc<dynamic, AppPhase> {
 
   @override
   Stream<AppPhase> mapEventToState(event) async* {
-    yield event;
+    // yield event;
   }
 
   void setIntroFinished() async {
@@ -124,11 +123,11 @@ class AppBloc extends Bloc<dynamic, AppPhase> {
     }
   }
 
-  bool shouldShowAdminPageForGym(Gym gym) {
+  bool shouldShowAdminPageForGym(Gym? gym) {
     if (!isLoggedIn) {
       return false;
     }
-    return adminGymList.isAdminOfGym(gym);
+    return adminGymList!.isAdminOfGym(gym);
   }
 }
 

@@ -10,7 +10,8 @@ import 'package:where_gym/login/authenticators.dart';
 import 'package:where_gym/shared_appearances.dart';
 
 class LoginPage extends StatelessWidget {
-  void _performSignIn(BuildContext context, Future<UserCredential> task) async {
+  void _performSignIn(
+      BuildContext context, Future<UserCredential?> task) async {
     try {
       await task;
       Navigator.pop(context);
@@ -48,13 +49,13 @@ class LoginPage extends StatelessWidget {
             children: [
               Text(
                 '使用者登入',
-                style: TextStyles.large.header.copyWith(
+                style: TextStyles.large.header!.copyWith(
                     color: Colors.black, decoration: TextDecoration.none),
               ),
               SizedBox(height: 24),
               FutureBuilder(
                 future: Authenticators.isAppleLoginAvailable,
-                builder: (context, snap) => snap.hasData && snap.data
+                builder: (context, snap) => snap.hasData
                     ? Column(
                         children: [
                           _buildAppleButton(context),
@@ -167,7 +168,7 @@ class LoginPage extends StatelessWidget {
                 style: link,
                 recognizer: TapGestureRecognizer()
                   ..onTap = () {
-                    _openLink(context, Configs.instance.tosLink);
+                    _openLink(context, Configs.instance!.tosLink);
                   }),
             TextSpan(text: '及', style: normal),
             TextSpan(
@@ -175,7 +176,7 @@ class LoginPage extends StatelessWidget {
                 style: link,
                 recognizer: TapGestureRecognizer()
                   ..onTap = () {
-                    _openLink(context, Configs.instance.ppLink);
+                    _openLink(context, Configs.instance!.ppLink);
                   }),
             TextSpan(text: '。開始使用即代表閣下已同意上述政策。', style: normal),
           ])),

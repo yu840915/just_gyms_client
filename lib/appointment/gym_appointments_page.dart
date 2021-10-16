@@ -10,23 +10,23 @@ import 'package:where_gym/gym.dart';
 import 'package:where_gym/shared_appearances.dart';
 
 class GymAppointmentsPage extends StatefulWidget {
-  final Gym gym;
-  GymAppointmentsPage({@required this.gym});
+  final Gym? gym;
+  GymAppointmentsPage({required this.gym});
 
   @override
   State<GymAppointmentsPage> createState() => _GymAppointmentsPageState();
 }
 
 class _GymAppointmentsPageState extends State<GymAppointmentsPage> {
-  GymAppointmentSchedule _schedule;
-  DateTime _date;
+  GymAppointmentSchedule? _schedule;
+  DateTime? _date;
 
   @override
   void initState() {
     super.initState();
     _date = DateTime.now();
     _schedule = GymAppointmentSchedule(
-        appBloc: BlocProvider.of(context), gym: widget.gym);
+        appBloc: BlocProvider.of(context), gym: widget.gym!);
   }
 
   @override
@@ -34,12 +34,12 @@ class _GymAppointmentsPageState extends State<GymAppointmentsPage> {
     return Scaffold(
       appBar: AppBarFactory.appBar(
         title: Text(
-          '${widget.gym.name}的預約',
+          '${widget.gym!.name}的預約',
           style: TextStyles.large.header,
         ),
-      ),
+      ) as PreferredSizeWidget?,
       body: StreamBuilder<List<AppointmentInfo>>(
-          stream: _schedule.onAppointments,
+          stream: _schedule!.onAppointments,
           builder: (context, snapshot) {
             return _buildBody(context, snapshot.data ?? []);
           }),
@@ -92,7 +92,7 @@ class _GymAppointmentsPageState extends State<GymAppointmentsPage> {
       return Center(
         child: Text(
           '沒有預約',
-          style: TextStyles.large.title.copyWith(color: Colors.grey.shade300),
+          style: TextStyles.large.title!.copyWith(color: Colors.grey.shade300),
         ),
       );
     }

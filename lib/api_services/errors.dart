@@ -16,13 +16,13 @@ extension ClientErrorMethods on ClientError {
     if (response.body == null) {
       return ClientError('未知的錯誤，請嘗試更新版本後再試');
     }
-    final String contentType = response.headers['content-type'];
+    final String? contentType = response.headers['content-type'];
     if (response.body is String &&
         (contentType == null || contentType.contains('text'))) {
       return ClientError(response.body);
     }
     try {
-      if (contentType.contains('application/json')) {
+      if (contentType!.contains('application/json')) {
         final errorMap = jsonDecode(response.body);
         return ClientError(errorMap['message'] ?? response.body);
       }

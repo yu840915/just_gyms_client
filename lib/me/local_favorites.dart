@@ -8,13 +8,13 @@ part 'local_favorites.g.dart';
 @HiveType(typeId: 1)
 class FavoriteGym extends HiveObject with FavoriteGymMixin {
   @HiveField(0)
-  String id;
+  String? id;
   @HiveField(1)
-  DateTime addedAt;
+  DateTime? addedAt;
   @HiveField(2)
-  DateTime lastContactedAt;
+  DateTime? lastContactedAt;
   @HiveField(3)
-  int contactCount;
+  int? contactCount;
 }
 
 class LocalFavoriteGymList implements FavoriteGymList {
@@ -38,7 +38,7 @@ class LocalFavoriteGymList implements FavoriteGymList {
     _list.add(records);
   }
 
-  Future<void> add(String gymId) async {
+  Future<void> add(String? gymId) async {
     final gym = FavoriteGym()
       ..id = gymId
       ..contactCount = 0
@@ -47,17 +47,17 @@ class LocalFavoriteGymList implements FavoriteGymList {
     _updateList();
   }
 
-  Future<void> delete(String gymId) async {
+  Future<void> delete(String? gymId) async {
     await dataStore.deleteValue(gymId);
     _updateList();
   }
 
-  FavoriteGym getGym(String gymId) {
+  FavoriteGym? getGym(String? gymId) {
     return dataStore.getValue(gymId);
   }
 
   @override
-  bool isFavorite(String gymId) {
+  bool isFavorite(String? gymId) {
     return getGym(gymId) != null;
   }
 }

@@ -13,8 +13,8 @@ class PermissionPage extends StatelessWidget {
       appBar: AppBarFactory.appBar(
           title: Text(
         '使用者授權',
-        style: TextStyles.large.header.copyWith(color: Colors.black),
-      )),
+        style: TextStyles.large.header!.copyWith(color: Colors.black),
+      )) as PreferredSizeWidget?,
       body: _buildBody(context, bloc.permissionChecker.items),
     );
   }
@@ -47,12 +47,12 @@ class PermissionCheckerRow extends StatelessWidget {
     return StreamBuilder<Object>(
       stream: item.onUpdate,
       builder: (context, snapshot) {
-        return _buildContent(context, snapshot.data);
+        return _buildContent(context, snapshot.data as GrantStatus?);
       },
     );
   }
 
-  Widget _buildContent(BuildContext context, GrantStatus status) {
+  Widget _buildContent(BuildContext context, GrantStatus? status) {
     if (status == GrantStatus.denied) {
       return SizedBox.shrink();
     }
@@ -74,13 +74,13 @@ class PermissionCheckerRow extends StatelessWidget {
     );
   }
 
-  Widget _buildAction(BuildContext context, GrantStatus status) {
+  Widget _buildAction(BuildContext context, GrantStatus? status) {
     if (status == null) {
       return Container(
         height: 44,
         child: Text(
           '檢查中...',
-          style: TextStyles.large.action.copyWith(color: AppColors.progressing),
+          style: TextStyles.large.action!.copyWith(color: AppColors.progressing),
         ),
       );
     }
@@ -94,7 +94,7 @@ class PermissionCheckerRow extends StatelessWidget {
           height: 44,
           child: Text(
             '已完成',
-            style: TextStyles.large.action.copyWith(color: Colors.black),
+            style: TextStyles.large.action!.copyWith(color: Colors.black),
           ),
         );
     }

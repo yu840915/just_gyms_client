@@ -4,7 +4,7 @@ class GymFacility {
   final String id;
   final String displayName;
 
-  GymFacility._({@required this.id, @required this.displayName});
+  GymFacility._({required this.id, required this.displayName});
 
   static final table = {
     'changingRoom': GymFacility._(id: 'changingRoom', displayName: '更衣室'),

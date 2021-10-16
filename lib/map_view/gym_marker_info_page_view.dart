@@ -13,7 +13,7 @@ import 'package:where_gym/tracking/event_names.dart';
 import 'package:where_gym/tracking/tracking.dart';
 
 class GymMarkerInfoPageView extends StatefulWidget {
-  final GymMarkerList gymMarkerList;
+  final GymMarkerList? gymMarkerList;
   GymMarkerInfoPageView(this.gymMarkerList);
 
   @override
@@ -21,32 +21,32 @@ class GymMarkerInfoPageView extends StatefulWidget {
 }
 
 class _GymMarkerInfoPageViewState extends State<GymMarkerInfoPageView> {
-  GymMarkerList get gymMarkerList => widget.gymMarkerList;
-  PageController pageController;
-  List<DisplayableGymMarker> markers;
+  GymMarkerList? get gymMarkerList => widget.gymMarkerList;
+  PageController? pageController;
+  List<DisplayableGymMarker>? markers;
 
   @override
   void initState() {
     super.initState();
-    gymMarkerList.onDisplayableMarkersChange.listen((event) {
+    gymMarkerList!.onDisplayableMarkersChange.listen((event) {
       markers = event;
     });
-    gymMarkerList.onSelection.listen((event) {
-      _handleSelectionChanged(gymMarkerList.selectedMarker);
+    gymMarkerList!.onSelection.listen((event) {
+      _handleSelectionChanged(gymMarkerList!.selectedMarker);
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<List<DisplayableGymMarker>>(
-        stream: gymMarkerList.onDisplayableMarkersChange,
+        stream: gymMarkerList!.onDisplayableMarkersChange,
         builder: (context, snapshot) {
           return _buildCardViews(
               context, GymInfoCard.convertMarkersToCards(snapshot.data));
         });
   }
 
-  Widget _buildCardViews(BuildContext context, List<GymInfoCard> cards) {
+  Widget _buildCardViews(BuildContext context, List<GymInfoCard>? cards) {
     if (cards == null) {
       return Container();
     }
@@ -61,10 +61,10 @@ class _GymMarkerInfoPageViewState extends State<GymMarkerInfoPageView> {
   }
 
   void _handlePageChanged(GymInfoCard card) {
-    gymMarkerList.selecteMarker(card.assosiatedMarker);
+    gymMarkerList!.selecteMarker(card.assosiatedMarker);
   }
 
-  void _handleSelectionChanged(DisplayableGymMarker marker) {
+  void _handleSelectionChanged(DisplayableGymMarker? marker) {
     if (marker == null) {
       return;
     }
@@ -75,13 +75,13 @@ class _GymMarkerInfoPageViewState extends State<GymMarkerInfoPageView> {
       _initPageControllerWithSelection(marker);
       return;
     }
-    final currentIdx = pageController.page.toInt() % markers.length;
-    final padding = pageController.page.toInt() - currentIdx;
-    if (markers[currentIdx].id == marker.id) {
+    final currentIdx = pageController!.page!.toInt() % markers!.length;
+    final padding = pageController!.page!.toInt() - currentIdx;
+    if (markers![currentIdx].id == marker.id) {
       return;
     }
-    final newIdx = markers.indexWhere((element) => element.id == marker.id);
-    pageController.animateToPage(
+    final newIdx = markers!.indexWhere((element) => element.id == marker.id);
+    pageController!.animateToPage(
       newIdx + padding,
       duration: Duration(microseconds: 150),
       curve: Curves.linear,
@@ -89,9 +89,9 @@ class _GymMarkerInfoPageViewState extends State<GymMarkerInfoPageView> {
   }
 
   void _initPageControllerWithSelection(DisplayableGymMarker marker) {
-    final idx = markers.indexWhere((element) => element.id == marker.id);
+    final idx = markers!.indexWhere((element) => element.id == marker.id);
     pageController = PageController(
-        initialPage: markers.length * 30 + idx, viewportFraction: 0.8);
+        initialPage: markers!.length * 30 + idx, viewportFraction: 0.8);
   }
 }
 
@@ -146,7 +146,7 @@ class GymInfoCardView extends StatelessWidget {
                               color: Colors.grey.shade100,
                               image: card.gym.cover != null
                                   ? DecorationImage(
-                                      image: NetworkImage(card.gym.cover),
+                                      image: NetworkImage(card.gym.cover!),
                                       fit: BoxFit.cover,
                                     )
                                   : null),
@@ -156,7 +156,7 @@ class GymInfoCardView extends StatelessWidget {
                           child: Column(
                             children: [
                               Text(
-                                card.gym.name,
+                                card.gym.name!,
                                 style: TextStyles.small.header,
                               ),
                               SizedBox(height: 8),
@@ -176,7 +176,7 @@ class GymInfoCardView extends StatelessWidget {
                     ),
                     SizedBox(height: 8),
                     Text(
-                      card.gym.address,
+                      card.gym.address!,
                       style: TextStyles.small.detail,
                     ),
                     SizedBox(height: 12),
@@ -186,7 +186,7 @@ class GymInfoCardView extends StatelessWidget {
                         if (card.gym.hourlyRate != null)
                           Text(
                             '(' +
-                                PriceFormat.format(card.gym.hourlyRate) +
+                                PriceFormat.format(card.gym.hourlyRate!) +
                                 '/小時)',
                             style: TextStyles.small.subscription,
                           ),
@@ -223,7 +223,7 @@ class GymInfoCardView extends StatelessWidget {
 
   Widget _buildDistanceLable(BuildContext context) {
     AppBloc bloc = BlocProvider.of(context);
-    final num meters = bloc.location.metersFrom(card.gym);
+    final num? meters = bloc.location.metersFrom(card.gym);
     if (meters == null) {
       return Container();
     }
@@ -233,7 +233,7 @@ class GymInfoCardView extends StatelessWidget {
     );
   }
 
-  Widget buildPricingTable(List<Fare> fares) {
+  Widget buildPricingTable(List<Fare>? fares) {
     String plans = '請電洽';
     if (fares != null && fares.isNotEmpty) {
       plans = fares.map((e) => FareFormat.format(e)).join('、');
@@ -245,10 +245,10 @@ class GymInfoCardView extends StatelessWidget {
 class GymInfoCard {
   final Gym gym;
   final DisplayableGymMarker assosiatedMarker;
-  GymInfoCard({@required this.gym, @required this.assosiatedMarker});
+  GymInfoCard({required this.gym, required this.assosiatedMarker});
 
-  static List<GymInfoCard> convertMarkersToCards(
-      List<DisplayableGymMarker> markers) {
+  static List<GymInfoCard>? convertMarkersToCards(
+      List<DisplayableGymMarker>? markers) {
     if (markers == null || markers.isEmpty) {
       return null;
     }

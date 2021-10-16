@@ -6,11 +6,11 @@ import 'package:where_gym/api_services/api_services.dart';
 import 'package:where_gym/app_bloc.dart';
 
 class PhoneVerification {
-  String _verificationId;
+  String? _verificationId;
   final AppBloc appBloc;
   final _isPhoneVerified = BehaviorSubject<bool>();
   Stream<bool> get onPhoneVerified => _isPhoneVerified;
-  String _lastPhoneNum;
+  String? _lastPhoneNum;
   PhoneVerification(this.appBloc);
 
   Future<void> sendSMS(String phoneNum) async {
@@ -42,7 +42,7 @@ class PhoneVerification {
   }
 
   Future<void> resendSms() async {
-    await sendSMS(_lastPhoneNum);
+    await sendSMS(_lastPhoneNum!);
   }
 
   void _onComplete(PhoneAuthCredential cred) async {
@@ -59,7 +59,7 @@ class PhoneVerification {
   }
 
   void _onCodeSent(String id, Completer completer, String phoneNum,
-      [int forceResendingToken]) {
+      [int? forceResendingToken]) {
     _verificationId = id;
     _lastPhoneNum = phoneNum;
     completer.complete();
@@ -75,14 +75,14 @@ class PhoneVerification {
     }
     await _linkPhoneCredential(
       PhoneAuthProvider.credential(
-        verificationId: _verificationId,
+        verificationId: _verificationId!,
         smsCode: code,
       ),
     );
   }
 
   Future _linkPhoneCredential(AuthCredential credential) async {
-    await appBloc.firebaseUser.linkWithCredential(credential);
+    await appBloc.firebaseUser!.linkWithCredential(credential);
     _isPhoneVerified.add(true);
   }
 }

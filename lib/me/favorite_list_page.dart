@@ -24,8 +24,8 @@ class FavoriteListPage extends StatefulWidget {
 }
 
 class _FavoriteListPageState extends State<FavoriteListPage> {
-  FavoriteDetailList list;
-  StreamSubscription _subscription;
+  late FavoriteDetailList list;
+  late StreamSubscription _subscription;
 
   @override
   void initState() {
@@ -84,7 +84,7 @@ class _FavoriteListPageState extends State<FavoriteListPage> {
           style: TextStyles.large.title,
         ),
         actions: [
-          StreamBuilder<DocumentReference>(
+          StreamBuilder<DocumentReference?>(
             stream: bloc.onUserRefChange,
             builder: (context, snapshot) {
               if (bloc.isLoggedIn) {
@@ -101,7 +101,7 @@ class _FavoriteListPageState extends State<FavoriteListPage> {
             },
           )
         ],
-      ),
+      ) as PreferredSizeWidget?,
       body: StreamBuilder<List<FavoriteGymDetail>>(
           stream: list.onUpdate,
           builder: (context, snapshot) {
@@ -110,7 +110,7 @@ class _FavoriteListPageState extends State<FavoriteListPage> {
     );
   }
 
-  Widget _buildList(BuildContext context, List<FavoriteGymDetail> details) {
+  Widget _buildList(BuildContext context, List<FavoriteGymDetail>? details) {
     if (details == null) {
       return Container();
     }
@@ -124,12 +124,12 @@ class _FavoriteListPageState extends State<FavoriteListPage> {
 
 class _Row extends StatelessWidget {
   final FavoriteGymDetail detail;
-  Gym get gym => detail.gym;
+  Gym? get gym => detail.gym;
   _Row(this.detail);
 
   void _showDetail(BuildContext context) {
     track(EventName.showGymDetail, {
-      ...gym.trackingProps,
+      ...gym!.trackingProps,
       EventProperties.distance: detail.meters,
       EventProperties.from: 'favorite list',
     });
@@ -147,7 +147,7 @@ class _Row extends StatelessWidget {
         builder: (context) {
           return AlertFactory.actionAlert(
             context,
-            title: '是否要移除${gym.name}?',
+            title: '是否要移除${gym!.name}?',
             actions: [
               PlatformDialogAction(
                 child: Text('移除'),
@@ -162,9 +162,9 @@ class _Row extends StatelessWidget {
       return;
     }
     AppBloc bloc = BlocProvider.of(context);
-    bloc.favoriteGymList.delete(gym.id);
+    bloc.favoriteGymList.delete(gym!.id);
     track(EventName.removeBookmark, {
-      ...gym.trackingProps,
+      ...gym!.trackingProps,
       EventProperties.distance: detail.meters,
       EventProperties.from: 'favorite list',
     });
@@ -187,9 +187,9 @@ class _Row extends StatelessWidget {
                     height: 50,
                     decoration: BoxDecoration(
                         color: Colors.grey.shade100,
-                        image: gym.cover != null
+                        image: gym!.cover != null
                             ? DecorationImage(
-                                image: NetworkImage(gym.cover),
+                                image: NetworkImage(gym!.cover!),
                                 fit: BoxFit.cover,
                               )
                             : null),
@@ -199,7 +199,7 @@ class _Row extends StatelessWidget {
                     child: Column(
                       children: [
                         Text(
-                          gym.name,
+                          gym!.name!,
                           style: TextStyles.small.header,
                         ),
                         SizedBox(height: 8),
@@ -214,16 +214,16 @@ class _Row extends StatelessWidget {
               ),
               SizedBox(height: 8),
               Text(
-                gym.address,
+                gym!.address!,
                 style: TextStyles.small.detail,
               ),
               SizedBox(height: 12),
               Row(
                 children: [
-                  buildPricingTable(gym.pricing),
-                  if (gym.hourlyRate != null)
+                  buildPricingTable(gym!.pricing),
+                  if (gym!.hourlyRate != null)
                     Text(
-                      '(' + PriceFormat.format(gym.hourlyRate) + '/小時)',
+                      '(' + PriceFormat.format(gym!.hourlyRate!) + '/小時)',
                       style: TextStyles.small.subscription,
                     ),
                   Spacer(),
@@ -257,12 +257,12 @@ class _Row extends StatelessWidget {
     }
 
     return Text(
-      DistanceFormat.format(detail.meters),
+      DistanceFormat.format(detail.meters!),
       style: TextStyles.small.subscription,
     );
   }
 
-  Widget buildPricingTable(List<Fare> fares) {
+  Widget buildPricingTable(List<Fare>? fares) {
     String plans = '請電洽';
     if (fares != null && fares.isNotEmpty) {
       plans = fares.map((e) => FareFormat.format(e)).join('、');
