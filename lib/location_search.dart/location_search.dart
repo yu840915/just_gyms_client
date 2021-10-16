@@ -13,8 +13,10 @@ part 'location_search.g.dart';
 class LocationSearch {
   final _querySubject = BehaviorSubject<String>();
   final _resultSubject = BehaviorSubject<AddressSearchResult>();
+  final _taskSubject = BehaviorSubject<Future>();
   Stream<AddressSearchResult> get onResult => _resultSubject;
   StreamSubscription _subscription;
+  Stream<Future> get onRunningTask => _taskSubject;
   final Function(AddressSearchResultItem) _onSelectAddress;
   final AppBloc appBloc;
   LocationSearch(
@@ -32,9 +34,10 @@ class LocationSearch {
   }
 
   void dispose() {
+    _subscription.cancel();
     _querySubject.close();
     _resultSubject.close();
-    _subscription.cancel();
+    _taskSubject.close();
   }
 
   void updateQuery(String q) {
@@ -45,15 +48,25 @@ class LocationSearch {
     if (q == null || q.isEmpty) {
       return _resultSubject.add(null);
     }
-    final res = await APIServices.instances.get('/geocode/search',
-        params: {'q': q, 'country': 'TW'}, token: await appBloc.getIdToken());
-    if (_querySubject != null && _querySubject.value != q) {
-      return;
+    try {
+      final getToken = appBloc.getIdToken();
+      _taskSubject.add(getToken);
+      final fetch = APIServices.instances.get('/geocode/search',
+          params: {'q': q, 'country': 'TW'}, token: await getToken);
+      _taskSubject.add(fetch);
+      final res = await fetch;
+      if (_querySubject != null && _querySubject.value != q) {
+        return;
+      }
+      final List<AddressSearchResultItem> items = res.statusCode == 200
+          ? List<Map>.from(jsonDecode(res.body))
+              .map((e) => AddressSearchResultItem.fromJson(e))
+              .toList()
+          : [];
+      _resultSubject.add(AddressSearchResult(items: items, query: q));
+    } finally {
+      _taskSubject.add(null);
     }
-    final items = List<Map>.from(jsonDecode(res.body))
-        .map((e) => AddressSearchResultItem.fromJson(e))
-        .toList();
-    _resultSubject.add(AddressSearchResult(items: items, query: q));
   }
 }
 

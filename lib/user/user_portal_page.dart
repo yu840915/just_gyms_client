@@ -168,8 +168,7 @@ class _Row extends StatelessWidget {
             if (hasDetail)
               Icon(
                 Icons.arrow_forward_ios_rounded,
-                size: 20,
-                color: Colors.grey,
+                size: 20,                
               ),
           ],
         ),

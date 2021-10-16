@@ -98,7 +98,17 @@ class _LocationSearchViewState extends State<LocationSearchView> {
 
   Widget _buildResultView(BuildContext context, AddressSearchResult result) {
     if (result == null) {
-      return Container();
+      return SizedBox.shrink();
+    } else if (result.items.isEmpty) {
+      return Container(
+        padding: EdgeInsets.all(20),
+        alignment: Alignment.center,
+        child: Text(
+          '找不到與「${result.query}」相關的結果',
+          style: TextStyles.large.detail.copyWith(color: Colors.black),
+          textAlign: TextAlign.center,
+        ),
+      );
     }
     return Column(
       children: result.items
