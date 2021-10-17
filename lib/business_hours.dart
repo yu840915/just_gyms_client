@@ -1,10 +1,7 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:where_gym/appointment/appointment_info.dart';
 import 'package:where_gym/appointment/appointment_time_composer.dart';
-import 'package:where_gym/gym.dart';
+import 'package:where_gym/schedule_time_slot.dart';
 part 'business_hours.g.dart';
 
 class BusinessHours {
@@ -48,6 +45,23 @@ class BusinessHours {
       return true;
     }
     return start.isAfterDate(dateTime);
+  }
+
+  List<TimeSlot> generateTimeSlots(DateTime day) {
+    assert(WeekdayMethods.fromInt(day.weekday) == weekday);
+    List<TimeSlot> slots = [];
+    TimeOfDay slotStart = start;
+    TimeOfDay slotEnd = slotStart.adding(minutes: 30);
+    while (slotEnd.isBefore(end)) {
+      slots.add(TimeSlot(
+          day: day, timeRange: TimeRange(start: slotStart, end: slotEnd)));
+      slotStart = slotEnd;
+      slotEnd = slotStart.adding(minutes: 30);
+    }
+    slotEnd = slotEnd.isAfter(end) ? slotEnd : end;
+    slots.add(TimeSlot(
+        day: day, timeRange: TimeRange(start: slotStart, end: slotEnd)));
+    return slots;
   }
 
   static Map<Weekday, BusinessHours> fromDescriptors(
@@ -231,5 +245,10 @@ extension TimeOfDayMethods on TimeOfDay {
     final String hourLabel = _addLeadingZeroIfNeeded(hour);
     final String minuteLabel = _addLeadingZeroIfNeeded(minute);
     return "$hourLabel:$minuteLabel";
+  }
+
+  TimeOfDay adding({int hours = 0, int minutes = 0}) {
+    final sumMin = hour * 60 + minute + hours * 60 + minutes;
+    return TimeOfDay(hour: ((sumMin / 60) as int) % 24, minute: sumMin % 60);
   }
 }
