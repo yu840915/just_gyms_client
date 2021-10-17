@@ -109,12 +109,12 @@ class CurrentLocation {
     dataStore.putValue(_lastLocationKey, loc);
   }
 
-  num? metersFrom(Gym? gym) {
+  num? metersFrom(Gym gym) {
     if (_myLocationSubject.valueOrNull == null) {
       return null;
     }
     final location = _myLocationSubject.value;
     return Geolocator.distanceBetween(
-        gym!.lat!, gym.lon!, location.latitude, location.longitude);
+        gym.lat, gym.lon, location.latitude, location.longitude);
   }
 }

@@ -81,7 +81,7 @@ class _PhoneVerificationPageState extends State<PhoneVerificationPage> {
     return TextField(
       decoration: InputDecoration(
         labelText: '請輸入手機號碼',
-        labelStyle: TextStyles.large.title!.copyWith(color: Colors.black),
+        labelStyle: TextStyles.large.title.copyWith(color: Colors.black),
         isDense: false,
         focusedBorder: OutlineInputBorder(
           borderSide: BorderSide(color: Colors.black),

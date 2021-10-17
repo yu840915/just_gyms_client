@@ -8,8 +8,8 @@ final apiBaseUrl = 'https://us-central1-where-gym.cloudfunctions.net/api';
 
 class APIServices {
   static final instances = APIServices(baseUrl: apiBaseUrl);
-  APIServices({this.baseUrl});
-  final String? baseUrl;
+  APIServices({required this.baseUrl});
+  final String baseUrl;
   final httpClient = http.Client();
 
   Future<http.Response> get(String path,
@@ -25,7 +25,7 @@ class APIServices {
   }
 
   Uri _makeUri(String path, {Map<String, dynamic>? params}) {
-    final uri = Uri.parse(baseUrl! + path);
+    final uri = Uri.parse(baseUrl + path);
     if (params == null || params.isEmpty) {
       return uri;
     }

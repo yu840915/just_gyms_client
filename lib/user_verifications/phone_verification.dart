@@ -49,8 +49,9 @@ class PhoneVerification {
     try {
       await _linkPhoneCredential(cred);
       _lastPhoneNum = null;
-    } catch (e) {
+    } catch (e, stack) {
       print(e);
+      print(stack);
     }
   }
 

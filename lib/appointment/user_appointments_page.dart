@@ -88,11 +88,11 @@ class _UserAppointmentsPageState extends State<UserAppointmentsPage> {
 
   Widget _buildAppointments(
       BuildContext context, List<AppointmentInfo> appointments) {
-    if (appointments == null || appointments.isEmpty) {
+    if (appointments.isEmpty) {
       return Center(
         child: Text(
           '沒有預約',
-          style: TextStyles.large.title!.copyWith(color: Colors.grey.shade300),
+          style: TextStyles.large.title.copyWith(color: Colors.grey.shade300),
         ),
       );
     }

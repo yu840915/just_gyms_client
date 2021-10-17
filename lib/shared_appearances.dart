@@ -8,13 +8,13 @@ class AppColors {
 }
 
 class TextStyles {
-  TextStyle? header;
-  TextStyle? title;
-  TextStyle? detail;
-  TextStyle? subscription;
-  TextStyle? action;
+  TextStyle header;
+  TextStyle title;
+  TextStyle detail;
+  TextStyle subscription;
+  TextStyle action;
   TextStyles._(
-      {this.header, this.title, this.detail, this.action, this.subscription});
+      {required this.header, required this.title, required this.detail, required this.action, required this.subscription});
 
   static final large = TextStyles._(
     header: TextStyle(

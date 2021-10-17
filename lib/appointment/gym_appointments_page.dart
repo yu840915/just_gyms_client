@@ -70,7 +70,7 @@ class _GymAppointmentsPageState extends State<GymAppointmentsPage> {
           color: AppColors.theme,
           shape: BoxShape.circle,
         ),
-      ),      
+      ),
       lastDay: tomorrow.add(Duration(days: 30)),
       calendarFormat: CalendarFormat.month,
       rangeSelectionMode: RangeSelectionMode.disabled,
@@ -88,11 +88,11 @@ class _GymAppointmentsPageState extends State<GymAppointmentsPage> {
 
   Widget _buildAppointments(
       BuildContext context, List<AppointmentInfo> appointments) {
-    if (appointments == null || appointments.isEmpty) {
+    if (appointments.isEmpty) {
       return Center(
         child: Text(
           '沒有預約',
-          style: TextStyles.large.title!.copyWith(color: Colors.grey.shade300),
+          style: TextStyles.large.title.copyWith(color: Colors.grey.shade300),
         ),
       );
     }

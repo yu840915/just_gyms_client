@@ -49,7 +49,7 @@ class LoginPage extends StatelessWidget {
             children: [
               Text(
                 '使用者登入',
-                style: TextStyles.large.header!.copyWith(
+                style: TextStyles.large.header.copyWith(
                     color: Colors.black, decoration: TextDecoration.none),
               ),
               SizedBox(height: 24),

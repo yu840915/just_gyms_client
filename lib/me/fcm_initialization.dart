@@ -5,7 +5,7 @@ import 'package:where_gym/app_bloc.dart';
 class FCMInitialization {
   static FirebaseMessaging get _messaging => FirebaseMessaging.instance;
 
-  static Future<AuthorizationStatus> requestPermissionIfNeeded() async {    
+  static Future<AuthorizationStatus> requestPermissionIfNeeded() async {
     final settings = await _messaging.requestPermission(
       provisional: true,
       badge: true,
@@ -20,10 +20,13 @@ class FCMInitialization {
     print('FCM token: $token');
     await APIServices.instances
         .post(
-          '/me/fcm-tokens',
-          body: {'token': token},
-          token: await bloc.getIdToken(),
-        )
-        .catchError(print);
+      '/me/fcm-tokens',
+      body: {'token': token},
+      token: await bloc.getIdToken(),
+    )
+        .catchError((e, stack) {
+      print(e);
+      print(stack);
+    });
   }
 }

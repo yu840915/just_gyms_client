@@ -9,7 +9,7 @@ import 'package:where_gym/user_verifications/cooldown_timer.dart';
 import 'package:where_gym/user_verifications/phone_verification.dart';
 
 class SMSCodePage extends StatefulWidget {
-  final PhoneVerification? phoneVerification;  
+  final PhoneVerification? phoneVerification;
   SMSCodePage(this.phoneVerification);
 
   @override
@@ -114,7 +114,7 @@ class _SMSCodePageState extends State<SMSCodePage> {
     return TextField(
       decoration: InputDecoration(
         labelText: '請輸入驗證碼',
-        labelStyle: TextStyles.large.title!.copyWith(color: Colors.black),
+        labelStyle: TextStyles.large.title.copyWith(color: Colors.black),
         isDense: false,
         focusedBorder: OutlineInputBorder(
           borderSide: BorderSide(color: Colors.black),
@@ -138,7 +138,7 @@ class _SMSCodePageState extends State<SMSCodePage> {
             ),
             TextSpan(
               text: '重新發送',
-              style: TextStyles.large.detail!
+              style: TextStyles.large.detail
                   .copyWith(decoration: TextDecoration.underline),
               recognizer: TapGestureRecognizer()
                 ..onTap = (() {

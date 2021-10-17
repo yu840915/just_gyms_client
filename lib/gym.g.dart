@@ -7,13 +7,13 @@ part of 'gym.dart';
 // **************************************************************************
 
 Gym _$GymFromJson(Map<String, dynamic> json) => Gym(
-      id: json['id'] as String?,
-      name: json['name'] as String?,
-      address: json['address'] as String?,
-      lat: (json['lat'] as num?)?.toDouble(),
-      lon: (json['lon'] as num?)?.toDouble(),
-      equipments: (json['equipments'] as List<dynamic>?)
-          ?.map((e) => Equipments.fromJson(e as Map<String, dynamic>))
+      id: json['id'] as String,
+      name: json['name'] as String,
+      address: json['address'] as String,
+      lat: (json['lat'] as num).toDouble(),
+      lon: (json['lon'] as num).toDouble(),
+      equipments: (json['equipments'] as List<dynamic>)
+          .map((e) => Equipments.fromJson(e as Map<String, dynamic>))
           .toList(),
       facilities: (json['facilities'] as List<dynamic>?)
           ?.map((e) => e as String)
@@ -27,8 +27,8 @@ Gym _$GymFromJson(Map<String, dynamic> json) => Gym(
           : Price.fromJson(json['hourlyRate'] as Map<String, dynamic>),
       phones:
           (json['phones'] as List<dynamic>?)?.map((e) => e as String).toList(),
-      pricing: (json['pricing'] as List<dynamic>?)
-          ?.map((e) => Fare.fromJson(e as Map<String, dynamic>))
+      pricing: (json['pricing'] as List<dynamic>)
+          .map((e) => Fare.fromJson(e as Map<String, dynamic>))
           .toList(),
       pageLink: json['pageLink'] as String?,
       images:

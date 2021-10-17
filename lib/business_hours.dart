@@ -4,10 +4,10 @@ part 'business_hours.g.dart';
 
 class BusinessHours {
   final Weekday weekday;
-  final TimeOfDay? start;
-  final TimeOfDay? end;
-  bool get isOff => start!.isZero && end!.isZero;
-  bool get isCrossing => !isOff && end!.isBefore(start!);
+  final TimeOfDay start;
+  final TimeOfDay end;
+  bool get isOff => start.isZero && end.isZero;
+  bool get isCrossing => !isOff && end.isBefore(start);
   BusinessHours({
     required this.weekday,
     required this.start,
@@ -19,17 +19,17 @@ class BusinessHours {
       return false;
     }
     if (weekday.intValue == dateTime.weekday) {
-      return start!.isBeforeDate(dateTime) &&
-          (isCrossing || end!.isAfterDate(dateTime));
+      return start.isBeforeDate(dateTime) &&
+          (isCrossing || end.isAfterDate(dateTime));
     }
     if (isCrossing && weekday.intValue + 1 == dateTime.weekday) {
-      return end!.isAfterDate(dateTime);
+      return end.isAfterDate(dateTime);
     }
     return false;
   }
 
   bool isOpenAtTime(TimeOfDay time) {
-    return !start!.isAfter(time) && !end!.isBefore(time);
+    return !start.isAfter(time) && !end.isBefore(time);
   }
 
   bool opensAfter(DateTime dateTime) {
@@ -42,25 +42,15 @@ class BusinessHours {
     if (weekday.intValue > dateTime.weekday) {
       return true;
     }
-    return start!.isAfterDate(dateTime);
+    return start.isAfterDate(dateTime);
   }
 
-  static Map<Weekday, BusinessHours>? fromDescriptors(
-      List<BusinessHoursDescriptor>? descriptors) {
-    if (descriptors == null || descriptors.isEmpty) {
-      return null;
-    }
+  static Map<Weekday, BusinessHours> fromDescriptors(
+      List<BusinessHoursDescriptor> descriptors) {
     BusinessHoursDescriptor? base;
     Map<Weekday?, BusinessHoursDescriptor> dayDescriptors = {};
     for (var descriptor in descriptors) {
-      if (descriptor.weekday == null) {
-        base = descriptor;
-      } else {
         dayDescriptors[descriptor.weekday] = descriptor;
-      }
-    }
-    if (base == null && dayDescriptors.length != 7) {
-      return null;
     }
     final weekdays = [
       Weekday.mon,
@@ -86,34 +76,30 @@ class BusinessHours {
 
 @JsonSerializable()
 class BusinessHoursDescriptor {
-  final String? dayOfWeek;
+  final String dayOfWeek;
   final String start;
   final String end;
-  Weekday? _weekday;
-  TimeOfDay? _parsedStart;
-  TimeOfDay? _parsedEnd;
-  Weekday? get weekday => _weekday;
-  TimeOfDay? get parsedStart => _parsedStart;
-  TimeOfDay? get parsedEnd => _parsedEnd;
-  BusinessHoursDescriptor({this.dayOfWeek, required this.start, required this.end}) {
-    _weekday = WeekdayMethods.fromString(dayOfWeek);
-    _parsedStart = TimeOfDayMethods.fromString(start);
-    _parsedEnd = TimeOfDayMethods.fromString(end);
-  }
+  Weekday _weekday;
+  TimeOfDay _parsedStart;
+  TimeOfDay _parsedEnd;
+  Weekday get weekday => _weekday;
+  TimeOfDay get parsedStart => _parsedStart;
+  TimeOfDay get parsedEnd => _parsedEnd;
+  BusinessHoursDescriptor(
+      {required this.dayOfWeek, required this.start, required this.end})
+      : _weekday = WeekdayMethods.fromString(dayOfWeek),
+        _parsedStart = TimeOfDayMethods.fromString(start),
+        _parsedEnd = TimeOfDayMethods.fromString(end);
 
-  Map<String, dynamic>? toJson() => 
-   _$BusinessHoursDescriptorToJson(this);
-  factory BusinessHoursDescriptor.fromJson(Map<String, dynamic> json) => 
-  _$BusinessHoursDescriptorFromJson(json);
+  Map<String, dynamic>? toJson() => _$BusinessHoursDescriptorToJson(this);
+  factory BusinessHoursDescriptor.fromJson(Map<String, dynamic> json) =>
+      _$BusinessHoursDescriptorFromJson(json);
 }
 
 enum Weekday { mon, tue, wed, thu, fri, sat, sun }
 
 extension WeekdayMethods on Weekday {
-  static Weekday? fromString(String? str) {
-    if (str == null) {
-      return null;
-    }
+  static Weekday fromString(String str) {
     switch (str.toLowerCase()) {
       case 'mon':
         return Weekday.mon;

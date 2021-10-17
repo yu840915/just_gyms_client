@@ -114,7 +114,7 @@ class _RowState extends State<_Row> {
                 child: Column(
                   children: [
                     Text(
-                      widget.gym.name!,
+                      widget.gym.name,
                       style: TextStyles.small.header,
                     ),
                   ],

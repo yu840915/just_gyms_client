@@ -105,7 +105,7 @@ class _LocationSearchViewState extends State<LocationSearchView> {
         alignment: Alignment.center,
         child: Text(
           '找不到與「${result.query}」相關的結果',
-          style: TextStyles.large.detail!.copyWith(color: Colors.black),
+          style: TextStyles.large.detail.copyWith(color: Colors.black),
           textAlign: TextAlign.center,
         ),
       );

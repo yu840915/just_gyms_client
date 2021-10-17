@@ -25,9 +25,11 @@ class _GymListPageState extends State<GymListPage> {
   void initState() {
     super.initState();
     AppBloc bloc = BlocProvider.of(context);
-    _gymList = GymList(bloc.location);
-    _gymList.refresh()!.catchError((e) {
+    final list = GymList(bloc.location);
+    _gymList = list;
+    list.refresh().catchError((e, stack) {
       print(e);
+      print(stack);
     });
   }
 
@@ -126,7 +128,7 @@ class _Row extends StatelessWidget {
                     child: Column(
                       children: [
                         Text(
-                          gym.name!,
+                          gym.name,
                           style: TextStyles.small.header,
                         ),
                         SizedBox(height: 8),
@@ -145,7 +147,7 @@ class _Row extends StatelessWidget {
               ),
               SizedBox(height: 8),
               Text(
-                gym.address!,
+                gym.address,
                 style: TextStyles.small.detail,
               ),
               SizedBox(height: 12),

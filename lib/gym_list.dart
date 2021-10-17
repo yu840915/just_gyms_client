@@ -12,7 +12,7 @@ class GymList {
   Future? _task;
   GymList(this.location);
 
-  Future<void>? refresh() async {
+  Future<void> refresh() async {
     if (_task != null) {
       return _task;
     }
@@ -24,7 +24,7 @@ class GymList {
           .get('/gyms?lat=${pos.latitude}&lon=${pos.longitude}');
       _task = task;
       final res = await task;
-      if (res.body == null) {
+      if (res.body.isEmpty) {
         _listSubject.add([]);
         return;
       }

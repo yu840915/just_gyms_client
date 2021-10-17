@@ -50,7 +50,7 @@ class _FavoriteListPageState extends State<FavoriteListPage> {
   void _syncWithLocalIfLoggedIn(BuildContext context) async {
     final isLoggedIn =
         await LoginCheckFlow.check(context, where: 'syncFavoriteGyms');
-    if (isLoggedIn == null || !isLoggedIn) {
+    if (!isLoggedIn) {
       return;
     }
     await Future.delayed(Duration.zero, () {
@@ -124,12 +124,12 @@ class _FavoriteListPageState extends State<FavoriteListPage> {
 
 class _Row extends StatelessWidget {
   final FavoriteGymDetail detail;
-  Gym? get gym => detail.gym;
+  Gym get gym => detail.gym;
   _Row(this.detail);
 
   void _showDetail(BuildContext context) {
     track(EventName.showGymDetail, {
-      ...gym!.trackingProps,
+      ...gym.trackingProps,
       EventProperties.distance: detail.meters,
       EventProperties.from: 'favorite list',
     });
@@ -147,7 +147,7 @@ class _Row extends StatelessWidget {
         builder: (context) {
           return AlertFactory.actionAlert(
             context,
-            title: '是否要移除${gym!.name}?',
+            title: '是否要移除${gym.name}?',
             actions: [
               PlatformDialogAction(
                 child: Text('移除'),
@@ -162,9 +162,9 @@ class _Row extends StatelessWidget {
       return;
     }
     AppBloc bloc = BlocProvider.of(context);
-    bloc.favoriteGymList.delete(gym!.id);
+    bloc.favoriteGymList.delete(gym.id);
     track(EventName.removeBookmark, {
-      ...gym!.trackingProps,
+      ...gym.trackingProps,
       EventProperties.distance: detail.meters,
       EventProperties.from: 'favorite list',
     });
@@ -187,9 +187,9 @@ class _Row extends StatelessWidget {
                     height: 50,
                     decoration: BoxDecoration(
                         color: Colors.grey.shade100,
-                        image: gym!.cover != null
+                        image: gym.cover != null
                             ? DecorationImage(
-                                image: NetworkImage(gym!.cover!),
+                                image: NetworkImage(gym.cover!),
                                 fit: BoxFit.cover,
                               )
                             : null),
@@ -199,7 +199,7 @@ class _Row extends StatelessWidget {
                     child: Column(
                       children: [
                         Text(
-                          gym!.name!,
+                          gym.name,
                           style: TextStyles.small.header,
                         ),
                         SizedBox(height: 8),
@@ -214,16 +214,16 @@ class _Row extends StatelessWidget {
               ),
               SizedBox(height: 8),
               Text(
-                gym!.address!,
+                gym.address,
                 style: TextStyles.small.detail,
               ),
               SizedBox(height: 12),
               Row(
                 children: [
-                  buildPricingTable(gym!.pricing),
-                  if (gym!.hourlyRate != null)
+                  buildPricingTable(gym.pricing),
+                  if (gym.hourlyRate != null)
                     Text(
-                      '(' + PriceFormat.format(gym!.hourlyRate!) + '/小時)',
+                      '(' + PriceFormat.format(gym.hourlyRate!) + '/小時)',
                       style: TextStyles.small.subscription,
                     ),
                   Spacer(),

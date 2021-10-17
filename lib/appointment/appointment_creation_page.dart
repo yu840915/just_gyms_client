@@ -16,7 +16,7 @@ import 'package:where_gym/shared_appearances.dart';
 import 'package:where_gym/utils/loading_view.dart';
 
 class AppointmentCreatePage extends StatefulWidget {
-  final Gym? gym;
+  final Gym gym;
   AppointmentCreatePage({required this.gym});
 
   @override
@@ -41,7 +41,7 @@ class _AppointmentCreatePageState extends State<AppointmentCreatePage> {
       print(error);
     });
     _composer =
-        AppointmentTimeComposer(businessHours: widget.gym!.weekdayBusinessHours!);
+        AppointmentTimeComposer(businessHours: widget.gym.weekdayBusinessHours!);
   }
 
   @override
@@ -105,7 +105,7 @@ class _AppointmentCreatePageState extends State<AppointmentCreatePage> {
     return Scaffold(
       appBar: AppBarFactory.appBar(
         title: Text(
-          widget.gym!.name!,
+          widget.gym.name,
           style: TextStyles.large.header,
         ),
       ) as PreferredSizeWidget?,
@@ -123,7 +123,8 @@ class _AppointmentCreatePageState extends State<AppointmentCreatePage> {
         StreamBuilder<Object>(
           stream: _schedule!.onAppointments,
           builder: (context, snapshot) {
-            return _buildCalender(snapshot.data as List<AppointmentInfo>? ?? []);
+            return _buildCalender(
+                snapshot.data as List<AppointmentInfo>? ?? []);
           },
         ),
         Container(
@@ -188,8 +189,8 @@ class _AppointmentCreatePageState extends State<AppointmentCreatePage> {
       return SizedBox.shrink();
     }
     return Text(
-      '營業時間：${businessHours.start!.stringValue} - ${businessHours.end!.stringValue}',
-      style: TextStyles.large.title!.copyWith(color: Colors.grey.shade500),
+      '營業時間：${businessHours.start.stringValue} - ${businessHours.end.stringValue}',
+      style: TextStyles.large.title.copyWith(color: Colors.grey.shade500),
     );
   }
 
@@ -247,11 +248,11 @@ class _AppointmentCreatePageState extends State<AppointmentCreatePage> {
 
   Widget _buildAppointments(
       BuildContext context, List<AppointmentInfo> appointments, DateTime? day) {
-    if (appointments == null || appointments.isEmpty) {
+    if (appointments.isEmpty) {
       return Center(
         child: Text(
           '沒有預約',
-          style: TextStyles.large.title!.copyWith(color: Colors.grey.shade300),
+          style: TextStyles.large.title.copyWith(color: Colors.grey.shade300),
         ),
       );
     }

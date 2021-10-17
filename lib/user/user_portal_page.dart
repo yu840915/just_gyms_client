@@ -136,7 +136,7 @@ class UserPortalPage extends StatelessWidget {
           Divider(height: 1),
           _Row(
             title: '刪除帳號',
-            style: TextStyles.small.action!.copyWith(color: Colors.redAccent),
+            style: TextStyles.small.action.copyWith(color: Colors.redAccent),
             action: () => _requestAccountDeletion(context),
           ),
         ],
@@ -168,7 +168,7 @@ class _Row extends StatelessWidget {
             if (hasDetail)
               Icon(
                 Icons.arrow_forward_ios_rounded,
-                size: 20,                
+                size: 20,
               ),
           ],
         ),

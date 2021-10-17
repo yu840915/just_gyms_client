@@ -84,7 +84,7 @@ class _PhotoGalleryViewState extends State<PhotoGalleryView> {
       ),
       child: Text(
         '${info.current + 1}/${info.total}',
-        style: TextStyles.small.detail!.copyWith(color: Colors.white),
+        style: TextStyles.small.detail.copyWith(color: Colors.white),
       ),
     );
   }

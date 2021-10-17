@@ -9,20 +9,20 @@ part 'gym.g.dart';
 
 @JsonSerializable()
 class Gym {
-  final String? id;
-  final String? name;
-  final String? address;
-  final List<Equipments>? equipments;
+  final String id;
+  final String name;
+  final String address;
+  final List<Equipments> equipments;
   final List<BusinessHoursDescriptor>? businessHours;
   Map<Weekday, BusinessHours>? _weekdayBusinessHours;
   Map<Weekday, BusinessHours>? get weekdayBusinessHours =>
       _weekdayBusinessHours;
-  final List<Fare>? pricing;
+  final List<Fare> pricing;
   final Price? hourlyRate;
   final List<String>? phones;
   final String? pageLink;
-  final double? lat;
-  final double? lon;
+  final double lat;
+  final double lon;
   final List<String>? facilities;
   final List<String>? images;
   String? get cover =>
@@ -34,21 +34,23 @@ class Gym {
       phones != null && phones!.isNotEmpty ? phones!.first : null;
   bool? supportsBooking;
   Gym(
-      {this.id,
-      this.name,
-      this.address,
-      this.lat,
-      this.lon,
-      this.equipments,
+      {required this.id,
+      required this.name,
+      required this.address,
+      required this.lat,
+      required this.lon,
+      required this.equipments,
       this.facilities,
       this.businessHours,
       this.hourlyRate,
       this.phones,
-      this.pricing,
+      required this.pricing,
       this.pageLink,
       this.images,
-      this.supportsBooking}) {
-    _weekdayBusinessHours = BusinessHours.fromDescriptors(businessHours);
+      this.supportsBooking})
+      : _weekdayBusinessHours = businessHours != null
+            ? BusinessHours.fromDescriptors(businessHours)
+            : null {
     _gymFacilities = facilities != null
         ? facilities!.map((e) => GymFacility.table[e]).toList()
         : [];
@@ -56,7 +58,7 @@ class Gym {
   }
 
   bool? isOpenNow() {
-    return _weekdayBusinessHours != null
+    return _weekdayBusinessHours != null && _weekdayBusinessHours!.isNotEmpty
         ? _weekdayBusinessHours!.values.firstWhereOrNull(
               (element) => element.isOpenAt(DateTime.now()),
             ) !=
@@ -65,16 +67,13 @@ class Gym {
   }
 
   BusinessHours? businessHoursOfToday() {
-    if (_weekdayBusinessHours == null) {
-      return null;
-    }
-    final openingDay = _weekdayBusinessHours!.values.firstWhereOrNull(
+    final openingDay = _weekdayBusinessHours?.values.firstWhereOrNull(
       (element) => element.isOpenAt(DateTime.now()),
     );
     if (openingDay != null) {
       return openingDay;
     }
-    return _weekdayBusinessHours!.values.firstWhereOrNull(
+    return _weekdayBusinessHours?.values.firstWhereOrNull(
       (element) => element.opensAfter(DateTime.now()),
     );
   }

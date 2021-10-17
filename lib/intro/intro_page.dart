@@ -18,8 +18,9 @@ class IntroPage extends StatelessWidget {
   void _openLink(String link) async {
     try {
       await launch(link);
-    } catch (e) {
+    } catch (e, stack) {
       print(e);
+      print(stack);
     }
   }
 

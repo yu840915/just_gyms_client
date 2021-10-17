@@ -118,8 +118,9 @@ class AppBloc extends Bloc<dynamic, AppPhase?> {
     try {
       await prefs.setBool(_hasFinishedIntroKey, true);
       _setUpPermission();
-    } catch (e) {
+    } catch (e, stack) {
       print(e);
+      print(stack);
     }
   }
 

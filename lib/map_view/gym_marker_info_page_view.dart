@@ -156,7 +156,7 @@ class GymInfoCardView extends StatelessWidget {
                           child: Column(
                             children: [
                               Text(
-                                card.gym.name!,
+                                card.gym.name,
                                 style: TextStyles.small.header,
                               ),
                               SizedBox(height: 8),
@@ -176,7 +176,7 @@ class GymInfoCardView extends StatelessWidget {
                     ),
                     SizedBox(height: 8),
                     Text(
-                      card.gym.address!,
+                      card.gym.address,
                       style: TextStyles.small.detail,
                     ),
                     SizedBox(height: 12),

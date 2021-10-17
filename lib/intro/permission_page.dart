@@ -13,7 +13,7 @@ class PermissionPage extends StatelessWidget {
       appBar: AppBarFactory.appBar(
           title: Text(
         '使用者授權',
-        style: TextStyles.large.header!.copyWith(color: Colors.black),
+        style: TextStyles.large.header.copyWith(color: Colors.black),
       )) as PreferredSizeWidget?,
       body: _buildBody(context, bloc.permissionChecker.items),
     );
@@ -80,7 +80,7 @@ class PermissionCheckerRow extends StatelessWidget {
         height: 44,
         child: Text(
           '檢查中...',
-          style: TextStyles.large.action!.copyWith(color: AppColors.progressing),
+          style: TextStyles.large.action.copyWith(color: AppColors.progressing),
         ),
       );
     }
@@ -94,11 +94,10 @@ class PermissionCheckerRow extends StatelessWidget {
           height: 44,
           child: Text(
             '已完成',
-            style: TextStyles.large.action!.copyWith(color: Colors.black),
+            style: TextStyles.large.action.copyWith(color: Colors.black),
           ),
         );
     }
-    return SizedBox.shrink();
   }
 
   Widget _buildPermitButton(BuildContext context) {

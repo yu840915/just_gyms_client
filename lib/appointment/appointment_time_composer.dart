@@ -23,11 +23,10 @@ class AppointmentTimeComposer {
         Weekday.sat,
       ].where((day) => !businessHours[day]!.isOff).toList();
 
-  BusinessHours? get businessHoursOnSelectedDay =>
-      _daySubject.valueOrNull != null
-          ? businessHours[
-              WeekdayMethods.fromInt(_daySubject.valueOrNull?.weekday)!]
-          : null;
+  BusinessHours? get businessHoursOnSelectedDay => _daySubject.valueOrNull !=
+          null
+      ? businessHours[WeekdayMethods.fromInt(_daySubject.valueOrNull?.weekday)!]
+      : null;
 
   AppointmentTimeComposer({required this.businessHours}) {
     DateTime date = DateTime.now().add(Duration(days: 1));
@@ -37,7 +36,7 @@ class AppointmentTimeComposer {
       }
     }
     setDay(date);
-    setStart(businessHours[date.dayOfWeek!]!.start!);
+    setStart(businessHours[date.dayOfWeek!]!.start);
   }
 
   void dispose() {
@@ -60,11 +59,11 @@ class AppointmentTimeComposer {
     TimeOfDay? end = _timeRangeSubject.valueOrNull?.end;
     if (end == null || start.isAfter(end)) {
       end = TimeOfDay(hour: start.hour + 1, minute: start.minute);
-      if (businessHoursOnSelectedDay!.end!.isBefore(end)) {
+      if (businessHoursOnSelectedDay!.end.isBefore(end)) {
         end = businessHoursOnSelectedDay!.end;
       }
     }
-    _updateRange(start, end!);
+    _updateRange(start, end);
   }
 
   void setEnd(TimeOfDay end) {

@@ -153,7 +153,7 @@ class GymMarker {
   final List<Gym> gyms;
 
   GymMarker({required this.latLng, required this.gyms})
-      : id = gyms.first.id! + '-${gyms.length}';
+      : id = gyms.first.id + '-${gyms.length}';
 
   static Future<GymMarker> fromMarkerFeature(
       GeoJsonFeature<GeoJsonPoint?> feature) async {

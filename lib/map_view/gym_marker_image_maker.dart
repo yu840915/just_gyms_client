@@ -1,5 +1,3 @@
-import 'dart:async';
-import 'dart:typed_data';
 import 'dart:ui';
 
 import 'package:after_layout/after_layout.dart';
@@ -154,7 +152,7 @@ class _GymMarkerImageMakerState extends State<GymMarkerImageMaker>
 
   Widget _buildMarkerContentForGym(Gym gym, TextStyle textStyle, bool marked) {
     Text text = Text('請電洽', style: textStyle);
-    if (gym.pricing != null && gym.pricing!.isNotEmpty) {
+    if (gym.hourlyRate != null) {
       text = Text(PriceFormat.format(gym.hourlyRate!), style: textStyle);
     }
     if (!marked) {

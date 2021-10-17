@@ -18,7 +18,7 @@ class FavoriteDetailList {
     _updateSubscription = list.onListUpdate.listen(_getDetailsOnUpdate);
   }
 
-  GymDetailFetcher _getFetchers(String? gymId) {
+  GymDetailFetcher _getFetchers(String gymId) {
     GymDetailFetcher? fetcher = _fetchers[gymId];
     if (fetcher != null) {
       return fetcher;
@@ -32,7 +32,7 @@ class FavoriteDetailList {
     if (_details.isClosed) {
       return;
     }
-    final gyms = await Future.wait(list.map((e) => _getFetchers(e.id).fetch()));
+    final gyms = await Future.wait(list.map((e) => _getFetchers(e.id!).fetch()));
     await location.getLocation();
     final details =
         gyms.map((e) => FavoriteGymDetail(e, location.metersFrom(e))).toList();
@@ -50,7 +50,7 @@ class FavoriteDetailList {
 }
 
 class FavoriteGymDetail {
-  final Gym? gym;
+  final Gym gym;
   final num? meters;
   FavoriteGymDetail(this.gym, this.meters);
 }
@@ -70,9 +70,9 @@ class GymDetailFetcher {
     return await _task;
   }
 
-  Future<Gym?> fetch() async {
+  Future<Gym> fetch() async {
     final res = await APIServices.instances.get('/gyms/$gymId');
     _gym = Gym.fromJson(jsonDecode(res.body));
-    return _gym;
+    return _gym!;
   }
 }
