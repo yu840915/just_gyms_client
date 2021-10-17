@@ -79,16 +79,16 @@ class _GymMarkerImageMakerState extends State<GymMarkerImageMaker>
 
   @override
   void afterFirstLayout(BuildContext context) async {
-    final normalIcon = await (normalController.capture() as FutureOr<Uint8List>);
-    final selectionIcon = await (selectionController.capture() as FutureOr<Uint8List>);
-    final markedNormalIcon = await (markedNormalController.capture() as FutureOr<Uint8List>);
-    final markedSelectionIcon = await (markedSelectionController.capture() as FutureOr<Uint8List>);
-    widget.gymMarkerList!.insertDisplayableMarker(      
+    final normalIcon = await normalController.capture();
+    final selectionIcon = await selectionController.capture();
+    final markedNormalIcon = await markedNormalController.capture();
+    final markedSelectionIcon = await markedSelectionController.capture();
+    widget.gymMarkerList!.insertDisplayableMarker(
       DisplayableGymMarker(
-        icon: BitmapDescriptor.fromBytes(normalIcon),
-        selectionIcon: BitmapDescriptor.fromBytes(selectionIcon),
-        markedIcon: BitmapDescriptor.fromBytes(markedNormalIcon),
-        markedSelectionIcon: BitmapDescriptor.fromBytes(markedSelectionIcon),
+        icon: BitmapDescriptor.fromBytes(normalIcon!),
+        selectionIcon: BitmapDescriptor.fromBytes(selectionIcon!),
+        markedIcon: BitmapDescriptor.fromBytes(markedNormalIcon!),
+        markedSelectionIcon: BitmapDescriptor.fromBytes(markedSelectionIcon!),
         marker: widget.gymMarker,
       ),
     );

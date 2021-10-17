@@ -17,7 +17,7 @@ import 'package:where_gym/me/favorites.dart';
 import 'package:where_gym/me/fcm_initialization.dart';
 import 'package:where_gym/me/local_favorites.dart';
 
-class AppBloc extends Bloc<dynamic, AppPhase> {
+class AppBloc extends Bloc<dynamic, AppPhase?> {
   final _hasFinishedIntroKey = 'hasFinishedIntro';
   final permissionChecker = PermissionChecker();
 
@@ -109,8 +109,8 @@ class AppBloc extends Bloc<dynamic, AppPhase> {
   }
 
   @override
-  Stream<AppPhase> mapEventToState(event) async* {
-    // yield event;
+  Stream<AppPhase?> mapEventToState(event) async* {
+    yield event as AppPhase;
   }
 
   void setIntroFinished() async {

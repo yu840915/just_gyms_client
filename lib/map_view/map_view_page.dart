@@ -88,7 +88,7 @@ class _MapViewPageState extends State<MapViewPage> {
   @override
   void dispose() {
     _locationSearch!.dispose();
-    _subscription?.forEach((element) {
+    _subscription.forEach((element) {
       element.cancel();
     });
     super.dispose();
@@ -214,12 +214,12 @@ class _MapViewPageState extends State<MapViewPage> {
     setState(() {
       markerList = list;
     });
-    _subscription.add(markerList!.onDisplayableMarkersChange.listen((event) {
+    _subscription.add(list.onDisplayableMarkersChange.listen((event) {
       setState(() {
-        _markers = event ?? [];
+        _markers = event;
       });
     }));
-    _subscription.add(markerList!.onSelection.listen((event) {
+    _subscription.add(list.onSelection.listen((event) {
       setState(() {
         _needsUpdate = true;
       });

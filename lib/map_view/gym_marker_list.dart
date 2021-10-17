@@ -175,13 +175,13 @@ class GymMarker {
 }
 
 class DisplayableGymMarker {
-  GymMarker? _gymMarker;
+  GymMarker _gymMarker;
 
-  String get id => _gymMarker!.id;
+  String get id => _gymMarker.id;
 
-  List<Gym> get gyms => _gymMarker!.gyms;
+  List<Gym> get gyms => _gymMarker.gyms;
 
-  GoogleMap.LatLng get latLng => _gymMarker!.latLng;
+  GoogleMap.LatLng get latLng => _gymMarker.latLng;
   final GoogleMap.BitmapDescriptor icon;
   final GoogleMap.BitmapDescriptor selectionIcon;
   final GoogleMap.BitmapDescriptor markedIcon;
@@ -192,11 +192,11 @@ class DisplayableGymMarker {
     required this.selectionIcon,
     required this.markedIcon,
     required this.markedSelectionIcon,
-    GymMarker? marker,
+    required GymMarker marker,
   }) : _gymMarker = marker;
 
   GoogleMap.Marker getNormalMarker(BuildContext context, {Function? onTap}) {
-    final marker = _gymMarker!.toMarker();
+    final marker = _gymMarker.toMarker();
     return GoogleMap.Marker(
       zIndex: 1,
       markerId: marker.markerId,
@@ -216,7 +216,7 @@ class DisplayableGymMarker {
   }
 
   GoogleMap.Marker getSelectedMarker(BuildContext context) {
-    final marker = _gymMarker!.toMarker();
+    final marker = _gymMarker.toMarker();
     return GoogleMap.Marker(
       zIndex: 100,
       markerId: marker.markerId,

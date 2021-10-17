@@ -57,14 +57,14 @@ class _MyAppState extends State<MyApp> {
             visualDensity: VisualDensity.adaptivePlatformDensity,
           ),
           debugShowCheckedModeBanner: false,
-          home: BlocBuilder<AppBloc, AppPhase>(builder: _buildMainFlow),
+          home: BlocBuilder<AppBloc, AppPhase?>(builder: _buildMainFlow),
           routes: namedRoutes,
         ),
       ),
     );
   }
 
-  Widget _buildMainFlow(BuildContext context, AppPhase phase) {
+  Widget _buildMainFlow(BuildContext context, AppPhase? phase) {
     if (phase == null) {
       return Container(
         color: Colors.white,

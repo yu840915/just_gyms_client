@@ -75,7 +75,8 @@ class APIServices {
     return response;
   }
 
-  Future<http.Response> patch(String path, {dynamic body, String? token}) async {
+  Future<http.Response> patch(String path,
+      {dynamic body, String? token}) async {
     final headers = Map<String, String>();
     dynamic putBody = body;
     if (token != null) {
@@ -108,9 +109,8 @@ class APIServices {
 
   void _checkResponse(http.Response response) {
     if (response.statusCode >= 500) {
-      jsonEncode(response.body);
-
-      throw ServiceError(response.body ?? '伺服器錯誤，請稍候再試');
+      throw ServiceError(
+          response.body.isNotEmpty ? response.body : '伺服器錯誤，請稍候再試');
     }
   }
 
