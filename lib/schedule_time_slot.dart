@@ -29,11 +29,16 @@ class TimeSlot {
 
 class ScheduleUtilization {
   final num? capacity;
+  final TimeSlot timeSlot;
   num? get availableSeats =>
       capacity != null ? capacity! - maxConcurrentAppointments : null;
   final num maxConcurrentAppointments;
+  final List<AppointmentInfo> appointments;
   ScheduleUtilization(
-      {required this.capacity, required this.maxConcurrentAppointments});
+      {required this.capacity,
+      required this.maxConcurrentAppointments,
+      required this.timeSlot,
+      required this.appointments});
   num? get rate {
     return capacity != null
         ? max(0, min(maxConcurrentAppointments / capacity!, 1))
@@ -42,8 +47,16 @@ class ScheduleUtilization {
 
   static ScheduleUtilization inferFromAppointments(
       List<AppointmentInfo> appointments, TimeSlot timeSlot, num? capacity) {
-    final visitorEvents = appointments
-        .where((a) => timeSlot.range.overlap(a.timeRange))
+    final appointmentsOnSlot =
+        appointments.where((a) => timeSlot.range.overlap(a.timeRange));
+    if (appointmentsOnSlot.isEmpty) {
+      return ScheduleUtilization(
+          capacity: capacity,
+          timeSlot: timeSlot,
+          maxConcurrentAppointments: 0,
+          appointments: appointmentsOnSlot.toList());
+    }
+    final visitorEvents = appointmentsOnSlot
         .map((e) => [
               VisitorEvent(e.timeRange.start, 1),
               VisitorEvent(e.timeRange.end, -1)
@@ -59,7 +72,10 @@ class ScheduleUtilization {
       return sum;
     });
     return ScheduleUtilization(
-        capacity: capacity, maxConcurrentAppointments: max);
+        capacity: capacity,
+        timeSlot: timeSlot,
+        maxConcurrentAppointments: max,
+        appointments: appointmentsOnSlot.toList());
   }
 
   UtilizationStatus get status {

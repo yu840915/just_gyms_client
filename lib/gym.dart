@@ -4,6 +4,7 @@ import 'package:json_annotation/json_annotation.dart';
 import 'package:where_gym/business_hours.dart';
 import 'package:where_gym/gym_facility.dart';
 import 'package:where_gym/price_format.dart';
+import 'package:where_gym/schedule_time_slot.dart';
 import 'package:where_gym/tracking/event_names.dart';
 part 'gym.g.dart';
 
@@ -93,6 +94,14 @@ class Gym {
         EventProperties.price:
             hourlyRate != null ? PriceFormat.format(hourlyRate!) : null,
       };
+
+  List<TimeSlot>? generateTimeSlotOnDay(DateTime day) {
+    if (weekdayBusinessHours == null) {
+      return null;
+    }
+    return weekdayBusinessHours![WeekdayMethods.fromInt(day.weekday)]!
+        .generateTimeSlots(day);
+  }
 }
 
 @JsonSerializable()

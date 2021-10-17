@@ -49,6 +49,9 @@ class BusinessHours {
 
   List<TimeSlot> generateTimeSlots(DateTime day) {
     assert(WeekdayMethods.fromInt(day.weekday) == weekday);
+    if (isOff) {
+      return [];
+    }
     List<TimeSlot> slots = [];
     TimeOfDay slotStart = start;
     TimeOfDay slotEnd = slotStart.adding(minutes: 30);
@@ -69,7 +72,11 @@ class BusinessHours {
     BusinessHoursDescriptor? base;
     Map<Weekday?, BusinessHoursDescriptor> dayDescriptors = {};
     for (var descriptor in descriptors) {
-      dayDescriptors[descriptor.weekday] = descriptor;
+      if (descriptor.weekday != null) {
+        dayDescriptors[descriptor.weekday!] = descriptor;
+      } else {
+        base = descriptor;
+      }
     }
     final weekdays = [
       Weekday.sun,
@@ -95,18 +102,19 @@ class BusinessHours {
 
 @JsonSerializable()
 class BusinessHoursDescriptor {
-  final String dayOfWeek;
+  final String? dayOfWeek;
   final String start;
   final String end;
-  Weekday _weekday;
+  Weekday? _weekday;
   TimeOfDay _parsedStart;
   TimeOfDay _parsedEnd;
-  Weekday get weekday => _weekday;
+  Weekday? get weekday => _weekday;
   TimeOfDay get parsedStart => _parsedStart;
   TimeOfDay get parsedEnd => _parsedEnd;
   BusinessHoursDescriptor(
       {required this.dayOfWeek, required this.start, required this.end})
-      : _weekday = WeekdayMethods.fromString(dayOfWeek),
+      : _weekday =
+            dayOfWeek != null ? WeekdayMethods.fromString(dayOfWeek) : null,
         _parsedStart = TimeOfDayMethods.fromString(start),
         _parsedEnd = TimeOfDayMethods.fromString(end);
 
@@ -249,6 +257,6 @@ extension TimeOfDayMethods on TimeOfDay {
 
   TimeOfDay adding({int hours = 0, int minutes = 0}) {
     final sumMin = hour * 60 + minute + hours * 60 + minutes;
-    return TimeOfDay(hour: ((sumMin / 60) as int) % 24, minute: sumMin % 60);
+    return TimeOfDay(hour: (sumMin ~/ 60) % 24, minute: sumMin % 60);
   }
 }

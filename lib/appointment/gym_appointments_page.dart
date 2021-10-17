@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -7,10 +9,11 @@ import 'package:where_gym/appointment/appointment_info.dart';
 import 'package:where_gym/appointment/gym_appointment_cell.dart';
 import 'package:where_gym/appointment/gym_appointment_schedule.dart';
 import 'package:where_gym/gym.dart';
+import 'package:where_gym/schedule_time_slot.dart';
 import 'package:where_gym/shared_appearances.dart';
 
 class GymAppointmentsPage extends StatefulWidget {
-  final Gym? gym;
+  final Gym gym;
   GymAppointmentsPage({required this.gym});
 
   @override
@@ -20,13 +23,32 @@ class GymAppointmentsPage extends StatefulWidget {
 class _GymAppointmentsPageState extends State<GymAppointmentsPage> {
   GymAppointmentSchedule? _schedule;
   DateTime? _date;
+  GymAppointmentDayViewModel? _viewModel;
+  StreamSubscription? subscription;
 
   @override
   void initState() {
     super.initState();
     _date = DateTime.now();
-    _schedule = GymAppointmentSchedule(
-        appBloc: BlocProvider.of(context), gym: widget.gym!);
+    final schedule = GymAppointmentSchedule(
+        appBloc: BlocProvider.of(context), gym: widget.gym);
+    subscription = schedule.onAppointments.listen((event) {
+      _updateViewModel(event);
+    });
+    _schedule = schedule;
+  }
+
+  void _updateViewModel(List<AppointmentInfo> appointments) {
+    setState(() {
+      _viewModel = GymAppointmentDayViewModel(
+          day: _date!, gym: widget.gym, appointments: appointments);
+    });
+  }
+
+  @override
+  void dispose() {
+    subscription?.cancel();
+    super.dispose();
   }
 
   @override
@@ -34,7 +56,7 @@ class _GymAppointmentsPageState extends State<GymAppointmentsPage> {
     return Scaffold(
       appBar: AppBarFactory.appBar(
         title: Text(
-          '${widget.gym!.name}的預約',
+          '${widget.gym.name}的預約',
           style: TextStyles.large.header,
         ),
       ) as PreferredSizeWidget?,
@@ -107,5 +129,28 @@ class _GymAppointmentsPageState extends State<GymAppointmentsPage> {
       separatorBuilder: (context, idx) => SizedBox(height: 8),
       itemCount: appointments.length,
     );
+  }
+}
+
+class GymAppointmentDayViewModel {
+  final List<AppointmentInfo> appointments;
+  final Gym gym;
+  final DateTime day;
+  List<ScheduleUtilization>? _utilizations;
+  List<ScheduleUtilization>? get utilizations => _utilizations;
+  List<TimeSlot>? get timeSlots =>
+      utilizations?.map((e) => e.timeSlot).toList();
+  GymAppointmentDayViewModel(
+      {required this.day,
+      required this.gym,
+      required List<AppointmentInfo> appointments})
+      : this.appointments = appointments
+            .where((a) => DateUtils.isSameDay(day, a.timeRange.start))
+            .toList() {
+    _utilizations = gym
+        .generateTimeSlotOnDay(day)
+        ?.map((e) => ScheduleUtilization.inferFromAppointments(
+            this.appointments, e, gym.capacity))
+        .toList();
   }
 }

@@ -280,7 +280,7 @@ class GymDetailPage extends StatelessWidget {
 }
 
 class _AdminButton extends StatefulWidget {
-  final Gym? gym;
+  final Gym gym;
   _AdminButton({required this.gym});
 
   @override
@@ -293,7 +293,7 @@ class _AdminButtonState extends State<_AdminButton> {
   void initState() {
     super.initState();
     _schedule = GymAppointmentSchedule(
-        appBloc: BlocProvider.of(context), gym: widget.gym!);
+        appBloc: BlocProvider.of(context), gym: widget.gym);
   }
 
   @override
