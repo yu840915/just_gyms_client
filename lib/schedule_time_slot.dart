@@ -13,7 +13,7 @@ extension DateTimeRangeMethod on DateTimeRange {
     );
   }
 
-  bool overlaps(DateTimeRange range) {
+  bool overlap(DateTimeRange range) {
     return !(range.start.isAfter(end) && range.end.isBefore(start));
   }
 }
@@ -25,22 +25,6 @@ class TimeSlot {
       DateTimeRangeMethod.fromDayAndTimeRange(day, timeRange);
 
   TimeSlot({required this.day, required this.timeRange});
-}
-
-class TimeSlotSchedule {
-  final TimeSlot timeSlot;
-  final Stream<ScheduleUtilization?> onUtilization;
-
-  TimeSlotSchedule({
-    required this.timeSlot,
-    num? capacity,
-    required Stream<List<AppointmentInfo>> appointmentStream,
-  }) : onUtilization = appointmentStream.map((list) =>
-            ScheduleUtilization.inferFromAppointments(
-                list
-                    .where((a) => timeSlot.range.overlaps(a.timeRange))
-                    .toList(),
-                capacity));
 }
 
 class ScheduleUtilization {
@@ -57,8 +41,9 @@ class ScheduleUtilization {
   }
 
   static ScheduleUtilization inferFromAppointments(
-      List<AppointmentInfo> appointments, num? capacity) {
+      List<AppointmentInfo> appointments, TimeSlot timeSlot, num? capacity) {
     final visitorEvents = appointments
+        .where((a) => timeSlot.range.overlap(a.timeRange))
         .map((e) => [
               VisitorEvent(e.timeRange.start, 1),
               VisitorEvent(e.timeRange.end, -1)
