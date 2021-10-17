@@ -15,6 +15,9 @@ Gym _$GymFromJson(Map<String, dynamic> json) => Gym(
       equipments: (json['equipments'] as List<dynamic>)
           .map((e) => Equipments.fromJson(e as Map<String, dynamic>))
           .toList(),
+      pricing: (json['pricing'] as List<dynamic>)
+          .map((e) => Fare.fromJson(e as Map<String, dynamic>))
+          .toList(),
       facilities: (json['facilities'] as List<dynamic>?)
           ?.map((e) => e as String)
           .toList(),
@@ -27,13 +30,11 @@ Gym _$GymFromJson(Map<String, dynamic> json) => Gym(
           : Price.fromJson(json['hourlyRate'] as Map<String, dynamic>),
       phones:
           (json['phones'] as List<dynamic>?)?.map((e) => e as String).toList(),
-      pricing: (json['pricing'] as List<dynamic>)
-          .map((e) => Fare.fromJson(e as Map<String, dynamic>))
-          .toList(),
       pageLink: json['pageLink'] as String?,
       images:
           (json['images'] as List<dynamic>?)?.map((e) => e as String).toList(),
       supportsBooking: json['supportsBooking'] as bool?,
+      capacity: json['capacity'] as num?,
     );
 
 Map<String, dynamic> _$GymToJson(Gym instance) => <String, dynamic>{
@@ -51,6 +52,7 @@ Map<String, dynamic> _$GymToJson(Gym instance) => <String, dynamic>{
       'facilities': instance.facilities,
       'images': instance.images,
       'supportsBooking': instance.supportsBooking,
+      'capacity': instance.capacity,
     };
 
 Equipments _$EquipmentsFromJson(Map<String, dynamic> json) => Equipments(

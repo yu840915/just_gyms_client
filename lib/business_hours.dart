@@ -1,5 +1,10 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:where_gym/appointment/appointment_info.dart';
+import 'package:where_gym/appointment/appointment_time_composer.dart';
+import 'package:where_gym/gym.dart';
 part 'business_hours.g.dart';
 
 class BusinessHours {
@@ -50,16 +55,16 @@ class BusinessHours {
     BusinessHoursDescriptor? base;
     Map<Weekday?, BusinessHoursDescriptor> dayDescriptors = {};
     for (var descriptor in descriptors) {
-        dayDescriptors[descriptor.weekday] = descriptor;
+      dayDescriptors[descriptor.weekday] = descriptor;
     }
     final weekdays = [
+      Weekday.sun,
       Weekday.mon,
       Weekday.tue,
       Weekday.wed,
       Weekday.thu,
       Weekday.fri,
       Weekday.sat,
-      Weekday.sun,
     ];
     Map<Weekday, BusinessHours> retVal = {};
     for (var weekday in weekdays) {
@@ -137,7 +142,6 @@ extension WeekdayMethods on Weekday {
       case Weekday.sun:
         return DateTime.sunday;
     }
-    throw 'Unexpected error';
   }
 
   static Weekday? fromInt(int? val) {
@@ -168,10 +172,7 @@ extension WeekdayMethods on Weekday {
 }
 
 extension DateTimeMethods on DateTime {
-  static DateTime? onDayWithTime(DateTime? day, TimeOfDay time) {
-    if (day == null || time == null) {
-      return null;
-    }
+  static DateTime onDayWithTime(DateTime day, TimeOfDay time) {
     return DateTime(day.year, day.month, day.day, time.hour, time.minute);
   }
 

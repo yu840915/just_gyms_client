@@ -33,6 +33,7 @@ class Gym {
   String? get phone =>
       phones != null && phones!.isNotEmpty ? phones!.first : null;
   bool? supportsBooking;
+  num? capacity;
   Gym(
       {required this.id,
       required this.name,
@@ -40,14 +41,15 @@ class Gym {
       required this.lat,
       required this.lon,
       required this.equipments,
+      required this.pricing,
       this.facilities,
       this.businessHours,
       this.hourlyRate,
       this.phones,
-      required this.pricing,
       this.pageLink,
       this.images,
-      this.supportsBooking})
+      this.supportsBooking,
+      this.capacity})
       : _weekdayBusinessHours = businessHours != null
             ? BusinessHours.fromDescriptors(businessHours)
             : null {

@@ -3,7 +3,6 @@ import 'package:rxdart/rxdart.dart';
 import 'package:rxdart/subjects.dart';
 import 'package:where_gym/api_services/api_services.dart';
 import 'package:where_gym/business_hours.dart';
-import 'package:where_gym/gym.dart';
 
 class AppointmentTimeComposer {
   final _timeRangeSubject = BehaviorSubject<TimeRange?>();
@@ -68,7 +67,7 @@ class AppointmentTimeComposer {
 
   void setEnd(TimeOfDay end) {
     final range = _timeRangeSubject.valueOrNull;
-    if (range == null || range.start == null) {
+    if (range == null) {
       throw LocalError('請先選擇開始時間');
     } else if (end.isBefore(range.start)) {
       throw LocalError('結束時間必須在開始時間以後');
@@ -79,9 +78,6 @@ class AppointmentTimeComposer {
   }
 
   void _updateRange(TimeOfDay start, TimeOfDay end) {
-    if (start == null) {
-      return _timeRangeSubject.add(null);
-    }
     _timeRangeSubject.add(TimeRange(start: start, end: end));
   }
 
@@ -96,18 +92,15 @@ class AppointmentTimeComposer {
   }
 
   DateTimeRange getDateRange() {
-    final day = _daySubject.valueOrNull;
     final range = _timeRangeSubject.valueOrNull;
     if (_daySubject.valueOrNull == null) {
       throw LocalError('請先選擇日期');
-    } else if (range == null || range.start == null) {
+    } else if (range == null) {
       throw LocalError('請先選擇開始時間');
-    } else if (range.start == null) {
-      throw LocalError('請先選擇結束時間');
     }
     return DateTimeRange(
-      start: DateTimeMethods.onDayWithTime(day, range.start)!,
-      end: DateTimeMethods.onDayWithTime(day, range.end)!,
+      start: DateTimeMethods.onDayWithTime(_daySubject.value, range.start),
+      end: DateTimeMethods.onDayWithTime(_daySubject.value, range.end),
     );
   }
 }
@@ -116,6 +109,5 @@ class TimeRange {
   final TimeOfDay start;
   final TimeOfDay end;
   TimeRange({required this.start, required this.end})
-      : assert(start != null),
-        assert(end == null || !start.isAfter(end));
+      : assert(!start.isAfter(end));
 }
