@@ -130,11 +130,11 @@ class GymMarkerList {
   }
 
   void selecteMarker(DisplayableGymMarker marker) {
-    if (marker == null) {
-      _selectedMarkerIdSubject.add(null);
-    } else if (_displayableMarkersSubject.value.contains(marker)) {
+    if (_displayableMarkersSubject.value.contains(marker)) {
       _selectedMarkerIdSubject.add(marker.id);
       _scrollToSelectionIfNeeded(marker);
+    } else {
+      _selectedMarkerIdSubject.add(null);
     }
   }
 

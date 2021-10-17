@@ -104,9 +104,8 @@ class CurrentLocation {
     if (loc == null) {
       loc = LocationRecord();
     }
-    loc
-      ..latitude = pos.latitude
-      ..longitude = pos.longitude;
+    loc.latitude = pos.longitude;
+    loc.longitude = pos.latitude;
     dataStore.putValue(_lastLocationKey, loc);
   }
 

@@ -49,7 +49,7 @@ class _MapViewPageState extends State<MapViewPage> {
         top: false,
         child: Container(
           padding: EdgeInsets.symmetric(vertical: 20),
-          child: GymMarkerInfoPageView(markerList),
+          child: GymMarkerInfoPageView(markerList!),
           height: 200,
           clipBehavior: Clip.none,
         ),

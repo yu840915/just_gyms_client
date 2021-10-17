@@ -13,7 +13,7 @@ import 'package:where_gym/tracking/event_names.dart';
 import 'package:where_gym/tracking/tracking.dart';
 
 class GymMarkerInfoPageView extends StatefulWidget {
-  final GymMarkerList? gymMarkerList;
+  final GymMarkerList gymMarkerList;
   GymMarkerInfoPageView(this.gymMarkerList);
 
   @override
@@ -21,25 +21,25 @@ class GymMarkerInfoPageView extends StatefulWidget {
 }
 
 class _GymMarkerInfoPageViewState extends State<GymMarkerInfoPageView> {
-  GymMarkerList? get gymMarkerList => widget.gymMarkerList;
+  GymMarkerList get gymMarkerList => widget.gymMarkerList;
   PageController? pageController;
   List<DisplayableGymMarker>? markers;
 
   @override
   void initState() {
     super.initState();
-    gymMarkerList!.onDisplayableMarkersChange.listen((event) {
+    gymMarkerList.onDisplayableMarkersChange.listen((event) {
       markers = event;
     });
-    gymMarkerList!.onSelection.listen((event) {
-      _handleSelectionChanged(gymMarkerList!.selectedMarker);
+    gymMarkerList.onSelection.listen((event) {
+      _handleSelectionChanged(gymMarkerList.selectedMarker);
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<List<DisplayableGymMarker>>(
-        stream: gymMarkerList!.onDisplayableMarkersChange,
+        stream: gymMarkerList.onDisplayableMarkersChange,
         builder: (context, snapshot) {
           return _buildCardViews(
               context, GymInfoCard.convertMarkersToCards(snapshot.data));
@@ -56,12 +56,12 @@ class _GymMarkerInfoPageViewState extends State<GymMarkerInfoPageView> {
     return PageView.builder(
       controller: pageController,
       itemBuilder: (context, idx) => GymInfoCardView(cards[idx % cards.length]),
-      onPageChanged: (idx) => {_handlePageChanged(cards[idx % cards.length])},
+      onPageChanged: (idx) => _handlePageChanged(cards[idx % cards.length]),
     );
   }
 
   void _handlePageChanged(GymInfoCard card) {
-    gymMarkerList!.selecteMarker(card.assosiatedMarker);
+    gymMarkerList.selecteMarker(card.assosiatedMarker);
   }
 
   void _handleSelectionChanged(DisplayableGymMarker? marker) {
