@@ -60,24 +60,21 @@ class _GymAppointmentsPageState extends State<GymAppointmentsPage> {
           style: TextStyles.large.header,
         ),
       ) as PreferredSizeWidget?,
-      body: StreamBuilder<List<AppointmentInfo>>(
-          stream: _schedule!.onAppointments,
-          builder: (context, snapshot) {
-            return _buildBody(context, snapshot.data ?? []);
-          }),
+      body: Column(
+        children: [
+          StreamBuilder<List<AppointmentInfo>>(
+            stream: _schedule!.onAppointments,
+            builder: (context, snapshot) {
+              return _buildCalender(snapshot.data);
+            },
+          ),
+          Expanded(child: _buildCells(context))
+        ],
+      ),
     );
   }
 
-  Widget _buildBody(BuildContext context, List<AppointmentInfo> appointments) {
-    return Column(
-      children: [
-        _buildCalender(appointments),
-        Expanded(child: _buildAppointments(context, appointments)),
-      ],
-    );
-  }
-
-  Widget _buildCalender(List<AppointmentInfo> list) {
+  Widget _buildCalender(List<AppointmentInfo>? list) {
     final tomorrow = DateTime.now().add(Duration(days: 1));
     return TableCalendar(
       locale: Intl.systemLocale,
@@ -102,32 +99,44 @@ class _GymAppointmentsPageState extends State<GymAppointmentsPage> {
         });
       },
       selectedDayPredicate: (date) => _date == date,
-      eventLoader: (date) => list
-          .where((a) => DateUtils.isSameDay(date, a.timeRange.start))
-          .toList(),
+      eventLoader: (date) =>
+          list
+              ?.where((a) => DateUtils.isSameDay(date, a.timeRange.start))
+              .toList() ??
+          [],
     );
   }
 
-  Widget _buildAppointments(
-      BuildContext context, List<AppointmentInfo> appointments) {
-    if (appointments.isEmpty) {
-      return Center(
-        child: Text(
-          '沒有預約',
-          style: TextStyles.large.title.copyWith(color: Colors.grey.shade300),
-        ),
-      );
+  Widget _buildCells(BuildContext context) {
+    List<ScheduleUtilization>? appointments = _viewModel?.utilizations;
+    if (appointments == null) {
+      return SizedBox.shrink();
     }
-    appointments = appointments
-        .where((e) => DateUtils.isSameDay(_date, e.timeRange.start))
-        .toList();
-
     return ListView.separated(
       padding: EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-      itemBuilder: (context, idx) =>
-          GymAppointmentCell(info: appointments[idx], schedule: _schedule),
-      separatorBuilder: (context, idx) => SizedBox(height: 8),
+      itemBuilder: (context, idx) => TimeSlotCell(appointments[idx].timeSlot),
+      separatorBuilder: (context, idx) => SizedBox(height: 1),
       itemCount: appointments.length,
+    );
+  }
+}
+
+class TimeSlotCell extends StatelessWidget {
+  final TimeSlot timeSlot;
+  TimeSlotCell(this.timeSlot);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: Column(
+        children: [
+          Text(
+            Formats.time.format(timeSlot.range.start),
+            style: TextStyles.small.title,
+          ),
+          SizedBox(height: 20),
+        ],
+      ),
     );
   }
 }
