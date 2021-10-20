@@ -14,7 +14,7 @@ extension DateTimeRangeMethod on DateTimeRange {
   }
 
   bool overlap(DateTimeRange range) {
-    return !(range.start.isAfter(end) && range.end.isBefore(start));
+    return !(range.start.isAfter(end) || !range.end.isAfter(start));
   }
 }
 
@@ -64,6 +64,7 @@ class ScheduleUtilization {
         .reduce((value, element) => value + element)
       ..sort((a, b) => a.date.compareTo(b.date));
     num max = 0;
+    visitorEvents.insert(0, VisitorEvent(visitorEvents.first.date, 0));
     visitorEvents.map((e) => e.diff).reduce((value, element) {
       final sum = value + element;
       if (sum > max) {

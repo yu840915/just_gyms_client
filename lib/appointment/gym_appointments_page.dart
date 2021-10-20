@@ -23,26 +23,27 @@ class GymAppointmentsPage extends StatefulWidget {
 
 class _GymAppointmentsPageState extends State<GymAppointmentsPage> {
   GymAppointmentSchedule? _schedule;
-  DateTime? _date;
+  DateTime _date = DateTime.now();
+  List<AppointmentInfo> _appointments = [];
   _ListViewModel? _viewModel;
   StreamSubscription? subscription;
 
   @override
   void initState() {
     super.initState();
-    _date = DateTime.now();
     final schedule = GymAppointmentSchedule(
         appBloc: BlocProvider.of(context), gym: widget.gym);
     subscription = schedule.onAppointments.listen((event) {
-      _updateViewModel(event);
+      _appointments = event;
+      _updateViewModel();
     });
     _schedule = schedule;
   }
 
-  void _updateViewModel(List<AppointmentInfo> appointments) {
+  void _updateViewModel() {
     setState(() {
       _viewModel = _ListViewModel(
-          day: _date!, gym: widget.gym, appointments: appointments);
+          day: _date, gym: widget.gym, appointments: _appointments);
     });
   }
 
@@ -95,9 +96,8 @@ class _GymAppointmentsPageState extends State<GymAppointmentsPage> {
       calendarFormat: CalendarFormat.twoWeeks,
       rangeSelectionMode: RangeSelectionMode.disabled,
       onDaySelected: (date, _) {
-        setState(() {
-          _date = date;
-        });
+        _date = date;
+        _updateViewModel();
       },
       selectedDayPredicate: (date) => _date == date,
       eventLoader: (date) =>
