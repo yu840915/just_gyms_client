@@ -92,7 +92,7 @@ class _GymAppointmentsPageState extends State<GymAppointmentsPage> {
         ),
       ),
       lastDay: tomorrow.add(Duration(days: 30)),
-      calendarFormat: CalendarFormat.month,
+      calendarFormat: CalendarFormat.twoWeeks,
       rangeSelectionMode: RangeSelectionMode.disabled,
       onDaySelected: (date, _) {
         setState(() {
@@ -141,29 +141,31 @@ class ScheduleUtilizationCell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () => _showAppointmentDialog(context),
+      onTap: viewModel.hasDetail ? () => _showAppointmentDialog(context) : null,
       child: Row(
         children: [
           TimeSlotCell(viewModel.utilizationViewModel.timeSlotViewModel),
-          Container(
-            color: viewModel.indicatorColor,
-            height: 40,
-            child: Row(
-              children: [
-                Spacer(),
-                _buildCountLabel(),
-                SizedBox(width: 12),
-                Container(
-                  width: 30,
-                  child: viewModel.hasDetail
-                      ? Icon(
-                          Icons.arrow_forward_ios_rounded,
-                          size: 20,
-                        )
-                      : null,
-                ),
-                SizedBox(width: 8),
-              ],
+          Expanded(
+            child: Container(
+              color: viewModel.indicatorColor,
+              height: 40,
+              child: Row(
+                children: [
+                  Spacer(),
+                  _buildCountLabel(),
+                  SizedBox(width: 12),
+                  Container(
+                    width: 30,
+                    child: viewModel.hasDetail
+                        ? Icon(
+                            Icons.arrow_forward_ios_rounded,
+                            size: 20,
+                          )
+                        : null,
+                  ),
+                  SizedBox(width: 8),
+                ],
+              ),
             ),
           ),
         ],

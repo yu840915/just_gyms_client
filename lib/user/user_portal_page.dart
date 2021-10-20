@@ -88,7 +88,8 @@ class UserPortalPage extends StatelessWidget {
           builder: (context, snapshot) {
             return _buildBody(
               context,
-              shouldShowAdminUi: snapshot.hasData && snapshot.data!.isNotEmpty,
+              shouldShowAdminUi:
+                  snapshot.data != null && snapshot.data!.isNotEmpty,
             );
           }),
     );
