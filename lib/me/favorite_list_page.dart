@@ -17,6 +17,7 @@ import 'package:where_gym/price_format.dart';
 import 'package:where_gym/shared_appearances.dart';
 import 'package:where_gym/tracking/event_names.dart';
 import 'package:where_gym/tracking/tracking.dart';
+import 'package:where_gym/utils/empty_view.dart';
 
 class FavoriteListPage extends StatefulWidget {
   @override
@@ -113,6 +114,9 @@ class _FavoriteListPageState extends State<FavoriteListPage> {
   Widget _buildList(BuildContext context, List<FavoriteGymDetail>? details) {
     if (details == null) {
       return Container();
+    }
+    if (details.isEmpty) {
+      return EmptyView(message: '在場租頁面按下「☆」即可加入收藏');
     }
     return ListView.separated(
       itemBuilder: (context, idx) => _Row(details[idx]),
