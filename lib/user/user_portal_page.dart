@@ -14,6 +14,7 @@ import 'package:where_gym/gym.dart';
 import 'package:where_gym/login/authenticators.dart';
 import 'package:where_gym/me/favorite_list_page.dart';
 import 'package:where_gym/shared_appearances.dart';
+import 'package:where_gym/utils/empty_view.dart';
 
 class UserPortalPage extends StatelessWidget {
   void _showFavorites(BuildContext context) {
@@ -97,6 +98,9 @@ class UserPortalPage extends StatelessWidget {
 
   Widget _buildBody(BuildContext context, {required bool shouldShowAdminUi}) {
     AppBloc bloc = BlocProvider.of(context);
+    if (!bloc.isLoggedIn) {
+      return EmptyView(message: '此功能需登入才能使用');
+    }
     return Column(
       children: [
         _Row(
