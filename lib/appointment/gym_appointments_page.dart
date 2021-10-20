@@ -6,7 +6,6 @@ import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:where_gym/app_bar_factory.dart';
 import 'package:where_gym/appointment/appointment_info.dart';
-import 'package:where_gym/appointment/gym_appointment_cell.dart';
 import 'package:where_gym/appointment/gym_appointment_schedule.dart';
 import 'package:where_gym/gym.dart';
 import 'package:where_gym/schedule_time_slot.dart';
@@ -23,7 +22,7 @@ class GymAppointmentsPage extends StatefulWidget {
 class _GymAppointmentsPageState extends State<GymAppointmentsPage> {
   GymAppointmentSchedule? _schedule;
   DateTime? _date;
-  GymAppointmentDayViewModel? _viewModel;
+  _ListViewModel? _viewModel;
   StreamSubscription? subscription;
 
   @override
@@ -40,7 +39,7 @@ class _GymAppointmentsPageState extends State<GymAppointmentsPage> {
 
   void _updateViewModel(List<AppointmentInfo> appointments) {
     setState(() {
-      _viewModel = GymAppointmentDayViewModel(
+      _viewModel = _ListViewModel(
           day: _date!, gym: widget.gym, appointments: appointments);
     });
   }
@@ -108,15 +107,70 @@ class _GymAppointmentsPageState extends State<GymAppointmentsPage> {
   }
 
   Widget _buildCells(BuildContext context) {
-    List<ScheduleUtilization>? appointments = _viewModel?.utilizations;
-    if (appointments == null) {
+    List<_CellViewModel>? cellModels = _viewModel?.cellModels;
+    if (cellModels == null) {
       return SizedBox.shrink();
     }
     return ListView.separated(
       padding: EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-      itemBuilder: (context, idx) => TimeSlotCell(appointments[idx].timeSlot),
+      itemBuilder: (context, idx) =>
+          ScheduleUtilizationCell(viewModel: cellModels[idx]),
       separatorBuilder: (context, idx) => SizedBox(height: 1),
-      itemCount: appointments.length,
+      itemCount: cellModels.length,
+    );
+  }
+}
+
+class ScheduleUtilizationCell extends StatelessWidget {
+  final _CellViewModel viewModel;
+  ScheduleUtilizationCell({required this.viewModel});
+
+  void _showAppointmentDialog(BuildContext context) {}
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: () => _showAppointmentDialog(context),
+      child: Row(
+        children: [
+          TimeSlotCell(viewModel.timeSlot),
+          Container(
+            color: viewModel.indicatorColor,
+            height: 40,
+            child: Row(
+              children: [
+                Spacer(),
+                _buildCountLabel(),
+                SizedBox(width: 12),
+                Container(
+                  width: 30,
+                  child: viewModel.hasDetail
+                      ? Icon(
+                          Icons.arrow_forward_ios_rounded,
+                          size: 20,
+                        )
+                      : null,
+                ),
+                SizedBox(width: 8),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCountLabel() {
+    return Container(
+      padding: EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(4),
+        color: Colors.grey.shade50,
+      ),
+      child: Text(
+        viewModel.countText,
+        style: TextStyles.large.detail.copyWith(color: Colors.grey.shade700),
+      ),
     );
   }
 }
@@ -141,15 +195,14 @@ class TimeSlotCell extends StatelessWidget {
   }
 }
 
-class GymAppointmentDayViewModel {
+class _ListViewModel {
   final List<AppointmentInfo> appointments;
   final Gym gym;
   final DateTime day;
+  List<_CellViewModel>? get cellModels =>
+      _utilizations?.map((e) => _CellViewModel(utilization: e)).toList();
   List<ScheduleUtilization>? _utilizations;
-  List<ScheduleUtilization>? get utilizations => _utilizations;
-  List<TimeSlot>? get timeSlots =>
-      utilizations?.map((e) => e.timeSlot).toList();
-  GymAppointmentDayViewModel(
+  _ListViewModel(
       {required this.day,
       required this.gym,
       required List<AppointmentInfo> appointments})
@@ -162,4 +215,35 @@ class GymAppointmentDayViewModel {
             this.appointments, e, gym.capacity))
         .toList();
   }
+}
+
+class _CellViewModel {
+  final ScheduleUtilization utilization;
+  _CellViewModel({required this.utilization});
+  bool get hasDetail => utilization.appointments.isNotEmpty;
+  TimeSlot get timeSlot => utilization.timeSlot;
+  Color get indicatorColor {
+    switch (utilization.status) {
+      case UtilizationStatus.empty:
+        return Colors.white;
+      case UtilizationStatus.low:
+        return Colors.greenAccent.shade100;
+      case UtilizationStatus.heavy:
+        return Colors.orangeAccent.shade100;
+      case UtilizationStatus.full:
+        return Colors.redAccent.shade100;
+    }
+  }
+
+  String get countText {
+    final count = Formats.integer.format(utilization.appointments.length);
+    if (availableText != null) {
+      return '$count/$availableText';
+    }
+    return count;
+  }
+
+  String? get availableText => utilization.availableSeats != null
+      ? Formats.integer.format(utilization.availableSeats)
+      : null;
 }
