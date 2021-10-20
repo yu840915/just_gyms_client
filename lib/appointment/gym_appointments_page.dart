@@ -6,7 +6,9 @@ import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:where_gym/app_bar_factory.dart';
 import 'package:where_gym/appointment/appointment_info.dart';
+import 'package:where_gym/appointment/appointment_view_models.dart';
 import 'package:where_gym/appointment/gym_appointment_schedule.dart';
+import 'package:where_gym/appointment/utilization_detail_popup.dart';
 import 'package:where_gym/gym.dart';
 import 'package:where_gym/schedule_time_slot.dart';
 import 'package:where_gym/shared_appearances.dart';
@@ -107,14 +109,14 @@ class _GymAppointmentsPageState extends State<GymAppointmentsPage> {
   }
 
   Widget _buildCells(BuildContext context) {
-    List<_CellViewModel>? cellModels = _viewModel?.cellModels;
+    List<ScheduleUtilizationCellViewModel>? cellModels = _viewModel?.cellModels;
     if (cellModels == null) {
       return SizedBox.shrink();
     }
     return ListView.separated(
       padding: EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-      itemBuilder: (context, idx) =>
-          ScheduleUtilizationCell(viewModel: cellModels[idx]),
+      itemBuilder: (context, idx) => ScheduleUtilizationCell(
+          viewModel: cellModels[idx], schedule: _schedule!),
       separatorBuilder: (context, idx) => SizedBox(height: 1),
       itemCount: cellModels.length,
     );
@@ -122,10 +124,19 @@ class _GymAppointmentsPageState extends State<GymAppointmentsPage> {
 }
 
 class ScheduleUtilizationCell extends StatelessWidget {
-  final _CellViewModel viewModel;
-  ScheduleUtilizationCell({required this.viewModel});
+  final ScheduleUtilizationCellViewModel viewModel;
+  final GymAppointmentSchedule schedule;
+  ScheduleUtilizationCell({required this.viewModel, required this.schedule});
 
-  void _showAppointmentDialog(BuildContext context) {}
+  void _showAppointmentDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => UtilizationDetailPopup(
+        utilization: viewModel.utilization,
+        schedule: schedule,
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -133,7 +144,7 @@ class ScheduleUtilizationCell extends StatelessWidget {
       onTap: () => _showAppointmentDialog(context),
       child: Row(
         children: [
-          TimeSlotCell(viewModel.timeSlot),
+          TimeSlotCell(viewModel.utilizationViewModel.timeSlotViewModel),
           Container(
             color: viewModel.indicatorColor,
             height: 40,
@@ -176,8 +187,8 @@ class ScheduleUtilizationCell extends StatelessWidget {
 }
 
 class TimeSlotCell extends StatelessWidget {
-  final TimeSlot timeSlot;
-  TimeSlotCell(this.timeSlot);
+  final TimeSlotViewModel viewModel;
+  TimeSlotCell(this.viewModel);
 
   @override
   Widget build(BuildContext context) {
@@ -185,7 +196,7 @@ class TimeSlotCell extends StatelessWidget {
       child: Column(
         children: [
           Text(
-            Formats.time.format(timeSlot.range.start),
+            viewModel.start,
             style: TextStyles.small.title,
           ),
           SizedBox(height: 20),
@@ -199,8 +210,9 @@ class _ListViewModel {
   final List<AppointmentInfo> appointments;
   final Gym gym;
   final DateTime day;
-  List<_CellViewModel>? get cellModels =>
-      _utilizations?.map((e) => _CellViewModel(utilization: e)).toList();
+  List<ScheduleUtilizationCellViewModel>? get cellModels => _utilizations
+      ?.map((e) => ScheduleUtilizationCellViewModel(utilization: e))
+      .toList();
   List<ScheduleUtilization>? _utilizations;
   _ListViewModel(
       {required this.day,
@@ -217,33 +229,13 @@ class _ListViewModel {
   }
 }
 
-class _CellViewModel {
+class ScheduleUtilizationCellViewModel {
   final ScheduleUtilization utilization;
-  _CellViewModel({required this.utilization});
+  UtilizationViewModel utilizationViewModel;
+  ScheduleUtilizationCellViewModel({required this.utilization})
+      : utilizationViewModel = UtilizationViewModel(utilization: utilization);
   bool get hasDetail => utilization.appointments.isNotEmpty;
   TimeSlot get timeSlot => utilization.timeSlot;
-  Color get indicatorColor {
-    switch (utilization.status) {
-      case UtilizationStatus.empty:
-        return Colors.white;
-      case UtilizationStatus.low:
-        return Colors.greenAccent.shade100;
-      case UtilizationStatus.heavy:
-        return Colors.orangeAccent.shade100;
-      case UtilizationStatus.full:
-        return Colors.redAccent.shade100;
-    }
-  }
-
-  String get countText {
-    final count = Formats.integer.format(utilization.appointments.length);
-    if (availableText != null) {
-      return '$count/$availableText';
-    }
-    return count;
-  }
-
-  String? get availableText => utilization.availableSeats != null
-      ? Formats.integer.format(utilization.availableSeats)
-      : null;
+  Color get indicatorColor => utilizationViewModel.indicatorColor;
+  String get countText => utilizationViewModel.capacityInfo;
 }
