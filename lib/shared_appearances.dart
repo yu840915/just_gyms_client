@@ -102,5 +102,7 @@ class SharedIcons {
 
 class Formats {
   static final time = DateFormat(DateFormat.HOUR_MINUTE);
+  static final day = DateFormat(DateFormat.NUM_MONTH_DAY);
+  static final weekday = DateFormat(DateFormat.ABBR_WEEKDAY);
   static final integer = NumberFormat("#,###");
 }

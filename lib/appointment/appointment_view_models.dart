@@ -6,7 +6,11 @@ class TimeSlotViewModel {
   final TimeSlot timeSlot;
   TimeSlotViewModel({required this.timeSlot});
   String get start => Formats.time.format(timeSlot.range.start);
-  String get end => Formats.time.format(timeSlot.range.start);
+  String get end => Formats.time.format(timeSlot.range.end);
+  String get dayWeekday =>
+      Formats.day.format(timeSlot.day) +
+      " " +
+      Formats.weekday.format(timeSlot.day);
 }
 
 class UtilizationViewModel {
@@ -20,7 +24,7 @@ class UtilizationViewModel {
       case UtilizationStatus.empty:
         return Colors.white;
       case UtilizationStatus.low:
-        return Colors.greenAccent.shade100;
+        return Colors.greenAccent.shade700;
       case UtilizationStatus.heavy:
         return Colors.orangeAccent.shade100;
       case UtilizationStatus.full:
