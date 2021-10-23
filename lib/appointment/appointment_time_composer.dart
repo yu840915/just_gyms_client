@@ -3,6 +3,8 @@ import 'package:rxdart/rxdart.dart';
 import 'package:rxdart/subjects.dart';
 import 'package:where_gym/api_services/api_services.dart';
 import 'package:where_gym/business_hours.dart';
+import 'package:where_gym/gym.dart';
+import 'package:where_gym/schedule_time_slot.dart';
 
 class AppointmentTimeComposer {
   final _timeRangeSubject = BehaviorSubject<TimeRange?>();
@@ -102,6 +104,10 @@ class AppointmentTimeComposer {
       start: DateTimeMethods.onDayWithTime(_daySubject.value, range.start),
       end: DateTimeMethods.onDayWithTime(_daySubject.value, range.end),
     );
+  }
+
+  List<TimeSlot>? generateTimeSlotsOnSelectedDay({required Gym gym}) {
+    return gym.generateTimeSlotOnDay(_daySubject.value);
   }
 }
 

@@ -14,6 +14,7 @@ import 'package:where_gym/business_hours.dart';
 import 'package:where_gym/gym.dart';
 import 'package:where_gym/shared_appearances.dart';
 import 'package:where_gym/utils/loading_view.dart';
+import 'package:where_gym/utils/timeslot_picker.dart';
 
 class AppointmentCreatePage extends StatefulWidget {
   final Gym gym;
@@ -40,8 +41,8 @@ class _AppointmentCreatePageState extends State<AppointmentCreatePage> {
     }).onError((error) {
       print(error);
     });
-    _composer =
-        AppointmentTimeComposer(businessHours: widget.gym.weekdayBusinessHours!);
+    _composer = AppointmentTimeComposer(
+        businessHours: widget.gym.weekdayBusinessHours!);
   }
 
   @override
@@ -51,11 +52,16 @@ class _AppointmentCreatePageState extends State<AppointmentCreatePage> {
   }
 
   void _showStartTimePicker(BuildContext context) async {
-    final start = await showTimePicker(
+    final timeSlots = _composer.generateTimeSlotsOnSelectedDay(gym: widget.gym);
+    if (timeSlots == null) {
+      return;
+    }
+    final start = await showDialog(
       context: context,
-      initialTime: _composer.startTime ?? TimeOfDay.now(),
-      initialEntryMode: TimePickerEntryMode.input,
-      helpText: '選擇開始時間',
+      builder: (context) => TimeSlotPicker(
+        timeSlots: timeSlots,
+        header: '選擇開始時間',
+      ),
     );
     if (start != null) {
       try {
@@ -70,11 +76,17 @@ class _AppointmentCreatePageState extends State<AppointmentCreatePage> {
   }
 
   void _showEndTimePicker(BuildContext context) async {
-    final end = await showTimePicker(
+    final timeSlots = _composer.generateTimeSlotsOnSelectedDay(gym: widget.gym);
+    if (timeSlots == null) {
+      return;
+    }
+    final end = await showDialog(
       context: context,
-      initialTime: _composer.endTime ?? TimeOfDay.now(),
-      initialEntryMode: TimePickerEntryMode.input,
-      helpText: '選擇結束時間',
+      builder: (context) => TimeSlotPicker(
+        timeSlots: timeSlots,
+        start: _composer.startTime,
+        header: '選擇結束時間',
+      ),
     );
     if (end != null) {
       try {
