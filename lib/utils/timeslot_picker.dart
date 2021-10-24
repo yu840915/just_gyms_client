@@ -21,20 +21,37 @@ class TimeSlotPicker extends StatelessWidget {
     return Column(
       children: [
         Spacer(flex: 1),
-        ClipRRect(
-          borderRadius: BorderRadius.circular(8),
-          child: Container(
-            color: Colors.white,
-            child: Column(
-              children: [
-                if (header != null) _buildHeader(header!),
-                _buildGrid(context),
-              ],
+        Row(
+          children: [
+            Spacer(),
+            Expanded(
+              flex: 8,
+              child: Material(
+                color: Colors.transparent,
+                child: _buildContent(context),
+              ),
             ),
-          ),
+            Spacer(),
+          ],
         ),
         Spacer(flex: 2),
       ],
+    );
+  }
+
+  Widget _buildContent(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        color: Colors.white,
+        child: Column(
+          children: [
+            if (header != null) _buildHeader(header!),
+            _buildGrid(context),
+          ],
+          crossAxisAlignment: CrossAxisAlignment.center,
+        ),
+      ),
     );
   }
 
@@ -49,23 +66,24 @@ class TimeSlotPicker extends StatelessWidget {
   }
 
   Widget _buildGrid(BuildContext context) {
-    return GridView.builder(
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 4,
-        crossAxisSpacing: 1,
-        mainAxisSpacing: 1,
-      ),
+    return GridView.count(
+      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 30),
       shrinkWrap: true,
-      itemCount: timeSlots.length,
-      itemBuilder: (context, index) => TimeSlotCell(
-        viewModel: _TimeSlotCellViewModel(
-          timeSlot: timeSlots[index],
-          start: start,
-          action: () {
-            _onSelection(context, timeSlots[index]);
-          },
-        ),
-      ),
+      childAspectRatio: 2.5,
+      crossAxisCount: 3,
+      crossAxisSpacing: 8,
+      mainAxisSpacing: 8,
+      children: timeSlots
+          .map(
+            (e) => TimeSlotCell(
+              viewModel: _TimeSlotCellViewModel(
+                timeSlot: e,
+                start: start,
+                action: () => _onSelection(context, e),
+              ),
+            ),
+          )
+          .toList(),
     );
   }
 }
@@ -79,14 +97,17 @@ class TimeSlotCell extends StatelessWidget {
   Widget build(BuildContext context) {
     return OutlinedButton(
       onPressed: viewModel.onTap,
-      child: Text(
-        viewModel.time.format(context),
-      ),
+      child: Text(viewModel.formattedTime),
       style: OutlinedButton.styleFrom(
         primary: AppColors.theme,
-        side: BorderSide(color: AppColors.theme),
+        side: BorderSide(
+            color:
+                viewModel.isSelectable ? AppColors.theme : Colors.transparent),
         textStyle: TextStyles.small.action,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        fixedSize: Size.fromHeight(40),
+        padding: EdgeInsets.zero,
+        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
       ),
     );
   }
@@ -96,10 +117,12 @@ class _TimeSlotCellViewModel {
   final TimeSlot timeSlot;
   final TimeOfDay? start;
   final void Function() action;
+
   _TimeSlotCellViewModel(
       {required this.timeSlot, required this.action, this.start});
   TimeOfDay get time =>
       start == null ? timeSlot.timeRange.start : timeSlot.timeRange.end;
+  String get formattedTime => time.stringValue;
   bool get isSelectable =>
       start == null ? true : timeSlot.timeRange.end.isAfter(start!);
   void Function()? get onTap => isSelectable ? action : null;
