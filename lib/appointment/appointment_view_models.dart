@@ -7,6 +7,8 @@ class TimeSlotViewModel {
   TimeSlotViewModel({required this.timeSlot});
   String get start => Formats.time.format(timeSlot.range.start);
   String get end => Formats.time.format(timeSlot.range.end);
+  bool get shouldEmpashizeStart => timeSlot.timeRange.start.minute == 0;
+  bool get shouldEmpashizeEnd => timeSlot.timeRange.end.minute == 0;
   String get dayWeekday =>
       Formats.day.format(timeSlot.day) +
       " " +
@@ -16,13 +18,14 @@ class TimeSlotViewModel {
 class UtilizationViewModel {
   final ScheduleUtilization utilization;
   final TimeSlotViewModel timeSlotViewModel;
+
   UtilizationViewModel({required this.utilization})
       : timeSlotViewModel = TimeSlotViewModel(timeSlot: utilization.timeSlot);
 
   Color get indicatorColor {
     switch (utilization.status) {
       case UtilizationStatus.empty:
-        return Colors.white;
+        return Colors.transparent;
       case UtilizationStatus.low:
         return Colors.greenAccent.shade700;
       case UtilizationStatus.heavy:

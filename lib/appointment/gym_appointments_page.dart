@@ -114,10 +114,28 @@ class _GymAppointmentsPageState extends State<GymAppointmentsPage> {
       return SizedBox.shrink();
     }
     return ListView.separated(
-      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+      padding: EdgeInsets.only(top: 20, bottom: 50, left: 10, right: 10),
       itemBuilder: (context, idx) => ScheduleUtilizationCell(
-          viewModel: cellModels[idx], schedule: _schedule!),
-      separatorBuilder: (context, idx) => SizedBox(height: 1),
+        viewModel: cellModels[idx],
+        schedule: _schedule!,
+        isEnd: idx == cellModels.length - 1,
+      ),
+      separatorBuilder: (context, idx) => Row(
+        children: [
+          SizedBox(width: 90),
+          Expanded(
+            child: Container(
+              height: 1,
+              color: cellModels[idx]
+                      .utilizationViewModel
+                      .timeSlotViewModel
+                      .shouldEmpashizeEnd
+                  ? Colors.grey.shade300
+                  : Colors.grey.shade200,
+            ),
+          ),
+        ],
+      ),
       itemCount: cellModels.length,
     );
   }
@@ -125,8 +143,10 @@ class _GymAppointmentsPageState extends State<GymAppointmentsPage> {
 
 class ScheduleUtilizationCell extends StatelessWidget {
   final ScheduleUtilizationCellViewModel viewModel;
+  final bool isEnd;
   final GymAppointmentSchedule schedule;
-  ScheduleUtilizationCell({required this.viewModel, required this.schedule});
+  ScheduleUtilizationCell(
+      {required this.viewModel, required this.schedule, required this.isEnd});
 
   void _showAppointmentDialog(BuildContext context) {
     showDialog(
@@ -144,7 +164,11 @@ class ScheduleUtilizationCell extends StatelessWidget {
       onTap: viewModel.hasDetail ? () => _showAppointmentDialog(context) : null,
       child: Row(
         children: [
-          TimeSlotCell(viewModel.utilizationViewModel.timeSlotViewModel),
+          TimeSlotCell(
+            viewModel: viewModel.utilizationViewModel.timeSlotViewModel,
+            isEnd: isEnd,
+          ),
+          SizedBox(width: 8),
           Expanded(
             child: Container(
               color: viewModel.indicatorColor,
@@ -152,7 +176,7 @@ class ScheduleUtilizationCell extends StatelessWidget {
               child: Row(
                 children: [
                   Spacer(),
-                  _buildCountLabel(),
+                  if (viewModel.shouldShowCount) _buildCountLabel(),
                   SizedBox(width: 12),
                   Container(
                     width: 30,
@@ -168,6 +192,7 @@ class ScheduleUtilizationCell extends StatelessWidget {
               ),
             ),
           ),
+          SizedBox(width: 8),
         ],
       ),
     );
@@ -190,18 +215,38 @@ class ScheduleUtilizationCell extends StatelessWidget {
 
 class TimeSlotCell extends StatelessWidget {
   final TimeSlotViewModel viewModel;
-  TimeSlotCell(this.viewModel);
+  final bool isEnd;
+  TimeSlotCell({required this.viewModel, required this.isEnd});
 
   @override
   Widget build(BuildContext context) {
     return Container(
+      width: 90,
+      height: 40,
       child: Column(
         children: [
-          Text(
-            viewModel.start,
-            style: TextStyles.small.title,
+          Transform.translate(
+            offset: Offset(0, -8),
+            child: Text(
+              viewModel.start,
+              style: viewModel.shouldEmpashizeStart
+                  ? TextStyles.large.title
+                  : TextStyles.small.title
+                      .copyWith(color: Colors.grey.shade500),
+            ),
           ),
-          SizedBox(height: 20),
+          Spacer(),
+          if (isEnd)
+            Transform.translate(
+              offset: Offset(0, 8),
+              child: Text(
+                viewModel.end,
+                style: viewModel.shouldEmpashizeEnd
+                    ? TextStyles.large.title
+                    : TextStyles.small.title
+                        .copyWith(color: Colors.grey.shade500),
+              ),
+            )
         ],
       ),
     );
@@ -240,4 +285,5 @@ class ScheduleUtilizationCellViewModel {
   TimeSlot get timeSlot => utilization.timeSlot;
   Color get indicatorColor => utilizationViewModel.indicatorColor;
   String get countText => utilizationViewModel.capacityInfo;
+  bool get shouldShowCount => !utilization.isEmpty;
 }

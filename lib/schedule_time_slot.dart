@@ -79,11 +79,10 @@ class ScheduleUtilization {
         appointments: appointmentsOnSlot.toList());
   }
 
+  bool get isEmpty => maxConcurrentAppointments == 0;
   UtilizationStatus get status {
     if (rate == null) {
-      return maxConcurrentAppointments == 0
-          ? UtilizationStatus.empty
-          : UtilizationStatus.low;
+      return isEmpty ? UtilizationStatus.empty : UtilizationStatus.low;
     }
     if (rate! == 0) {
       return UtilizationStatus.empty;
