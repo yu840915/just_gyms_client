@@ -14,7 +14,7 @@ extension DateTimeRangeMethod on DateTimeRange {
   }
 
   bool overlap(DateTimeRange range) {
-    return !(range.start.isAfter(end) || !range.end.isAfter(start));
+    return !(!range.start.isBefore(end) || !range.end.isAfter(start));
   }
 }
 
@@ -48,7 +48,7 @@ class ScheduleUtilization {
   static ScheduleUtilization inferFromAppointments(
       List<AppointmentInfo> appointments, TimeSlot timeSlot, num? capacity) {
     final appointmentsOnSlot =
-        appointments.where((a) => timeSlot.range.overlap(a.timeRange));
+        appointments.where((a) => a.timeRange.overlap(timeSlot.range));
     if (appointmentsOnSlot.isEmpty) {
       return ScheduleUtilization(
           capacity: capacity,

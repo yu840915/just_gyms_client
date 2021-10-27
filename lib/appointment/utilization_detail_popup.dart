@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:where_gym/alert_factory.dart';
 import 'package:where_gym/appointment/appointment_info.dart';
 import 'package:where_gym/appointment/appointment_view_models.dart';
 import 'package:where_gym/appointment/gym_appointment_schedule.dart';
@@ -101,7 +102,7 @@ class UtilizationDetailPopup extends StatelessWidget {
     return ListView.separated(
       padding: EdgeInsets.symmetric(horizontal: 16, vertical: 20),
       itemBuilder: (context, idx) =>
-          UserAppointmentCell(info: appointments[idx], schedule: schedule),
+          _Cell(info: appointments[idx], schedule: schedule),
       separatorBuilder: (context, idx) => SizedBox(height: 8),
       itemCount: appointments.length,
     );
@@ -124,4 +125,74 @@ class _ViewModel {
       : null;
   _ViewModel({required this.utilization})
       : utilizationViewModel = UtilizationViewModel(utilization: utilization);
+}
+
+class _Cell extends StatelessWidget {
+  final AppointmentInfo info;
+  final GymAppointmentSchedule? schedule;
+  _Cell({required this.info, required this.schedule});
+
+  void _cancel(BuildContext context) async {
+    try {
+      await schedule!.cancel(info);
+    } catch (e) {
+      showDialog(
+          context: context,
+          builder: (context) => AlertFactory.errorAlert(context, error: e));
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.all(12),
+      child: Column(
+        children: [
+          _buildGymInfo(),
+          _buildTimeRange(),
+          Row(
+            children: [
+              Spacer(),
+              _buildCancelButton(context),
+            ],
+          ),
+        ],
+        crossAxisAlignment: CrossAxisAlignment.start,
+      ),
+      decoration: BoxDecoration(
+        border: Border.all(
+          color: Colors.grey,
+        ),
+        borderRadius: BorderRadius.circular(8),
+      ),
+    );
+  }
+
+  Widget _buildGymInfo() {
+    return Text(
+      info.userName!,
+      style: TextStyles.small.title,
+    );
+  }
+
+  Widget _buildTimeRange() {
+    return Text(
+      '${Formats.time.format(info.timeRange.start)} - ${Formats.time.format(info.timeRange.end)}',
+      style: TextStyles.small.title,
+    );
+  }
+
+  Widget _buildCancelButton(BuildContext context) {
+    return TextButton(
+      onPressed: () {
+        _cancel(context);
+      },
+      child: Text('取消此預約'),
+      style: TextButton.styleFrom(
+        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        textStyle: TextStyles.small.action,
+        primary: Colors.grey.shade400,
+      ),
+    );
+  }
 }

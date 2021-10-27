@@ -58,7 +58,7 @@ class AppointmentTimeComposer {
       throw LocalError('開始時間必須在營業時間內');
     }
     TimeOfDay? end = _timeRangeSubject.valueOrNull?.end;
-    if (end == null || start.isAfter(end)) {
+    if (end == null || !start.isBefore(end)) {
       end = TimeOfDay(hour: start.hour + 1, minute: start.minute);
       if (businessHoursOnSelectedDay!.end.isBefore(end)) {
         end = businessHoursOnSelectedDay!.end;
