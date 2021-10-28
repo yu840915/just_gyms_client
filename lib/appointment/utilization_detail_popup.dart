@@ -3,17 +3,15 @@ import 'package:where_gym/alert_factory.dart';
 import 'package:where_gym/appointment/appointment_info.dart';
 import 'package:where_gym/appointment/appointment_view_models.dart';
 import 'package:where_gym/appointment/gym_appointment_schedule.dart';
-import 'package:where_gym/appointment/user_appointment_cell.dart';
 import 'package:where_gym/schedule_time_slot.dart';
 import 'package:where_gym/shared_appearances.dart';
+import 'package:where_gym/utils/empty_view.dart';
 
 class UtilizationDetailPopup extends StatelessWidget {
   final GymAppointmentSchedule schedule;
-  final ScheduleUtilization utilization;
-  final _ViewModel _viewModel;
-  List<AppointmentInfo> get appointments => utilization.appointments;
-  UtilizationDetailPopup({required this.utilization, required this.schedule})
-      : _viewModel = _ViewModel(utilization: utilization);
+  final AppointmentCursor cursor;
+
+  UtilizationDetailPopup({required this.cursor, required this.schedule});
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +25,11 @@ class UtilizationDetailPopup extends StatelessWidget {
               Spacer(flex: 1),
               Expanded(
                 flex: 8,
-                child: _buildContent(context),
+                child: StreamBuilder<ScheduleUtilization>(
+                    stream: cursor.onUtilization,
+                    builder: (context, snapshot) {
+                      return _buildContent(context, snapshot.data);
+                    }),
               ),
               Spacer(flex: 1),
             ],
@@ -38,14 +40,18 @@ class UtilizationDetailPopup extends StatelessWidget {
     );
   }
 
-  Widget _buildContent(BuildContext context) {
+  Widget _buildContent(BuildContext context, ScheduleUtilization? utilization) {
+    if (utilization == null) {
+      return Container();
+    }
     return ClipRRect(
       borderRadius: BorderRadius.circular(8),
       child: Container(
         child: Column(
           children: [
-            _buildHeader(),
-            Expanded(child: _buildList(context)),
+            _buildHeader(_ViewModel(utilization: utilization)),
+            Container(height: 1, color: Colors.grey.shade100),
+            Expanded(child: _buildList(context, utilization.appointments)),
           ],
         ),
         color: Colors.white,
@@ -53,7 +59,7 @@ class UtilizationDetailPopup extends StatelessWidget {
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(_ViewModel _viewModel) {
     return Container(
       padding: EdgeInsets.all(8),
       width: double.infinity,
@@ -98,7 +104,10 @@ class UtilizationDetailPopup extends StatelessWidget {
     );
   }
 
-  Widget _buildList(BuildContext context) {
+  Widget _buildList(BuildContext context, List<AppointmentInfo> appointments) {
+    if (appointments.isEmpty) {
+      return EmptyView(message: '此時段沒有預約');
+    }
     return ListView.separated(
       padding: EdgeInsets.symmetric(horizontal: 16, vertical: 20),
       itemBuilder: (context, idx) =>

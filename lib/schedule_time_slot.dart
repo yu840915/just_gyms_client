@@ -3,7 +3,9 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:where_gym/appointment/appointment_info.dart';
 import 'package:where_gym/appointment/appointment_time_composer.dart';
+import 'package:where_gym/appointment/gym_appointment_schedule.dart';
 import 'package:where_gym/business_hours.dart';
+import 'package:where_gym/gym.dart';
 
 extension DateTimeRangeMethod on DateTimeRange {
   static DateTimeRange fromDayAndTimeRange(DateTime day, TimeRange timeRange) {
@@ -25,6 +27,22 @@ class TimeSlot {
       DateTimeRangeMethod.fromDayAndTimeRange(day, timeRange);
 
   TimeSlot({required this.day, required this.timeRange});
+}
+
+class AppointmentCursor {
+  final GymAppointmentSchedule schedule;
+  final TimeSlot timeSlot;
+  AppointmentCursor({required this.schedule, required this.timeSlot}) {
+    _utilizationStream = schedule.onAppointments.map((event) {
+      return ScheduleUtilization.inferFromAppointments(
+        event,
+        timeSlot,
+        schedule.gym.capacity,
+      );
+    }).asBroadcastStream();
+  }
+  Stream<ScheduleUtilization>? _utilizationStream;
+  Stream<ScheduleUtilization> get onUtilization => _utilizationStream!;
 }
 
 class ScheduleUtilization {

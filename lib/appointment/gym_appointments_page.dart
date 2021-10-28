@@ -152,7 +152,8 @@ class ScheduleUtilizationCell extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => UtilizationDetailPopup(
-        utilization: viewModel.utilization,
+        cursor:
+            AppointmentCursor(schedule: schedule, timeSlot: viewModel.timeSlot),
         schedule: schedule,
       ),
     );
