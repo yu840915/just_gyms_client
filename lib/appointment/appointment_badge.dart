@@ -36,14 +36,16 @@ class _AppointmentBadgeState extends State<AppointmentBadge> {
       return SizedBox.shrink();
     }
     return Container(
+      padding: EdgeInsets.symmetric(horizontal: 6),
+      alignment: Alignment.center,
       child: Text(
         Formats.integer.format(count),
-        style: TextStyles.small.subscription,
+        style: TextStyles.small.subscription.copyWith(color: Colors.white),
       ),
       height: 20,
       decoration: BoxDecoration(
-        color: Colors.green.shade900,
-        borderRadius: BorderRadius.circular(4),
+        color: Colors.redAccent.shade700,
+        borderRadius: BorderRadius.circular(10),
       ),
     );
   }
@@ -55,7 +57,7 @@ class AppointmentBadgeSource {
       : appointmentCount =
             Rx.combineLatest2<List<AppointmentInfo>, dynamic, int>(
                 schedule.onAppointments,
-                Stream.periodic(Duration(minutes: 1)),
+                Stream.periodic(Duration(minutes: 1)).startWith(0),
                 (list, _b) => list
                     .where((a) => a.timeRange.end.isAfter(DateTime.now()))
                     .length).asBroadcastStream();
