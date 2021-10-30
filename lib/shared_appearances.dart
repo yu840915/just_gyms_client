@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 class AppColors {
   AppColors._();
   static const theme = const Color(0xff019858);
+  static final destructive = Colors.redAccent.shade700;
   static final progressing = Colors.grey.shade600;
 }
 
@@ -14,7 +15,11 @@ class TextStyles {
   TextStyle subscription;
   TextStyle action;
   TextStyles._(
-      {required this.header, required this.title, required this.detail, required this.action, required this.subscription});
+      {required this.header,
+      required this.title,
+      required this.detail,
+      required this.action,
+      required this.subscription});
 
   static final large = TextStyles._(
     header: TextStyle(

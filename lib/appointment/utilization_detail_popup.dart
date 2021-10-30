@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:where_gym/alert_factory.dart';
 import 'package:where_gym/appointment/appointment_info.dart';
 import 'package:where_gym/appointment/appointment_view_models.dart';
 import 'package:where_gym/appointment/gym_appointment_schedule.dart';
+import 'package:where_gym/business_hours.dart';
 import 'package:where_gym/schedule_time_slot.dart';
 import 'package:where_gym/shared_appearances.dart';
 import 'package:where_gym/utils/empty_view.dart';
@@ -142,6 +144,28 @@ class _Cell extends StatelessWidget {
   _Cell({required this.info, required this.schedule});
 
   void _cancel(BuildContext context) async {
+    final confirmed = await showDialog(
+      context: context,
+      builder: (context) => AlertFactory.actionAlert(
+        context,
+        cancelTitle: '保留預約',
+        title: '確定要取消 ${info.userName} 的預約？',
+        message:
+            '時間：${Formats.day.format(info.timeRange.start)} ${Formats.time.format(info.timeRange.start)} - ${Formats.time.format(info.timeRange.end)}\n確認後將立即取消該預約',
+        actions: [
+          PlatformDialogAction(
+            child: Text(
+              '取消預約',
+              style: TextStyle(color: AppColors.destructive),
+            ),
+            onPressed: () => Navigator.pop(context, true),
+          ),
+        ],
+      ),
+    );
+    if (confirmed == null || confirmed == false) {
+      return;
+    }
     try {
       await schedule!.cancel(info);
     } catch (e) {
