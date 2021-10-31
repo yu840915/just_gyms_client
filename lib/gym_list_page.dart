@@ -19,15 +19,17 @@ class GymListPage extends StatefulWidget {
 }
 
 class _GymListPageState extends State<GymListPage> {
-  GymList _gymList;
+  late GymList _gymList;
 
   @override
   void initState() {
     super.initState();
     AppBloc bloc = BlocProvider.of(context);
-    _gymList = GymList(bloc.location);
-    _gymList.refresh().catchError((e) {
+    final list = GymList(bloc.location);
+    _gymList = list;
+    list.refresh().catchError((e, stack) {
       print(e);
+      print(stack);
     });
   }
 
@@ -44,7 +46,7 @@ class _GymListPageState extends State<GymListPage> {
           title: Text(
         '附近的場租',
         style: TextStyles.large.title,
-      )),
+      )) as PreferredSizeWidget?,
       body: _buildBody(context),
     );
   }
@@ -56,7 +58,7 @@ class _GymListPageState extends State<GymListPage> {
     );
   }
 
-  Widget _buildList(BuildContext context, List<Gym> gyms) {
+  Widget _buildList(BuildContext context, List<Gym>? gyms) {
     if (gyms == null) {
       return Container();
     }
@@ -76,7 +78,7 @@ class _GymListPageState extends State<GymListPage> {
 }
 
 class _Row extends StatelessWidget {
-  final num meters;
+  final num? meters;
   final Gym gym;
   _Row(this.gym, {this.meters});
 
@@ -116,7 +118,7 @@ class _Row extends StatelessWidget {
                         color: Colors.grey.shade100,
                         image: gym.cover != null
                             ? DecorationImage(
-                                image: NetworkImage(gym.cover),
+                                image: NetworkImage(gym.cover!),
                                 fit: BoxFit.cover,
                               )
                             : null),
@@ -154,7 +156,7 @@ class _Row extends StatelessWidget {
                   buildPricingTable(gym.pricing),
                   if (gym.hourlyRate != null)
                     Text(
-                      '(' + PriceFormat.format(gym.hourlyRate) + '/小時)',
+                      '(' + PriceFormat.format(gym.hourlyRate!) + '/小時)',
                       style: TextStyles.small.subscription,
                     ),
                   Spacer(),
@@ -186,12 +188,12 @@ class _Row extends StatelessWidget {
     }
 
     return Text(
-      DistanceFormat.format(meters),
+      DistanceFormat.format(meters!),
       style: TextStyles.small.subscription,
     );
   }
 
-  Widget buildPricingTable(List<Fare> fares) {
+  Widget buildPricingTable(List<Fare>? fares) {
     String plans = '請電洽';
     if (fares != null && fares.isNotEmpty) {
       plans = fares.map((e) => FareFormat.format(e)).join('、');

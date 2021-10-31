@@ -18,15 +18,16 @@ class IntroPage extends StatelessWidget {
   void _openLink(String link) async {
     try {
       await launch(link);
-    } catch (e) {
+    } catch (e, stack) {
       print(e);
+      print(stack);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBarFactory.shrinkedAppBar(),
+      appBar: AppBarFactory.shrinkedAppBar() as PreferredSizeWidget?,
       body: _buildBody(context),
       backgroundColor: Colors.white,
     );
@@ -90,7 +91,7 @@ class IntroPage extends StatelessWidget {
               if (snapshot.data == null) {
                 return Container();
               }
-              return Text(snapshot.data ? '下一步' : '開始使用');
+              return Text(snapshot.data! ? '下一步' : '開始使用');
             },
           ),
           style: TextButton.styleFrom(primary: Colors.black),
@@ -118,7 +119,7 @@ class IntroPage extends StatelessWidget {
             style: link,
             recognizer: TapGestureRecognizer()
               ..onTap = () {
-                _openLink(Configs.instance.tosLink);
+                _openLink(Configs.instance!.tosLink);
               }),
         TextSpan(text: '及', style: normal),
         TextSpan(
@@ -126,7 +127,7 @@ class IntroPage extends StatelessWidget {
             style: link,
             recognizer: TapGestureRecognizer()
               ..onTap = () {
-                _openLink(Configs.instance.ppLink);
+                _openLink(Configs.instance!.ppLink);
               }),
         TextSpan(text: '。開始使用即代表閣下已同意上述政策。', style: normal),
       ])),

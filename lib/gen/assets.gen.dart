@@ -1,8 +1,9 @@
-// @dart = 2.10
 /// GENERATED CODE - DO NOT MODIFY BY HAND
 /// *****************************************************
 ///  FlutterGen
 /// *****************************************************
+
+// ignore_for_file: directives_ordering
 
 import 'package:flutter/widgets.dart';
 
@@ -22,26 +23,23 @@ class Assets {
 }
 
 class AssetGenImage extends AssetImage {
-  const AssetGenImage(String assetName)
-      : _assetName = assetName,
-        super(assetName);
-  final String _assetName;
+  const AssetGenImage(String assetName) : super(assetName);
 
   Image image({
-    Key key,
-    ImageFrameBuilder frameBuilder,
-    ImageLoadingBuilder loadingBuilder,
-    ImageErrorWidgetBuilder errorBuilder,
-    String semanticLabel,
+    Key? key,
+    ImageFrameBuilder? frameBuilder,
+    ImageLoadingBuilder? loadingBuilder,
+    ImageErrorWidgetBuilder? errorBuilder,
+    String? semanticLabel,
     bool excludeFromSemantics = false,
-    double width,
-    double height,
-    Color color,
-    BlendMode colorBlendMode,
-    BoxFit fit,
+    double? width,
+    double? height,
+    Color? color,
+    BlendMode? colorBlendMode,
+    BoxFit? fit,
     AlignmentGeometry alignment = Alignment.center,
     ImageRepeat repeat = ImageRepeat.noRepeat,
-    Rect centerSlice,
+    Rect? centerSlice,
     bool matchTextDirection = false,
     bool gaplessPlayback = false,
     bool isAntiAlias = false,
@@ -70,5 +68,5 @@ class AssetGenImage extends AssetImage {
     );
   }
 
-  String get path => _assetName;
+  String get path => assetName;
 }

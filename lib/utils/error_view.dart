@@ -4,7 +4,7 @@ import 'package:where_gym/shared_appearances.dart';
 
 class ErrorView extends StatelessWidget {
   final dynamic error;
-  final RecoveryAction action;
+  final RecoveryAction? action;
 
   ErrorView(this.error, {this.action});
 
@@ -34,27 +34,27 @@ class ErrorView extends StatelessWidget {
   Widget _buildAction() {
     return TextButton(
       child: Text(
-        action.title,
+        action!.title,
       ),
       style: TextButton.styleFrom(
         textStyle: TextStyles.large.action,
         primary: AppColors.theme,
       ),
-      onPressed: action.action,
+      onPressed: action!.action as void Function()?,
     );
   }
 }
 
 class ErrorPage extends StatelessWidget {
   final dynamic error;
-  final RecoveryAction action;
+  final RecoveryAction? action;
 
   ErrorPage(this.error, {this.action});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBarFactory.shrinkedAppBar(),
+      appBar: AppBarFactory.shrinkedAppBar() as PreferredSizeWidget?,
       body: Column(
         children: [
           Spacer(flex: 1),
@@ -69,5 +69,5 @@ class ErrorPage extends StatelessWidget {
 class RecoveryAction {
   final String title;
   final Function action;
-  RecoveryAction({@required this.title, @required this.action});
+  RecoveryAction({required this.title, required this.action});
 }

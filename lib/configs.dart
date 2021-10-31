@@ -1,8 +1,8 @@
 import 'package:firebase_remote_config/firebase_remote_config.dart';
 
 class Configs {
-  static Configs _instance;
-  static Configs get instance => _instance;
+  static Configs? _instance;
+  static Configs? get instance => _instance;
 
   static Future<Configs> initialize() async {
     final config = RemoteConfig.instance;
@@ -26,6 +26,6 @@ class Configs {
   Configs(this._remoteConfig);
 
   String _getString(key) {
-    return _remoteConfig?.getString(key);
+    return _remoteConfig.getString(key);
   }
 }

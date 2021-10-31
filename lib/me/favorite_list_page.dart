@@ -17,6 +17,7 @@ import 'package:where_gym/price_format.dart';
 import 'package:where_gym/shared_appearances.dart';
 import 'package:where_gym/tracking/event_names.dart';
 import 'package:where_gym/tracking/tracking.dart';
+import 'package:where_gym/utils/empty_view.dart';
 
 class FavoriteListPage extends StatefulWidget {
   @override
@@ -24,8 +25,8 @@ class FavoriteListPage extends StatefulWidget {
 }
 
 class _FavoriteListPageState extends State<FavoriteListPage> {
-  FavoriteDetailList list;
-  StreamSubscription _subscription;
+  late FavoriteDetailList list;
+  late StreamSubscription _subscription;
 
   @override
   void initState() {
@@ -50,7 +51,7 @@ class _FavoriteListPageState extends State<FavoriteListPage> {
   void _syncWithLocalIfLoggedIn(BuildContext context) async {
     final isLoggedIn =
         await LoginCheckFlow.check(context, where: 'syncFavoriteGyms');
-    if (isLoggedIn == null || !isLoggedIn) {
+    if (!isLoggedIn) {
       return;
     }
     await Future.delayed(Duration.zero, () {
@@ -84,7 +85,7 @@ class _FavoriteListPageState extends State<FavoriteListPage> {
           style: TextStyles.large.title,
         ),
         actions: [
-          StreamBuilder<DocumentReference>(
+          StreamBuilder<DocumentReference?>(
             stream: bloc.onUserRefChange,
             builder: (context, snapshot) {
               if (bloc.isLoggedIn) {
@@ -101,7 +102,7 @@ class _FavoriteListPageState extends State<FavoriteListPage> {
             },
           )
         ],
-      ),
+      ) as PreferredSizeWidget?,
       body: StreamBuilder<List<FavoriteGymDetail>>(
           stream: list.onUpdate,
           builder: (context, snapshot) {
@@ -110,9 +111,12 @@ class _FavoriteListPageState extends State<FavoriteListPage> {
     );
   }
 
-  Widget _buildList(BuildContext context, List<FavoriteGymDetail> details) {
+  Widget _buildList(BuildContext context, List<FavoriteGymDetail>? details) {
     if (details == null) {
       return Container();
+    }
+    if (details.isEmpty) {
+      return EmptyView(message: '在場租頁面按下「☆」即可加入收藏');
     }
     return ListView.separated(
       itemBuilder: (context, idx) => _Row(details[idx]),
@@ -189,7 +193,7 @@ class _Row extends StatelessWidget {
                         color: Colors.grey.shade100,
                         image: gym.cover != null
                             ? DecorationImage(
-                                image: NetworkImage(gym.cover),
+                                image: NetworkImage(gym.cover!),
                                 fit: BoxFit.cover,
                               )
                             : null),
@@ -223,7 +227,7 @@ class _Row extends StatelessWidget {
                   buildPricingTable(gym.pricing),
                   if (gym.hourlyRate != null)
                     Text(
-                      '(' + PriceFormat.format(gym.hourlyRate) + '/小時)',
+                      '(' + PriceFormat.format(gym.hourlyRate!) + '/小時)',
                       style: TextStyles.small.subscription,
                     ),
                   Spacer(),
@@ -257,12 +261,12 @@ class _Row extends StatelessWidget {
     }
 
     return Text(
-      DistanceFormat.format(detail.meters),
+      DistanceFormat.format(detail.meters!),
       style: TextStyles.small.subscription,
     );
   }
 
-  Widget buildPricingTable(List<Fare> fares) {
+  Widget buildPricingTable(List<Fare>? fares) {
     String plans = '請電洽';
     if (fares != null && fares.isNotEmpty) {
       plans = fares.map((e) => FareFormat.format(e)).join('、');

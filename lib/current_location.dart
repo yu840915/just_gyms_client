@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:geolocator/geolocator.dart';
 import 'package:hive/hive.dart';
 import 'package:rxdart/subjects.dart';
@@ -9,9 +11,9 @@ part 'current_location.g.dart';
 @HiveType(typeId: 2)
 class LocationRecord extends HiveObject {
   @HiveField(1)
-  double latitude;
+  double? latitude;
   @HiveField(2)
-  double longitude;
+  double? longitude;
 }
 
 class CurrentLocation {
@@ -24,19 +26,19 @@ class CurrentLocation {
   CurrentLocation(this.dataStore);
   final _myLocationSubject = BehaviorSubject<Position>();
   Stream<Position> get onUpdate => _myLocationSubject;
-  Future _task;
+  Future? _task;
 
   Position _getFallbackLocation() {
-    final LocationRecord record = dataStore.getValue(_lastLocationKey);
-    double latitude = 25.055049;
-    double longitude = 121.542653;
+    final LocationRecord? record = dataStore.getValue(_lastLocationKey);
+    double? latitude = 25.055049;
+    double? longitude = 121.542653;
     if (record != null) {
       latitude = record.latitude;
       longitude = record.longitude;
     }
     return Position(
-        latitude: latitude,
-        longitude: longitude,
+        latitude: latitude!,
+        longitude: longitude!,
         speed: 0,
         accuracy: 30,
         altitude: 0,
@@ -45,9 +47,9 @@ class CurrentLocation {
         speedAccuracy: 0);
   }
 
-  Future<Position> getLocation() async {
+  Future<Position>? getLocation() async {
     if (_task != null) {
-      return _task;
+      return _task as FutureOr<Position>;
     }
     try {
       final findLocation = _determinePosition();
@@ -89,9 +91,7 @@ class CurrentLocation {
     final pos = await Geolocator.getCurrentPosition(
             desiredAccuracy: LocationAccuracy.medium)
         .timeout(Duration(seconds: 3), onTimeout: () async {
-      return _myLocationSubject.valueWrapper != null
-          ? _myLocationSubject.valueWrapper.value ?? _getFallbackLocation()
-          : _getFallbackLocation();
+      return _myLocationSubject.valueOrNull ?? _getFallbackLocation();
     });
     print(pos);
     _myLocationSubject.add(pos);
@@ -100,21 +100,20 @@ class CurrentLocation {
   }
 
   void _recordLocation(Position pos) {
-    LocationRecord loc = dataStore.getValue(_lastLocationKey);
+    LocationRecord? loc = dataStore.getValue(_lastLocationKey);
     if (loc == null) {
       loc = LocationRecord();
     }
-    loc
-      ..latitude = pos.latitude
-      ..longitude = pos.longitude;
+    loc.latitude = pos.longitude;
+    loc.longitude = pos.latitude;
     dataStore.putValue(_lastLocationKey, loc);
   }
 
-  num metersFrom(Gym gym) {
-    if (_myLocationSubject.valueWrapper == null) {
+  num? metersFrom(Gym gym) {
+    if (_myLocationSubject.valueOrNull == null) {
       return null;
     }
-    final location = _myLocationSubject.valueWrapper.value;
+    final location = _myLocationSubject.value;
     return Geolocator.distanceBetween(
         gym.lat, gym.lon, location.latitude, location.longitude);
   }

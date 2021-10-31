@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:loader_overlay/loader_overlay.dart';
 import 'package:where_gym/app_bloc.dart';
 import 'package:where_gym/named_routes.dart';
 import 'package:where_gym/tracking/tracking.dart';
@@ -45,23 +46,25 @@ class _MyAppState extends State<MyApp> {
     );
   }
 
-  Widget _buildApp(BuildContext context, InitializedProducts products) {
-    return BlocProvider(
-      create: (context) => AppBloc(null, initializedProducts: products),
-      child: MaterialApp(
-        title: 'Just Gyms',
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-          visualDensity: VisualDensity.adaptivePlatformDensity,
+  Widget _buildApp(BuildContext context, InitializedProducts? products) {
+    return GlobalLoaderOverlay(
+      child: BlocProvider(
+        create: (context) => AppBloc(null, initializedProducts: products!),
+        child: MaterialApp(
+          title: 'Just Gyms',
+          theme: ThemeData(
+            primarySwatch: Colors.blue,
+            visualDensity: VisualDensity.adaptivePlatformDensity,
+          ),
+          debugShowCheckedModeBanner: false,
+          home: BlocBuilder<AppBloc, AppPhase?>(builder: _buildMainFlow),
+          routes: namedRoutes,
         ),
-        debugShowCheckedModeBanner: false,
-        home: BlocBuilder<AppBloc, AppPhase>(builder: _buildMainFlow),
-        routes: namedRoutes,
       ),
     );
   }
 
-  Widget _buildMainFlow(BuildContext context, AppPhase phase) {
+  Widget _buildMainFlow(BuildContext context, AppPhase? phase) {
     if (phase == null) {
       return Container(
         color: Colors.white,

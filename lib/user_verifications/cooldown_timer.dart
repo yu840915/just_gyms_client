@@ -5,8 +5,8 @@ import 'package:rxdart/subjects.dart';
 class CooldownTimer {
   final _cooldownTimeSubject = BehaviorSubject<int>()..add(0);
   Stream<int> get onCooldownTime => _cooldownTimeSubject;
-  DateTime _deadline;
-  Timer _timer;
+  DateTime? _deadline;
+  Timer? _timer;
 
   void startCooldown(Duration duration) {
     if (_timer != null) {
@@ -21,10 +21,10 @@ class CooldownTimer {
 
   void _tick() {
     assert(_deadline != null);
-    final p = _deadline.difference(DateTime.now());
+    final p = _deadline!.difference(DateTime.now());
     if (p.inSeconds <= 0) {
       _cooldownTimeSubject.add(0);
-      _timer.cancel();
+      _timer!.cancel();
       _timer = null;
     } else {
       _cooldownTimeSubject.add(p.inSeconds);
@@ -32,7 +32,7 @@ class CooldownTimer {
   }
 
   void dispose() {
-    _timer.cancel();
+    _timer!.cancel();
     _cooldownTimeSubject.close();
   }
 }

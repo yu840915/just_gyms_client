@@ -9,7 +9,7 @@ import 'package:where_gym/user_verifications/cooldown_timer.dart';
 import 'package:where_gym/user_verifications/phone_verification.dart';
 
 class SMSCodePage extends StatefulWidget {
-  final PhoneVerification phoneVerification;  
+  final PhoneVerification? phoneVerification;
   SMSCodePage(this.phoneVerification);
 
   @override
@@ -17,18 +17,18 @@ class SMSCodePage extends StatefulWidget {
 }
 
 class _SMSCodePageState extends State<SMSCodePage> {
-  CooldownTimer _timer;
-  PhoneVerification get phoneVerification => widget.phoneVerification;
-  TextEditingController _editingController;
-  StreamSubscription _subscription;
-  Future _task;
+  late CooldownTimer _timer;
+  PhoneVerification? get phoneVerification => widget.phoneVerification;
+  TextEditingController? _editingController;
+  late StreamSubscription _subscription;
+  Future? _task;
 
   void _resendCode(BuildContext context) async {
     if (_task != null) {
       return;
     }
     try {
-      _task = phoneVerification.resendSms();
+      _task = phoneVerification!.resendSms();
       await _task;
     } catch (e) {
       showDialog(
@@ -45,7 +45,7 @@ class _SMSCodePageState extends State<SMSCodePage> {
       return;
     }
     try {
-      _task = phoneVerification.submitSmsCode(_editingController.text);
+      _task = phoneVerification!.submitSmsCode(_editingController!.text);
       await _task;
     } catch (e) {
       showDialog(
@@ -61,7 +61,7 @@ class _SMSCodePageState extends State<SMSCodePage> {
   void initState() {
     super.initState();
     _editingController = TextEditingController();
-    _subscription = phoneVerification.onPhoneVerified.listen((event) {
+    _subscription = phoneVerification!.onPhoneVerified.listen((event) {
       Navigator.popUntil(context, (route) => route.isFirst);
     });
     _timer = CooldownTimer();
@@ -71,7 +71,7 @@ class _SMSCodePageState extends State<SMSCodePage> {
   @override
   void dispose() {
     _subscription.cancel();
-    _editingController.dispose();
+    _editingController!.dispose();
     _timer.dispose();
     super.dispose();
   }
@@ -83,7 +83,7 @@ class _SMSCodePageState extends State<SMSCodePage> {
           title: Text(
         '驗證碼已送出',
         style: TextStyles.large.header,
-      )),
+      )) as PreferredSizeWidget?,
       body: _buildBody(context),
     );
   }
@@ -127,7 +127,7 @@ class _SMSCodePageState extends State<SMSCodePage> {
     );
   }
 
-  Widget _buildCooldownLabel(BuildContext context, int cdTime) {
+  Widget _buildCooldownLabel(BuildContext context, int? cdTime) {
     if (cdTime == null || cdTime == 0) {
       return RichText(
         text: TextSpan(

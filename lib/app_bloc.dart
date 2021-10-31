@@ -7,7 +7,9 @@ import 'package:flutter/material.dart';
 import 'package:rxdart/subjects.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:where_gym/admin_gym_list.dart';
 import 'package:where_gym/current_location.dart';
+import 'package:where_gym/gym.dart';
 import 'package:where_gym/initialization.dart';
 import 'package:where_gym/intro/permission_checker.dart';
 import 'package:where_gym/me/cloud_favorites.dart';
@@ -15,25 +17,29 @@ import 'package:where_gym/me/favorites.dart';
 import 'package:where_gym/me/fcm_initialization.dart';
 import 'package:where_gym/me/local_favorites.dart';
 
-class AppBloc extends Bloc<dynamic, AppPhase> {
+class AppBloc extends Bloc<dynamic, AppPhase?> {
   final _hasFinishedIntroKey = 'hasFinishedIntro';
   final permissionChecker = PermissionChecker();
-  User _firebaseUser;
-  User get firebaseUser => isLoggedIn ? _firebaseUser : null;
+
+  final _firebaseUserSubject = BehaviorSubject<User?>();
+  Stream<User?> get onFirebaseUserChange => _firebaseUserSubject;
+  User? get firebaseUser => isLoggedIn ? _firebaseUserSubject.value : null;
   FavoriteGymList get favoriteGymList =>
       _cloudFavoriteGymList ?? _localFavoriteGymList;
   final LocalFavoriteGymList _localFavoriteGymList;
-  CloudFavoriteGymList _cloudFavoriteGymList;
+  CloudFavoriteGymList? _cloudFavoriteGymList;
+  AdminGymList? get adminGymList => _adminGymList;
+  AdminGymList? _adminGymList;
   final CurrentLocation location;
   final _subscriptions = List<StreamSubscription>.empty(growable: true);
-  final _userRefSubject = BehaviorSubject<DocumentReference>();
-  DocumentReference get userRef => _userRefSubject.valueWrapper?.value;
-  Stream<DocumentReference> get onUserRefChange => _userRefSubject;
-  AppBloc(initialState, {@required InitializedProducts initializedProducts})
-      : _firebaseUser = initializedProducts.user,
-        _localFavoriteGymList = initializedProducts.favoriteGymList,
+  final _userRefSubject = BehaviorSubject<DocumentReference?>();
+  DocumentReference? get userRef => _userRefSubject.valueOrNull;
+  Stream<DocumentReference?> get onUserRefChange => _userRefSubject;
+  AppBloc(initialState, {required InitializedProducts initializedProducts})
+      : _localFavoriteGymList = initializedProducts.favoriteGymList,
         location = initializedProducts.location,
         super(initialState) {
+    _firebaseUserSubject.add(initializedProducts.user);
     _checkPermission();
     _subscribeEvents();
   }
@@ -45,8 +51,9 @@ class AppBloc extends Bloc<dynamic, AppPhase> {
     });
   }
 
-  bool get isLoggedIn =>
-      _firebaseUser == null ? false : !_firebaseUser.isAnonymous;
+  bool get isLoggedIn => _firebaseUserSubject.valueOrNull == null
+      ? false
+      : !_firebaseUserSubject.value!.isAnonymous;
 
   void _subscribeEvents() {
     _subscriptions.add(FirebaseAuth.instance.authStateChanges().listen((event) {
@@ -54,20 +61,23 @@ class AppBloc extends Bloc<dynamic, AppPhase> {
     }));
   }
 
-  void _handleUserUpdate(User user) {
+  void _handleUserUpdate(User? user) {
     if (user == null) {
-      _firebaseUser = null;
+      _firebaseUserSubject.add(null);
       _cloudFavoriteGymList?.dispose();
       _cloudFavoriteGymList = null;
       _userRefSubject.add(null);
+      _adminGymList?.dispose();
+      _adminGymList = null;
       return;
     }
-    _firebaseUser = user;
+    _firebaseUserSubject.add(user);
     if (!user.isAnonymous) {
       _cloudFavoriteGymList = CloudFavoriteGymList(this, user);
       _userRefSubject.add(
         FirebaseFirestore.instance.collection('users').doc(user.uid),
       );
+      _adminGymList = AdminGymList(userRef);
       FCMInitialization.syncToken(this).catchError(print);
     }
   }
@@ -75,7 +85,7 @@ class AppBloc extends Bloc<dynamic, AppPhase> {
   void _checkPermission() async {
     final prefs = await SharedPreferences.getInstance();
     if (!prefs.containsKey(_hasFinishedIntroKey) ||
-        !prefs.getBool(_hasFinishedIntroKey)) {
+        !prefs.getBool(_hasFinishedIntroKey)!) {
       add(AppPhase.intro);
     } else {
       _setUpPermission();
@@ -92,15 +102,15 @@ class AppBloc extends Bloc<dynamic, AppPhase> {
     });
   }
 
-  Future<String> getIdToken() => _firebaseUser?.getIdToken();
+  Future<String>? getIdToken() => firebaseUser?.getIdToken();
 
   Future syncFavoriteGyms() async {
     await _cloudFavoriteGymList?.syncWithLocalList(_localFavoriteGymList);
   }
 
   @override
-  Stream<AppPhase> mapEventToState(event) async* {
-    yield event;
+  Stream<AppPhase?> mapEventToState(event) async* {
+    yield event as AppPhase;
   }
 
   void setIntroFinished() async {
@@ -108,9 +118,17 @@ class AppBloc extends Bloc<dynamic, AppPhase> {
     try {
       await prefs.setBool(_hasFinishedIntroKey, true);
       _setUpPermission();
-    } catch (e) {
+    } catch (e, stack) {
       print(e);
+      print(stack);
     }
+  }
+
+  bool shouldShowAdminPageForGym(Gym? gym) {
+    if (!isLoggedIn) {
+      return false;
+    }
+    return adminGymList!.isAdminOfGym(gym);
   }
 }
 

@@ -1,0 +1,290 @@
+import 'dart:async';
+
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
+import 'package:table_calendar/table_calendar.dart';
+import 'package:where_gym/app_bar_factory.dart';
+import 'package:where_gym/appointment/appointment_info.dart';
+import 'package:where_gym/appointment/appointment_view_models.dart';
+import 'package:where_gym/appointment/gym_appointment_schedule.dart';
+import 'package:where_gym/appointment/utilization_detail_popup.dart';
+import 'package:where_gym/gym.dart';
+import 'package:where_gym/schedule_time_slot.dart';
+import 'package:where_gym/shared_appearances.dart';
+
+class GymAppointmentsPage extends StatefulWidget {
+  final Gym gym;
+  GymAppointmentsPage({required this.gym});
+
+  @override
+  State<GymAppointmentsPage> createState() => _GymAppointmentsPageState();
+}
+
+class _GymAppointmentsPageState extends State<GymAppointmentsPage> {
+  GymAppointmentSchedule? _schedule;
+  DateTime _date = DateTime.now();
+  List<AppointmentInfo> _appointments = [];
+  _ListViewModel? _viewModel;
+  StreamSubscription? subscription;
+
+  @override
+  void initState() {
+    super.initState();
+    final schedule = GymAppointmentSchedule(
+        appBloc: BlocProvider.of(context), gym: widget.gym);
+    subscription = schedule.onAppointments.listen((event) {
+      _appointments = event;
+      _updateViewModel();
+    });
+    _schedule = schedule;
+  }
+
+  void _updateViewModel() {
+    setState(() {
+      _viewModel = _ListViewModel(
+          day: _date, gym: widget.gym, appointments: _appointments);
+    });
+  }
+
+  @override
+  void dispose() {
+    subscription?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBarFactory.appBar(
+        title: Text(
+          '${widget.gym.name}的預約',
+          style: TextStyles.large.header,
+        ),
+      ) as PreferredSizeWidget?,
+      body: Column(
+        children: [
+          StreamBuilder<List<AppointmentInfo>>(
+            stream: _schedule!.onAppointments,
+            builder: (context, snapshot) {
+              return _buildCalender(snapshot.data);
+            },
+          ),
+          Expanded(child: _buildCells(context))
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCalender(List<AppointmentInfo>? list) {
+    final tomorrow = DateTime.now().add(Duration(days: 1));
+    return TableCalendar(
+      locale: Intl.systemLocale,
+      focusedDay: tomorrow,
+      firstDay: DateTime.now(),
+      headerStyle: HeaderStyle(
+        formatButtonVisible: false,
+        titleCentered: true,
+      ),
+      calendarStyle: CalendarStyle(
+        selectedDecoration: BoxDecoration(
+          color: AppColors.theme,
+          shape: BoxShape.circle,
+        ),
+      ),
+      lastDay: tomorrow.add(Duration(days: 30)),
+      calendarFormat: CalendarFormat.twoWeeks,
+      rangeSelectionMode: RangeSelectionMode.disabled,
+      onDaySelected: (date, _) {
+        _date = date;
+        _updateViewModel();
+      },
+      selectedDayPredicate: (date) => _date == date,
+      eventLoader: (date) =>
+          list
+              ?.where((a) => DateUtils.isSameDay(date, a.timeRange.start))
+              .toList() ??
+          [],
+    );
+  }
+
+  Widget _buildCells(BuildContext context) {
+    List<ScheduleUtilizationCellViewModel>? cellModels = _viewModel?.cellModels;
+    if (cellModels == null) {
+      return SizedBox.shrink();
+    }
+    return ListView.separated(
+      padding: EdgeInsets.only(top: 20, bottom: 50, left: 10, right: 10),
+      itemBuilder: (context, idx) => ScheduleUtilizationCell(
+        viewModel: cellModels[idx],
+        schedule: _schedule!,
+        isEnd: idx == cellModels.length - 1,
+      ),
+      separatorBuilder: (context, idx) => Row(
+        children: [
+          SizedBox(width: 90),
+          Expanded(
+            child: Container(
+              height: 1,
+              color: cellModels[idx]
+                      .utilizationViewModel
+                      .timeSlotViewModel
+                      .shouldEmpashizeEnd
+                  ? Colors.grey.shade300
+                  : Colors.grey.shade200,
+            ),
+          ),
+        ],
+      ),
+      itemCount: cellModels.length,
+    );
+  }
+}
+
+class ScheduleUtilizationCell extends StatelessWidget {
+  final ScheduleUtilizationCellViewModel viewModel;
+  final bool isEnd;
+  final GymAppointmentSchedule schedule;
+  ScheduleUtilizationCell(
+      {required this.viewModel, required this.schedule, required this.isEnd});
+
+  void _showAppointmentDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => UtilizationDetailPopup(
+        cursor:
+            AppointmentCursor(schedule: schedule, timeSlot: viewModel.timeSlot),
+        schedule: schedule,
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: viewModel.hasDetail ? () => _showAppointmentDialog(context) : null,
+      child: Row(
+        children: [
+          TimeSlotCell(
+            viewModel: viewModel.utilizationViewModel.timeSlotViewModel,
+            isEnd: isEnd,
+          ),
+          SizedBox(width: 8),
+          Expanded(
+            child: Container(
+              color: viewModel.indicatorColor,
+              height: 40,
+              child: Row(
+                children: [
+                  Spacer(),
+                  if (viewModel.shouldShowCount) _buildCountLabel(),
+                  SizedBox(width: 12),
+                  Container(
+                    width: 30,
+                    child: viewModel.hasDetail
+                        ? Icon(
+                            Icons.arrow_forward_ios_rounded,
+                            size: 20,
+                          )
+                        : null,
+                  ),
+                  SizedBox(width: 8),
+                ],
+              ),
+            ),
+          ),
+          SizedBox(width: 8),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCountLabel() {
+    return Container(
+      padding: EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(4),
+        color: Colors.grey.shade50,
+      ),
+      child: Text(
+        viewModel.countText,
+        style: TextStyles.large.detail.copyWith(color: Colors.grey.shade700),
+      ),
+    );
+  }
+}
+
+class TimeSlotCell extends StatelessWidget {
+  final TimeSlotViewModel viewModel;
+  final bool isEnd;
+  TimeSlotCell({required this.viewModel, required this.isEnd});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 90,
+      height: 40,
+      child: Column(
+        children: [
+          Transform.translate(
+            offset: Offset(0, -8),
+            child: Text(
+              viewModel.start,
+              style: viewModel.shouldEmpashizeStart
+                  ? TextStyles.large.title
+                  : TextStyles.small.title
+                      .copyWith(color: Colors.grey.shade500),
+            ),
+          ),
+          Spacer(),
+          if (isEnd)
+            Transform.translate(
+              offset: Offset(0, 8),
+              child: Text(
+                viewModel.end,
+                style: viewModel.shouldEmpashizeEnd
+                    ? TextStyles.large.title
+                    : TextStyles.small.title
+                        .copyWith(color: Colors.grey.shade500),
+              ),
+            )
+        ],
+      ),
+    );
+  }
+}
+
+class _ListViewModel {
+  final List<AppointmentInfo> appointments;
+  final Gym gym;
+  final DateTime day;
+  List<ScheduleUtilizationCellViewModel>? get cellModels => _utilizations
+      ?.map((e) => ScheduleUtilizationCellViewModel(utilization: e))
+      .toList();
+  List<ScheduleUtilization>? _utilizations;
+  _ListViewModel(
+      {required this.day,
+      required this.gym,
+      required List<AppointmentInfo> appointments})
+      : this.appointments = appointments
+            .where((a) => DateUtils.isSameDay(day, a.timeRange.start))
+            .toList() {
+    _utilizations = gym
+        .generateTimeSlotOnDay(day)
+        ?.map((e) => ScheduleUtilization.inferFromAppointments(
+            this.appointments, e, gym.capacity))
+        .toList();
+  }
+}
+
+class ScheduleUtilizationCellViewModel {
+  final ScheduleUtilization utilization;
+  UtilizationViewModel utilizationViewModel;
+  ScheduleUtilizationCellViewModel({required this.utilization})
+      : utilizationViewModel = UtilizationViewModel(utilization: utilization);
+  bool get hasDetail => utilization.appointments.isNotEmpty;
+  TimeSlot get timeSlot => utilization.timeSlot;
+  Color get indicatorColor => utilizationViewModel.indicatorColor;
+  String get countText => utilizationViewModel.capacityInfo;
+  bool get shouldShowCount => !utilization.isEmpty;
+}
