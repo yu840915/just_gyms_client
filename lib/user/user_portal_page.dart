@@ -43,7 +43,51 @@ class UserPortalPage extends StatelessWidget {
     await Fluttertoast.showToast(msg: '已複製使用者ID');
   }
 
-  void _requestAccountDeletion(BuildContext context) async {}
+  void _requestAccountDeletion(BuildContext context) async {
+    bool? delete = await showDialog(
+      context: context,
+      builder: (context) => AlertFactory.actionAlert(
+        context,
+        title: '注意！是否要刪除帳號？',
+        message: '刪除帳號將會清空帳戶資訊，取消所有的場租預約以及移除所有管理身份。',
+        actions: [
+          PlatformDialogAction(
+            child: Text('刪除', style: TextStyle(color: AppColors.destructive)),
+            onPressed: () => Navigator.pop(context, true),
+          )
+        ],
+      ),
+    );
+    if (delete == null || delete == false) {
+      return;
+    }
+    delete = await showDialog(
+      context: context,
+      builder: (context) => AlertFactory.actionAlert(
+        context,
+        title: '再次確認！是否要刪除帳號？',
+        message: '此動作將不能回復。',
+        actions: [
+          PlatformDialogAction(
+            child: Text('確認刪除', style: TextStyle(color: AppColors.destructive)),
+            onPressed: () => Navigator.pop(context, true),
+          )
+        ],
+      ),
+    );
+    if (delete == null || delete == false) {
+      return;
+    }
+    AppBloc bloc = BlocProvider.of(context);
+    try {
+      Navigator.pop(context);
+    } catch (e) {
+      showDialog(
+        context: context,
+        builder: (builder) => AlertFactory.errorAlert(context, error: e),
+      );
+    }
+  }
 
   void _logout(BuildContext context) async {
     try {
