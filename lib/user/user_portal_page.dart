@@ -15,6 +15,7 @@ import 'package:where_gym/login/authenticators.dart';
 import 'package:where_gym/me/favorite_list_page.dart';
 import 'package:where_gym/shared_appearances.dart';
 import 'package:where_gym/utils/empty_view.dart';
+import 'package:where_gym/utils/loading_view.dart';
 
 class UserPortalPage extends StatelessWidget {
   void _showFavorites(BuildContext context) {
@@ -80,7 +81,9 @@ class UserPortalPage extends StatelessWidget {
     }
     AppBloc bloc = BlocProvider.of(context);
     try {
+      await showLoadingOverlayOnTask(context, task: bloc.deleteUser());
       Navigator.pop(context);
+      Authenticators.logOut();
     } catch (e) {
       showDialog(
         context: context,

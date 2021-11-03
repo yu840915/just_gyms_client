@@ -3,11 +3,11 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
 import 'package:rxdart/subjects.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:where_gym/admin_gym_list.dart';
+import 'package:where_gym/api_services/api_services.dart';
 import 'package:where_gym/current_location.dart';
 import 'package:where_gym/gym.dart';
 import 'package:where_gym/initialization.dart';
@@ -129,6 +129,13 @@ class AppBloc extends Bloc<dynamic, AppPhase?> {
       return false;
     }
     return adminGymList!.isAdminOfGym(gym);
+  }
+
+  Future<void> deleteUser() async {
+    if (!isLoggedIn) {
+      return;
+    }
+    await APIServices.instances.delete('/me', token: await getIdToken());
   }
 }
 
