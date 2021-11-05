@@ -4,6 +4,8 @@ import 'package:where_gym/alert_factory.dart';
 import 'package:where_gym/appointment/appointment_info.dart';
 import 'package:where_gym/appointment/appointment_schedule.dart';
 import 'package:where_gym/shared_appearances.dart';
+import 'package:where_gym/tracking/event_names.dart';
+import 'package:where_gym/tracking/tracking.dart';
 
 class GymAppointmentCell extends StatelessWidget {
   final AppointmentInfo info;
@@ -34,6 +36,8 @@ class GymAppointmentCell extends StatelessWidget {
       return;
     }
     try {
+      track(EventName.cancelAppointment,
+          {...info.trackingProps, EventProperties.role: 'admin'});
       await schedule!.cancel(info);
     } catch (e) {
       showDialog(
