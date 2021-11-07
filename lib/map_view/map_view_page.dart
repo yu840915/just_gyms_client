@@ -18,8 +18,8 @@ import 'package:where_gym/tracking/event_names.dart';
 import 'package:where_gym/tracking/tracking.dart';
 
 class MapViewPage extends StatefulWidget {
-  final GymList gymList;
-  MapViewPage(this.gymList, {Key key});
+  final GymList? gymList;
+  MapViewPage(this.gymList, {Key? key});
 
   @override
   _MapViewPageState createState() => _MapViewPageState();
@@ -27,16 +27,16 @@ class MapViewPage extends StatefulWidget {
 
 class _MapViewPageState extends State<MapViewPage> {
   Completer<GoogleMapController> _controller = Completer();
-  GymList get gymList => widget.gymList;
-  GymMarkerList markerList;
-  PersistentBottomSheetController bottomSheetController;
+  GymList? get gymList => widget.gymList;
+  GymMarkerList? markerList;
+  PersistentBottomSheetController? bottomSheetController;
   List<DisplayableGymMarker> _markers = [];
   List<StreamSubscription> _subscription = [];
   bool needsInitialFetch = true;
   bool _needsUpdate = false;
-  LocationSearch _locationSearch;
+  LocationSearch? _locationSearch;
 
-  void _handleMarkerSelection(BuildContext context, String selection) async {
+  void _handleMarkerSelection(BuildContext context, String? selection) async {
     if (selection == null) {
       bottomSheetController?.close();
       return;
@@ -49,21 +49,21 @@ class _MapViewPageState extends State<MapViewPage> {
         top: false,
         child: Container(
           padding: EdgeInsets.symmetric(vertical: 20),
-          child: GymMarkerInfoPageView(markerList),
+          child: GymMarkerInfoPageView(markerList!),
           height: 200,
           clipBehavior: Clip.none,
         ),
       ),
       backgroundColor: Colors.transparent,
     );
-    await bottomSheetController.closed;
+    await bottomSheetController!.closed;
     bottomSheetController = null;
   }
 
   void _onSelectAddress(AddressSearchResultItem item) async {
     final mapController = await _controller.future;
     mapController.animateCamera(
-        CameraUpdate.newLatLng(item.geometry.location.toLatLng()));
+        CameraUpdate.newLatLng(item.geometry!.location!.toLatLng()));
   }
 
   void _showListView(BuildContext context) {
@@ -87,8 +87,8 @@ class _MapViewPageState extends State<MapViewPage> {
 
   @override
   void dispose() {
-    _locationSearch.dispose();
-    _subscription?.forEach((element) {
+    _locationSearch!.dispose();
+    _subscription.forEach((element) {
       element.cancel();
     });
     super.dispose();
@@ -101,7 +101,7 @@ class _MapViewPageState extends State<MapViewPage> {
         if (markerList != null)
           Center(child: GymMarkerImageMakerContainers(markerList)),
         new Scaffold(
-          appBar: AppBarFactory.shrinkedAppBar(),
+          appBar: AppBarFactory.shrinkedAppBar() as PreferredSizeWidget?,
           body: Stack(
             children: [
               _buildBody(context),
@@ -135,10 +135,10 @@ class _MapViewPageState extends State<MapViewPage> {
         SizedBox(height: 60),
         if (markerList != null)
           StreamBuilder<bool>(
-            stream: markerList.onIsDirty,
+            stream: markerList!.onIsDirty,
             builder: (context, snapshot) {
               return _buildRefreshButton(
-                  context, snapshot.hasData ? snapshot.data : false);
+                  context, snapshot.hasData ? snapshot.data! : false);
             },
           ),
         Spacer(),
@@ -146,7 +146,7 @@ class _MapViewPageState extends State<MapViewPage> {
     );
   }
 
-  Widget _buildMapView(BuildContext context, Position position) {
+  Widget _buildMapView(BuildContext context, Position? position) {
     if (position == null) {
       return Container();
     }
@@ -160,16 +160,16 @@ class _MapViewPageState extends State<MapViewPage> {
       myLocationEnabled: true,
       markers: _markers.map((e) {
         if (markerList?.selectedMarkerId != null &&
-            e.id == markerList.selectedMarkerId) {
+            e.id == markerList!.selectedMarkerId) {
           return e.getSelectedMarker(context);
         }
         return e.getNormalMarker(context, onTap: () => _onMarkerTap(e));
       }).toSet(),
       onCameraIdle: () {
-        markerList.markAsDirtyIfNeeded();
+        markerList!.markAsDirtyIfNeeded();
         if (needsInitialFetch) {
           needsInitialFetch = false;
-          markerList.updateMarkerIfNeeded();
+          markerList!.updateMarkerIfNeeded();
         }
       },
       onMapCreated: (GoogleMapController controller) {
@@ -190,7 +190,7 @@ class _MapViewPageState extends State<MapViewPage> {
       child: TextButton(
         onPressed: () {
           track(EventName.refreshMap);
-          markerList.updateMarkerIfNeeded();
+          markerList!.updateMarkerIfNeeded();
         },
         child: Text('搜尋此處的場館'),
         style: TextButton.styleFrom(
@@ -214,12 +214,12 @@ class _MapViewPageState extends State<MapViewPage> {
     setState(() {
       markerList = list;
     });
-    _subscription.add(markerList.onDisplayableMarkersChange.listen((event) {
+    _subscription.add(list.onDisplayableMarkersChange.listen((event) {
       setState(() {
-        _markers = event ?? [];
+        _markers = event;
       });
     }));
-    _subscription.add(markerList.onSelection.listen((event) {
+    _subscription.add(list.onSelection.listen((event) {
       setState(() {
         _needsUpdate = true;
       });
@@ -233,6 +233,6 @@ class _MapViewPageState extends State<MapViewPage> {
 
   void _onMarkerTap(DisplayableGymMarker marker) {
     track(EventName.selectMarker, marker.gyms.first.trackingProps);
-    markerList.selecteMarker(marker);
+    markerList!.selecteMarker(marker);
   }
 }

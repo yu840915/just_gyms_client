@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class AppColors {
   AppColors._();
-  static final theme = const Color(0xff019858);
+  static const theme = const Color(0xff019858);
+  static final destructive = Colors.redAccent.shade700;
+  static final progressing = Colors.grey.shade600;
 }
 
 class TextStyles {
@@ -12,7 +15,11 @@ class TextStyles {
   TextStyle subscription;
   TextStyle action;
   TextStyles._(
-      {this.header, this.title, this.detail, this.action, this.subscription});
+      {required this.header,
+      required this.title,
+      required this.detail,
+      required this.action,
+      required this.subscription});
 
   static final large = TextStyles._(
     header: TextStyle(
@@ -82,9 +89,25 @@ class ButtonStyles {
     ),
     primary: Colors.black,
   );
+  static final ButtonStyle callToAction = TextButton.styleFrom(
+    textStyle: TextStyles.large.action,
+    minimumSize: Size(double.infinity, 44),
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(8),
+    ),
+    primary: Colors.white,
+    backgroundColor: AppColors.theme,
+  );
 }
 
 class SharedIcons {
   static IconData get bookmark => Icons.star_border;
   static IconData get bookmarked => Icons.star;
+}
+
+class Formats {
+  static final time = DateFormat(DateFormat.HOUR_MINUTE);
+  static final day = DateFormat(DateFormat.NUM_MONTH_DAY);
+  static final weekday = DateFormat(DateFormat.ABBR_WEEKDAY);
+  static final integer = NumberFormat("#,###");
 }

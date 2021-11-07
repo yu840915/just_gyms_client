@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:where_gym/api_services/api_services.dart';
+import 'package:where_gym/api_services/errors.dart';
 
 class AlertFactory {
   static Widget actionAlert(BuildContext context,
-      {String title, String message, @required List<Widget> actions}) {
+      {String? title,
+      String? message,
+      required List<Widget>? actions,
+      String cancelTitle = '取消'}) {
     return PlatformAlertDialog(
       title: title != null ? Text(title) : null,
       content: message != null ? Text(message) : null,
       actions: [
         PlatformDialogAction(
-          child: Text('取消'),
+          child: Text(cancelTitle),
           onPressed: () {
             Navigator.pop(context, false);
           },
@@ -21,7 +24,7 @@ class AlertFactory {
   }
 
   static Widget errorAlert(BuildContext context,
-      {@required dynamic error, String title, Widget recoverAction}) {
+      {required dynamic error, String? title, Widget? recoverAction}) {
     return actionAlert(
       context,
       title: title ?? '無法完成',
@@ -31,8 +34,8 @@ class AlertFactory {
   }
 
   static String stringFromError(dynamic error) {
-    if (error is ServiceError) {
-      return error.info.toString();
+    if (error is ErrorDisplayable) {
+      return error.message;
     }
     return error.toString();
   }

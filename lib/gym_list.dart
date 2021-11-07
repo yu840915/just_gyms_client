@@ -5,12 +5,11 @@ import 'package:where_gym/api_services/api_services.dart';
 import 'package:where_gym/current_location.dart';
 import 'package:where_gym/gym.dart';
 
-
 class GymList {
   final CurrentLocation location;
   final _listSubject = BehaviorSubject<List<Gym>>();
   Stream<List<Gym>> get listStream => _listSubject;
-  Future _task;
+  Future? _task;
   GymList(this.location);
 
   Future<void> refresh() async {
@@ -20,19 +19,17 @@ class GymList {
     try {
       final findLocation = location.getLocation();
       _task = findLocation;
-      final pos = await findLocation;
-      print(pos.latitude);
-      print(pos.longitude);
+      final pos = await findLocation!;
       final task = APIServices.instances
           .get('/gyms?lat=${pos.latitude}&lon=${pos.longitude}');
       _task = task;
       final res = await task;
-      if (res.body == null) {
+      if (res.body.isEmpty) {
         _listSubject.add([]);
         return;
       }
       final list = List<Map>.from(jsonDecode(res.body))
-          .map((e) => Gym.fromJson(e))
+          .map((e) => Gym.fromJson(e as Map<String, dynamic>))
           .toList();
       if (list.isEmpty) {
         _listSubject.add([]);
@@ -44,7 +41,7 @@ class GymList {
     }
   }
 
-  num metersFrom(Gym gym) {
+  num? metersFrom(Gym gym) {
     return location.metersFrom(gym);
   }
 

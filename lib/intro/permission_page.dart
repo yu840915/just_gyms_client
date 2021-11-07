@@ -14,7 +14,7 @@ class PermissionPage extends StatelessWidget {
           title: Text(
         '使用者授權',
         style: TextStyles.large.header.copyWith(color: Colors.black),
-      )),
+      )) as PreferredSizeWidget?,
       body: _buildBody(context, bloc.permissionChecker.items),
     );
   }
@@ -24,22 +24,38 @@ class PermissionPage extends StatelessWidget {
     return ListView.separated(
         padding: EdgeInsets.symmetric(vertical: 40),
         itemBuilder: (context, idx) =>
-            _PermissionCheckerRow(permissionItems[idx]),
+            PermissionCheckerRow(permissionItems[idx]),
         separatorBuilder: (context, idx) => SizedBox(height: 12),
         itemCount: permissionItems.length);
   }
 }
 
-class _PermissionCheckerRow extends StatelessWidget {
+class PermissionCheckerRow extends StatelessWidget {
   final PermissionItem item;
-  _PermissionCheckerRow(this.item);
+  PermissionCheckerRow(this.item);
 
   void _permit(BuildContext context) async {
-    await item.startPermissionRequest();
+    try {
+      await item.startPermissionRequest(context);
+    } catch (e, s) {
+      print('$e, $s');
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    return StreamBuilder<Object>(
+      stream: item.onUpdate,
+      builder: (context, snapshot) {
+        return _buildContent(context, snapshot.data as GrantStatus?);
+      },
+    );
+  }
+
+  Widget _buildContent(BuildContext context, GrantStatus? status) {
+    if (status == GrantStatus.denied) {
+      return SizedBox.shrink();
+    }
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 24),
       child: Column(
@@ -51,11 +67,37 @@ class _PermissionCheckerRow extends StatelessWidget {
             style: TextStyles.large.title,
           ),
           SizedBox(height: 8),
-          _buildPermitButton(context),
+          _buildAction(context, status),
         ],
         crossAxisAlignment: CrossAxisAlignment.center,
       ),
     );
+  }
+
+  Widget _buildAction(BuildContext context, GrantStatus? status) {
+    if (status == null) {
+      return Container(
+        height: 44,
+        child: Text(
+          '檢查中...',
+          style: TextStyles.large.action.copyWith(color: AppColors.progressing),
+        ),
+      );
+    }
+    switch (status) {
+      case GrantStatus.undecided:
+        return _buildPermitButton(context);
+      case GrantStatus.denied:
+        return SizedBox.shrink();
+      case GrantStatus.granted:
+        return Container(
+          height: 44,
+          child: Text(
+            '已完成',
+            style: TextStyles.large.action.copyWith(color: Colors.black),
+          ),
+        );
+    }
   }
 
   Widget _buildPermitButton(BuildContext context) {
@@ -65,6 +107,9 @@ class _PermissionCheckerRow extends StatelessWidget {
       style: TextButton.styleFrom(
         primary: AppColors.theme,
         textStyle: TextStyles.large.action,
+        fixedSize: Size.fromHeight(44),
+        padding: EdgeInsets.zero,
+        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
       ),
     );
   }

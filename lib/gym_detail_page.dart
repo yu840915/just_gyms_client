@@ -3,6 +3,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:where_gym/app_bar_factory.dart';
 import 'package:where_gym/app_bloc.dart';
+import 'package:where_gym/appointment/appointment_badge.dart';
+import 'package:where_gym/appointment/appointment_creation_page.dart';
+import 'package:where_gym/appointment/gym_appointment_schedule.dart';
+import 'package:where_gym/appointment/gym_appointments_page.dart';
+import 'package:where_gym/appointment_preflight_checks/appointment_preflight_checks.dart';
+import 'package:where_gym/business_hours.dart';
 import 'package:where_gym/gym.dart';
 import 'package:where_gym/map_view/open_hour_indicator.dart';
 import 'package:where_gym/photo_gallery_view.dart';
@@ -13,9 +19,24 @@ import 'package:where_gym/tracking/tracking.dart';
 
 class GymDetailPage extends StatelessWidget {
   final Gym gym;
-  GymDetailPage({@required this.gym});
+  GymDetailPage({required this.gym});
 
-  void _callGym(String phone) {
+  void _book(BuildContext context) async {
+    if ((await AppointmentPreflightCheckFlow.check(context,
+            where: 'gym detail', gym: gym)) ==
+        false) {
+      return;
+    }
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => AppointmentCreatePage(gym: gym),
+        fullscreenDialog: true,
+      ),
+    );
+  }
+
+  void _callGym(String? phone) {
     track(EventName.contactGym, gym.trackingProps);
     launch('tel://$phone');
   }
@@ -34,7 +55,7 @@ class GymDetailPage extends StatelessWidget {
             builder: (context, snapshot) {
               return _buildFavoriteButton(context);
             })
-      ]),
+      ]) as PreferredSizeWidget?,
       extendBodyBehindAppBar: true,
       body: _buildBody(context),
     );
@@ -70,7 +91,7 @@ class GymDetailPage extends StatelessWidget {
           padding: EdgeInsets.only(bottom: 100),
           child: Column(
             children: [
-              PhotoGalleryView(gym?.images ?? []),
+              PhotoGalleryView(gym.images ?? []),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: _buildContents(context),
@@ -128,7 +149,7 @@ class GymDetailPage extends StatelessWidget {
     );
   }
 
-  Widget _buildFareRow(int bullet, Fare fare) {
+  Widget _buildFareRow(int? bullet, Fare fare) {
     return Text(
       (bullet != null ? '$bullet. ' : '') + FareFormat.format(fare),
       style: TextStyles.large.detail,
@@ -148,11 +169,13 @@ class GymDetailPage extends StatelessWidget {
   }
 
   Widget _buildBusinessHourDetail() {
-    final today = gym.businessHoursOfToday();
+    final today = gym.businessHoursOfToday()!;
     return Text(
-      (gym.isOpenNow()
-          ? '營業至 ${today.end.stringValue}'
-          : '將於 ${today.start.stringValue} 開始營業'),
+      (gym.isOpenNow() != null
+          ? (gym.isOpenNow()!
+              ? '營業至 ${today.end.stringValue}'
+              : '將於 ${today.start.stringValue} 開始營業')
+          : '未提供營業時間'),
       style: TextStyles.large.detail.copyWith(color: Colors.grey),
     );
   }
@@ -165,18 +188,31 @@ class GymDetailPage extends StatelessWidget {
           children: [
             SafeArea(
               top: false,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Row(
-                  children: [
-                    if (gym.pageLink != null)
-                      Expanded(child: _buildPageButton(gym.pageLink)),
-                    if (gym.pageLink != null && gym.phone != null)
-                      SizedBox(width: 12),
-                    if (gym.phone != null)
-                      Expanded(child: _buildReserveButton(gym.phone)),
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Row(
+                      children: [
+                        if (gym.pageLink != null)
+                          Expanded(child: _buildPageButton(gym.pageLink)),
+                        if (gym.pageLink != null && gym.phone != null)
+                          SizedBox(width: 12),
+                        if (gym.phone != null)
+                          Expanded(child: _buildPhoneButton(gym.phone)),
+                      ],
+                    ),
+                  ),
+                  if (gym.supportsBooking!) ...[
+                    SizedBox(height: 8),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: _shouldShowAdmin(context)
+                          ? _AdminButton(gym: gym)
+                          : _buildBookButton(context),
+                    ),
                   ],
-                ),
+                ],
               ),
             ),
             SizedBox(height: 12),
@@ -187,6 +223,9 @@ class GymDetailPage extends StatelessWidget {
       ),
     );
   }
+
+  bool _shouldShowAdmin(BuildContext context) =>
+      BlocProvider.of<AppBloc>(context).shouldShowAdminPageForGym(gym);
 
   Widget _buildEquipmentSection() {
     if (gym.equipments == null || gym.equipments.isEmpty) {
@@ -199,18 +238,18 @@ class GymDetailPage extends StatelessWidget {
   }
 
   Widget _buildFacilitySection() {
-    if (gym.gymFacilities == null || gym.gymFacilities.isEmpty) {
+    if (gym.gymFacilities == null || gym.gymFacilities!.isEmpty) {
       return Text('未提供', style: TextStyles.large.subscription);
     }
     return Text(
-      gym.gymFacilities.map((e) => e.displayName).join('、'),
+      gym.gymFacilities!.map((e) => e!.displayName).join('、'),
       style: TextStyles.large.detail,
     );
   }
 
-  Widget _buildPageButton(String link) {
+  Widget _buildPageButton(String? link) {
     return TextButton(
-      onPressed: () => _openPage(link),
+      onPressed: () => _openPage(link!),
       child: Text(
         '商家網頁',
       ),
@@ -221,13 +260,67 @@ class GymDetailPage extends StatelessWidget {
     );
   }
 
-  Widget _buildReserveButton(String phone) {
+  Widget _buildPhoneButton(String? phone) {
     return OutlinedButton(
       onPressed: () => _callGym(phone),
-      child: Text(
-        '立即預約',
-      ),
+      child: Text('撥打電話'),
       style: ButtonStyles.action,
+    );
+  }
+
+  Widget _buildBookButton(BuildContext context) {
+    return TextButton(
+      onPressed: () {
+        _book(context);
+      },
+      child: Text('我要預約'),
+      style: ButtonStyles.callToAction,
+    );
+  }
+}
+
+class _AdminButton extends StatefulWidget {
+  final Gym gym;
+  _AdminButton({required this.gym});
+
+  @override
+  State<_AdminButton> createState() => _AdminButtonState();
+}
+
+class _AdminButtonState extends State<_AdminButton> {
+  GymAppointmentSchedule? _schedule;
+  @override
+  void initState() {
+    super.initState();
+    _schedule = GymAppointmentSchedule(
+        appBloc: BlocProvider.of(context), gym: widget.gym);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return TextButton(
+      onPressed: () {
+        _showAdminSchedule(context);
+      },
+      child: Row(
+        children: [
+          SizedBox(width: 8),
+          Text('預約管理'),
+          SizedBox(width: 8),
+          AppointmentBadge(schedule: _schedule),
+        ],
+        mainAxisAlignment: MainAxisAlignment.center,
+      ),
+      style: ButtonStyles.callToAction,
+    );
+  }
+
+  void _showAdminSchedule(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => GymAppointmentsPage(gym: widget.gym),
+      ),
     );
   }
 }

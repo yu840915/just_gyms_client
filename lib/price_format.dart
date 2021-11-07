@@ -5,7 +5,7 @@ class PriceFormat {
   PriceFormat._();
   static String format(Price price) {
     return NumberFormat.simpleCurrency(
-      name: price.currency.toUpperCase(),
+      name: price.currency!.toUpperCase(),
       decimalDigits: 0,
     ).format(price.amount);
   }
@@ -14,8 +14,8 @@ class PriceFormat {
 class FareFormat {
   FareFormat._();
   static String format(Fare fare) {
-    return PriceFormat.format(fare.price) +
+    return PriceFormat.format(fare.price!) +
         '/${fare.amount}' +
-        fare.timeUnit.displayName;
+        fare.timeUnit.displayName!;
   }
 }

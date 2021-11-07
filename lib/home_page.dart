@@ -10,19 +10,23 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  GymList _gymList;
+  GymList? _gymList;
 
   @override
   void initState() {
     super.initState();
     AppBloc bloc = BlocProvider.of(context);
-    _gymList = GymList(bloc.location);
-    _gymList.refresh().catchError(print);
+    final list = GymList(bloc.location);
+    _gymList = list;
+    list.refresh().catchError((e, stack) {
+      print(e);
+      print(stack);
+    });
   }
 
   @override
   void dispose() {
-    _gymList.dispose();
+    _gymList!.dispose();
     super.dispose();
   }
 

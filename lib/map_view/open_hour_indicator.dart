@@ -5,7 +5,7 @@ import 'package:where_gym/shared_appearances.dart';
 class OpenHourIndicator extends StatelessWidget {
   final Gym gym;
   final TextStyles styles;
-  OpenHourIndicator({@required this.gym, @required this.styles});
+  OpenHourIndicator({required this.gym, required this.styles});
 
   @override
   Widget build(BuildContext context) {

@@ -8,10 +8,10 @@ import 'package:where_gym/gym.dart';
 import 'package:where_gym/me/favorites.dart';
 
 class FavoriteDetailList {
-  final _fetchers = Map<String, GymDetailFetcher>();
+  final _fetchers = Map<String?, GymDetailFetcher>();
   final _details = BehaviorSubject<List<FavoriteGymDetail>>();
   final CurrentLocation location;
-  StreamSubscription<List<FavoriteGymMixin>> _updateSubscription;
+  late StreamSubscription<List<FavoriteGymMixin>> _updateSubscription;
   Stream<List<FavoriteGymDetail>> get onUpdate => _details;
 
   FavoriteDetailList(FavoriteGymList list, this.location) {
@@ -19,7 +19,7 @@ class FavoriteDetailList {
   }
 
   GymDetailFetcher _getFetchers(String gymId) {
-    GymDetailFetcher fetcher = _fetchers[gymId];
+    GymDetailFetcher? fetcher = _fetchers[gymId];
     if (fetcher != null) {
       return fetcher;
     }
@@ -32,11 +32,11 @@ class FavoriteDetailList {
     if (_details.isClosed) {
       return;
     }
-    final gyms = await Future.wait(list.map((e) => _getFetchers(e.id).fetch()));
+    final gyms = await Future.wait(list.map((e) => _getFetchers(e.id!).fetch()));
     await location.getLocation();
     final details =
         gyms.map((e) => FavoriteGymDetail(e, location.metersFrom(e))).toList();
-    details.sort((a, b) => (a.meters - b.meters).toInt());
+    details.sort((a, b) => (a.meters! - b.meters!).toInt());
     if (_details.isClosed) {
       return;
     }
@@ -51,16 +51,16 @@ class FavoriteDetailList {
 
 class FavoriteGymDetail {
   final Gym gym;
-  final num meters;
+  final num? meters;
   FavoriteGymDetail(this.gym, this.meters);
 }
 
 class GymDetailFetcher {
-  final String gymId;
-  Future<Gym> _task;
+  final String? gymId;
+  Future<Gym?>? _task;
   GymDetailFetcher(this.gymId);
-  Gym _gym;
-  Future<Gym> getDetail() async {
+  Gym? _gym;
+  Future<Gym?> getDetail() async {
     if (_gym != null) {
       return _gym;
     }
@@ -73,6 +73,6 @@ class GymDetailFetcher {
   Future<Gym> fetch() async {
     final res = await APIServices.instances.get('/gyms/$gymId');
     _gym = Gym.fromJson(jsonDecode(res.body));
-    return _gym;
+    return _gym!;
   }
 }
