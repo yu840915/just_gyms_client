@@ -7,6 +7,8 @@ import 'package:where_gym/appointment/gym_appointment_schedule.dart';
 import 'package:where_gym/business_hours.dart';
 import 'package:where_gym/schedule_time_slot.dart';
 import 'package:where_gym/shared_appearances.dart';
+import 'package:where_gym/tracking/event_names.dart';
+import 'package:where_gym/tracking/tracking.dart';
 import 'package:where_gym/utils/empty_view.dart';
 
 class UtilizationDetailPopup extends StatelessWidget {
@@ -167,6 +169,8 @@ class _Cell extends StatelessWidget {
       return;
     }
     try {
+      track(EventName.cancelAppointment,
+          {...info.trackingProps, EventProperties.role: 'user'});
       await schedule!.cancel(info);
     } catch (e) {
       showDialog(

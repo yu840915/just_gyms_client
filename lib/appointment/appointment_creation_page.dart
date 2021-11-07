@@ -13,6 +13,8 @@ import 'package:where_gym/appointment/user_appointment_cell.dart';
 import 'package:where_gym/business_hours.dart';
 import 'package:where_gym/gym.dart';
 import 'package:where_gym/shared_appearances.dart';
+import 'package:where_gym/tracking/event_names.dart';
+import 'package:where_gym/tracking/tracking.dart';
 import 'package:where_gym/utils/loading_view.dart';
 import 'package:where_gym/utils/timeslot_picker.dart';
 
@@ -31,6 +33,7 @@ class _AppointmentCreatePageState extends State<AppointmentCreatePage> {
   @override
   void initState() {
     super.initState();
+    track(EventName.showBookingPage, widget.gym.trackingProps);
     _schedule = BookingAppointmentSchedule(
       userRef: BlocProvider.of<AppBloc>(context).userRef,
       gym: widget.gym,
@@ -102,6 +105,7 @@ class _AppointmentCreatePageState extends State<AppointmentCreatePage> {
 
   void _book(BuildContext context) async {
     try {
+      track(EventName.createAppointment, widget.gym.trackingProps);
       await showLoadingOverlayOnTask(context,
           task: _schedule!.bookWithRange(_composer.getDateRange()));
     } catch (e) {

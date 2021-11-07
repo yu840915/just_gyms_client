@@ -10,6 +10,8 @@ import 'package:where_gym/api_services/api_services.dart';
 import 'package:where_gym/app_bloc.dart';
 import 'package:where_gym/me/fcm_initialization.dart';
 import 'package:where_gym/named_routes.dart';
+import 'package:where_gym/tracking/event_names.dart';
+import 'package:where_gym/tracking/tracking.dart';
 
 class PermissionChecker {
   final _hasUnfinishedItemsSubject = BehaviorSubject<bool>();
@@ -48,6 +50,21 @@ abstract class PermissionItem {
 
 enum GrantStatus { undecided, denied, granted }
 
+extension GrantStatusMethods on GrantStatus {
+  String get name {
+    switch (this) {
+      case GrantStatus.denied:
+        return 'denied';
+      case GrantStatus.undecided:
+        return 'undecided';
+      case GrantStatus.granted:
+        return 'granted';
+    }
+  }
+
+  Map<String, dynamic> get trackingProps => {EventProperties.status: name};
+}
+
 class NotificationPermissionItem implements PermissionItem {
   final _key = 'permissionItem_Notification';
   final _statusSubject = BehaviorSubject<GrantStatus>()
@@ -81,10 +98,12 @@ class NotificationPermissionItem implements PermissionItem {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_key, false);
     _statusSubject.add(GrantStatus.denied);
+    track(EventName.skipPermissionFlow, {EventProperties.type: 'push auth'});
   }
 
   @override
   Future<bool> startPermissionRequest(BuildContext context) async {
+    track(EventName.startPermissionFlow, {EventProperties.type: 'push auth'});
     final status = await FCMInitialization.requestPermissionIfNeeded();
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_key, true);
@@ -93,6 +112,10 @@ class NotificationPermissionItem implements PermissionItem {
         ? GrantStatus.granted
         : GrantStatus.denied;
     _statusSubject.add(grantStatus);
+    track(EventName.updatePermissionStatus, {
+      ...grantStatus.trackingProps,
+      EventProperties.type: 'push auth',
+    });
     return grantStatus == GrantStatus.granted;
   }
 
@@ -130,6 +153,7 @@ class LocationPermissionItem implements PermissionItem {
 
   @override
   Future<void> skipPermissionRequest() async {
+    track(EventName.skipPermissionFlow, {EventProperties.type: 'location'});
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_key, false);
     _updateSubject.add(GrantStatus.denied);
@@ -137,6 +161,7 @@ class LocationPermissionItem implements PermissionItem {
 
   @override
   Future<bool> startPermissionRequest(BuildContext context) async {
+    track(EventName.startPermissionFlow, {EventProperties.type: 'location'});
     final status = await Permission.locationWhenInUse.request();
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_key, true);
@@ -145,6 +170,10 @@ class LocationPermissionItem implements PermissionItem {
             ? GrantStatus.granted
             : GrantStatus.denied;
     _updateSubject.add(grantStatus);
+    track(EventName.updatePermissionStatus, {
+      ...grantStatus.trackingProps,
+      EventProperties.type: 'location',
+    });
     return grantStatus == GrantStatus.granted;
   }
 
@@ -173,16 +202,28 @@ class LinkPhonePermissionItem implements PermissionItem {
   }
 
   @override
-  Stream<GrantStatus> get onUpdate => bloc.onFirebaseUserChange.map((event) =>
-      event!.phoneNumber == null ? GrantStatus.undecided : GrantStatus.granted);
+  Stream<GrantStatus> get onUpdate {
+    return bloc.onFirebaseUserChange.map((event) {
+      final grantStatus = event!.phoneNumber == null
+          ? GrantStatus.undecided
+          : GrantStatus.granted;
+      track(EventName.updatePermissionStatus, {
+        ...grantStatus.trackingProps,
+        EventProperties.type: 'phone',
+      });
+      return grantStatus;
+    });
+  }
 
   @override
   Future<void> skipPermissionRequest() {
+    track(EventName.skipPermissionFlow, {EventProperties.type: 'phone'});
     throw LocalError('為避免濫用，預約功能將只開放給連結電話的用戶');
   }
 
   @override
   Future<bool> startPermissionRequest(BuildContext context) async {
+    track(EventName.startPermissionFlow, {EventProperties.type: 'phone'});
     await Navigator.pushNamed(context, RouteNames.phoneVerification);
     return await getPermissionStatus() == GrantStatus.granted;
   }

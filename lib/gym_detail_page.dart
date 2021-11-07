@@ -23,7 +23,7 @@ class GymDetailPage extends StatelessWidget {
 
   void _book(BuildContext context) async {
     if ((await AppointmentPreflightCheckFlow.check(context,
-            where: 'gym detail')) ==
+            where: 'gym detail', gym: gym)) ==
         false) {
       return;
     }

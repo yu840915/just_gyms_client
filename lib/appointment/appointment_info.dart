@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:where_gym/tracking/event_names.dart';
 
 class AppointmentInfo {
   final String id;
@@ -19,6 +20,11 @@ class AppointmentInfo {
             start: (snap.data()!['startAt'] as Timestamp).toDate(),
             end: (snap.data()!['endAt'] as Timestamp).toDate()),
         status = AppointmentStatusMethods.fromString(snap.data()!['status']);
+
+  Map<String, dynamic> get trackingProps => {
+        EventProperties.gymId: id,
+        if (userRef != null) EventProperties.user: userRef!.id,
+      };
 }
 
 enum AppointmentStatus { scheduled, cancelled, fulfilled, missed, unkown }
