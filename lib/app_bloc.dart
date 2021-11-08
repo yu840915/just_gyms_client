@@ -71,8 +71,10 @@ class AppBloc extends Bloc<dynamic, AppPhase?> {
       _adminGymList = null;
       return;
     }
+    final oldUser = _firebaseUserSubject.valueOrNull;
     _firebaseUserSubject.add(user);
     if (!user.isAnonymous) {
+      _deleteAnonymousUserIfApplicable(oldUser);
       _cloudFavoriteGymList = CloudFavoriteGymList(this, user);
       _userRefSubject.add(
         FirebaseFirestore.instance.collection('users').doc(user.uid),
@@ -80,6 +82,16 @@ class AppBloc extends Bloc<dynamic, AppPhase?> {
       _adminGymList = AdminGymList(userRef);
       FCMInitialization.syncToken(this).catchError(print);
     }
+  }
+
+  Future<void> _deleteAnonymousUserIfApplicable(User? user) async {
+    if (user == null || !user.isAnonymous) {
+      return;
+    }
+    await APIServices.instances.delete(
+      '/me',
+      token: await user.getIdToken(),
+    );
   }
 
   void _checkPermission() async {
