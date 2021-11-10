@@ -89,8 +89,8 @@ class AppBloc extends Bloc<dynamic, AppPhase?> {
       return;
     }
     await APIServices.instances.delete(
-      '/me',
-      token: await user.getIdToken(),
+      '/users/${user.uid}',
+      token: await getIdToken(),
     );
   }
 
@@ -114,7 +114,8 @@ class AppBloc extends Bloc<dynamic, AppPhase?> {
     });
   }
 
-  Future<String>? getIdToken() => firebaseUser?.getIdToken();
+  Future<String>? getIdToken() =>
+      _firebaseUserSubject.valueOrNull?.getIdToken();
 
   Future syncFavoriteGyms() async {
     await _cloudFavoriteGymList?.syncWithLocalList(_localFavoriteGymList);
