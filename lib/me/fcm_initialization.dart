@@ -16,14 +16,12 @@ class FCMInitialization {
   }
 
   static Future<void> syncToken(AppBloc bloc) async {
+    final idToken = await bloc.getIdToken();
     final token = await _messaging.getToken();
     print('FCM token: $token');
+    print('ID token: $idToken');
     await APIServices.instances
-        .post(
-      '/me/fcm-tokens',
-      body: {'token': token},
-      token: await bloc.getIdToken(),
-    )
+        .post('/me/fcm-tokens', body: {'token': token}, token: idToken)
         .catchError((e, stack) {
       print(e);
       print(stack);

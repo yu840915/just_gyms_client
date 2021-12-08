@@ -14,6 +14,7 @@ import 'package:where_gym/gym.dart';
 import 'package:where_gym/login/authenticators.dart';
 import 'package:where_gym/me/favorite_list_page.dart';
 import 'package:where_gym/shared_appearances.dart';
+import 'package:where_gym/user/my_profile_pane.dart';
 import 'package:where_gym/utils/empty_view.dart';
 import 'package:where_gym/utils/loading_view.dart';
 
@@ -150,6 +151,8 @@ class UserPortalPage extends StatelessWidget {
     }
     return Column(
       children: [
+        MyProfilePane(),
+        SizedBox(height: 8),
         _Row(
           title: '使用者ID： ${bloc.userRef!.id}',
           style: TextStyles.large.action,
