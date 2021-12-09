@@ -19,12 +19,12 @@ class APIServices {
       headers['Authorization'] = 'Bearer $token';
     }
     final response =
-        await httpClient.get(_makeUri(path, params: params), headers: headers);
+        await httpClient.get(makeServiceUri(path, params: params), headers: headers);
     _checkResponse(response);
     return response;
   }
 
-  Uri _makeUri(String path, {Map<String, dynamic>? params}) {
+  Uri makeServiceUri(String path, {Map<String, dynamic>? params}) {
     final uri = Uri.parse(baseUrl + path);
     if (params == null || params.isEmpty) {
       return uri;
@@ -48,7 +48,7 @@ class APIServices {
       headers['Content-Type'] = 'application/json; charset=UTF-8';
     }
     final response = await httpClient.post(
-      _makeUri(path),
+      makeServiceUri(path),
       headers: headers,
       body: postBody,
     );
@@ -67,7 +67,7 @@ class APIServices {
       headers['Content-Type'] = 'application/json; charset=UTF-8';
     }
     final response = await httpClient.put(
-      _makeUri(path),
+      makeServiceUri(path),
       headers: headers,
       body: putBody,
     );
@@ -87,7 +87,7 @@ class APIServices {
       headers['Content-Type'] = 'application/json; charset=UTF-8';
     }
     final response = await httpClient.patch(
-      _makeUri(path),
+      makeServiceUri(path),
       headers: headers,
       body: putBody,
     );
@@ -101,7 +101,7 @@ class APIServices {
     if (token != null) {
       headers['Authorization'] = 'Bearer $token';
     }
-    final response = await httpClient.delete(_makeUri(path, params: params),
+    final response = await httpClient.delete(makeServiceUri(path, params: params),
         headers: headers);
     _checkResponse(response);
     return response;
