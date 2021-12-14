@@ -9,8 +9,13 @@ class MyProfilePane extends StatefulWidget {
 }
 
 class _MyProfilePaneState extends State<MyProfilePane> {
+  void _changeAvatar(BuildContext context) {}
+
+  void _changeName(BuildContext context) {}
+
   @override
   Widget build(BuildContext context) {
+    AppBloc bloc = BlocProvider.of(context);
     return Container(
       padding: EdgeInsets.symmetric(vertical: 16),
       color: Colors.transparent,
@@ -18,17 +23,25 @@ class _MyProfilePaneState extends State<MyProfilePane> {
       width: double.infinity,
       child: Column(
         children: [
-          _buildAvatarButton(context),
+          _buildAvatarButton(context, bloc),
+          StreamBuilder<Object?>(
+              stream: bloc.userRef!.snapshots().map((event) => null),
+              builder: (context, snapshot) {
+                return _buildNameButton(bloc);
+              }),
         ],
       ),
     );
   }
 
-  Widget _buildAvatarButton(BuildContext context) {
-    AppBloc bloc = BlocProvider.of(context);
+  Widget _buildAvatarButton(BuildContext context, AppBloc bloc) {
     return AvatarButton(
       userId: bloc.userRef!.id,
-      action: () {},
+      action: () => _changeAvatar(context),
     );
+  }
+
+  Widget _buildNameButton(dynamic profile) {
+    return Container();
   }
 }
