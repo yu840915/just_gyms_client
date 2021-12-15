@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:where_gym/app_bloc.dart';
 import 'package:where_gym/user/avatar_button.dart';
+import './profile.dart';
 
 class MyProfilePane extends StatefulWidget {
   @override
@@ -24,10 +25,12 @@ class _MyProfilePaneState extends State<MyProfilePane> {
       child: Column(
         children: [
           _buildAvatarButton(context, bloc),
-          StreamBuilder<Object?>(
-              stream: bloc.userRef!.snapshots().map((event) => null),
+          StreamBuilder<MyProfile?>(
+              stream: bloc.userRef!
+                  .snapshots()
+                  .map((event) => MyProfile.fromSnap(event)),
               builder: (context, snapshot) {
-                return _buildNameButton(bloc);
+                return _buildNameButton(snapshot.data);
               }),
         ],
       ),
@@ -41,7 +44,10 @@ class _MyProfilePaneState extends State<MyProfilePane> {
     );
   }
 
-  Widget _buildNameButton(dynamic profile) {
-    return Container();
+  Widget _buildNameButton(MyProfile? profile) {
+    return TextButton(
+      onPressed: () => _changeName(context),
+      child: profile != null ? Text(profile.name) : Text('使用者名稱'),
+    );
   }
 }
