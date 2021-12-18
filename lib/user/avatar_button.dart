@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:where_gym/user/avatar_uri_factory.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class AvatarButton extends StatelessWidget {
   final void Function()? action;
@@ -20,16 +21,9 @@ class AvatarButton extends StatelessWidget {
       child: Ink(
         height: size,
         width: size,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(size / 2),
-          image: DecorationImage(
-            image: NetworkImage(
-              AvatarUriFactory.uriForUserId(userId).toString(),
-            ),
-            fit: BoxFit.cover,
-          ),
-        ),
-        child: null,
+        child: CachedNetworkImage(
+            placeholder: (context, url) => Icon(Icons.person),
+            imageUrl: AvatarUriFactory.uriForUserId(userId).toString()),
       ),
     );
   }

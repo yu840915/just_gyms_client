@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:where_gym/app_bloc.dart';
+import 'package:where_gym/shared_appearances.dart';
 import 'package:where_gym/user/avatar_button.dart';
 import './profile.dart';
 
@@ -20,7 +21,7 @@ class _MyProfilePaneState extends State<MyProfilePane> {
     return Container(
       padding: EdgeInsets.symmetric(vertical: 16),
       color: Colors.transparent,
-      height: 120,
+      height: 180,
       width: double.infinity,
       child: Column(
         children: [
@@ -48,6 +49,9 @@ class _MyProfilePaneState extends State<MyProfilePane> {
     return TextButton(
       onPressed: () => _changeName(context),
       child: profile != null ? Text(profile.name) : Text('使用者名稱'),
+      style: TextButton.styleFrom(
+        textStyle: TextStyles.large.action,
+      ),
     );
   }
 }

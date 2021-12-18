@@ -470,6 +470,9 @@ PODS:
   - fluttertoast (0.0.2):
     - Flutter
     - Toast
+  - FMDB (2.7.5):
+    - FMDB/standard (= 2.7.5)
+  - FMDB/standard (2.7.5)
   - geolocator_apple (1.2.0):
     - Flutter
   - google_maps_flutter (0.0.1):
@@ -557,6 +560,9 @@ PODS:
     - Flutter
   - sign_in_with_apple (0.0.1):
     - Flutter
+  - sqflite (0.0.2):
+    - Flutter
+    - FMDB (>= 2.7.5)
   - Toast (4.0.0)
   - url_launcher (0.0.1):
     - Flutter
@@ -579,6 +585,7 @@ DEPENDENCIES:
   - permission_handler (from `.symlinks/plugins/permission_handler/ios`)
   - shared_preferences (from `.symlinks/plugins/shared_preferences/ios`)
   - sign_in_with_apple (from `.symlinks/plugins/sign_in_with_apple/ios`)
+  - sqflite (from `.symlinks/plugins/sqflite/ios`)
   - url_launcher (from `.symlinks/plugins/url_launcher/ios`)
 
 SPEC REPOS:
@@ -600,6 +607,7 @@ SPEC REPOS:
     - FirebaseInstallations
     - FirebaseMessaging
     - FirebaseRemoteConfig
+    - FMDB
     - GoogleDataTransport
     - GoogleMaps
     - GoogleSignIn
@@ -649,6 +657,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/shared_preferences/ios"
   sign_in_with_apple:
     :path: ".symlinks/plugins/sign_in_with_apple/ios"
+  sqflite:
+    :path: ".symlinks/plugins/sqflite/ios"
   url_launcher:
     :path: ".symlinks/plugins/url_launcher/ios"
 
@@ -679,6 +689,7 @@ SPEC CHECKSUMS:
   Flutter: 50d75fe2f02b26cc09d224853bb45737f8b3214a
   flutter_facebook_auth: 870a465b1afff3ace7a592bd44665d921991726c
   fluttertoast: 6122fa75143e992b1d3470f61000f591a798cc58
+  FMDB: 2ce00b547f966261cd18927a3ddb07cb6f3db82a
   geolocator_apple: b741765c55dc21950e3e106e8b3584e55cf81ce5
   google_maps_flutter: abdb8dee6c52d4be36ad131ee6ebfacd14417c5a
   google_sign_in: c5cecea71f3be43282263550556e311c4cc03582
@@ -699,6 +710,7 @@ SPEC CHECKSUMS:
   PromisesObjC: 68159ce6952d93e17b2dfe273b8c40907db5ba58
   shared_preferences: 5033afbb22d372e15aff8ff766df9021b845f273
   sign_in_with_apple: f3bf75217ea4c2c8b91823f225d70230119b8440
+  sqflite: 6d358c025f5b867b29ed92fc697fd34924e11904
   Toast: 91b396c56ee72a5790816f40d3a94dd357abc196
   url_launcher: b6e016d912f04be9f5bf6e8e82dc599b7ba59649
 
