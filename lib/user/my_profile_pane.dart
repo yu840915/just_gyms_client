@@ -27,12 +27,13 @@ class _MyProfilePaneState extends State<MyProfilePane> {
         children: [
           _buildAvatarButton(context, bloc),
           StreamBuilder<MyProfile?>(
-              stream: bloc.userRef!
-                  .snapshots()
-                  .map((event) => MyProfile.fromSnap(event)),
-              builder: (context, snapshot) {
-                return _buildNameButton(snapshot.data);
-              }),
+            stream: bloc.userRef!
+                .snapshots()
+                .map((event) => MyProfile.fromSnap(event)),
+            builder: (context, snapshot) {
+              return _buildNameButton(snapshot.data);
+            },
+          ),
         ],
       ),
     );
